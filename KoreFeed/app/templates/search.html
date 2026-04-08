@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Search – MiniFeed{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/">home</a><span class="sep">›</span>search
+  {% if domain %}<span class="sep">›</span>{{ domain }}{% endif %}
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH
+    {% if domain %}<span class="badge badge-dim" style="margin-left:0.5rem;">{{ domain }}</span>{% endif %}
+  </div>
+  <div class="panel-body">
+    <form action="/web/search" method="get" style="flex-direction:row; display:flex; gap:0;">
+      <input type="search" name="q" value="{{ q }}" placeholder="search all feeds…" style="flex:1;"
+             title="Terms are matched individually with AND logic — 'ai defence' finds entries containing both words anywhere in the headline or body">
+      {% if domain %}<input type="hidden" name="domain" value="{{ domain }}">{% endif %}
+      <button type="submit">SEARCH</button>
+    </form>
+    <p class="meta" style="margin-top:0.5rem;">Space or comma separated terms are AND-matched — each word must appear somewhere in the headline or body. There is no phrase search.</p>
+  </div>
+</div>
+
+{% if q %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span class="badge" style="margin-left:0.5rem;">{{ results|length }}</span>
+    <span class="meta" style="margin-left:0.75rem;">for "{{ q }}"</span>
+  </div>
+  <div class="panel-body" style="padding:0;">
+    {% if results %}
+    <form method="post" action="/web/entries/bulk-delete">
+      <div style="display:flex; align-items:center; padding:0.4rem 0.75rem;
+                  border-bottom:1px solid var(--border); gap:0.75rem;">
+        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;
+                       text-transform:none; font-size:12px; color:var(--dim);">
+          <input type="checkbox" id="select-all"
+                 onchange="document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked)">
+          select all
+        </label>
+        <button class="btn-danger btn-sm" type="submit" style="margin-left:auto;"
+                onclick="if(!document.querySelector('.row-check:checked')){alert('Select at least one entry.');return false;}return confirm('Delete selected entries?')">
+          DELETE SELECTED
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30px;"></th>
+            <th style="width:50px;">#</th>
+            <th>Headline</th>
+            <th>Domain</th>
+            <th>Feed</th>
+            <th style="width:140px;">Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+          <tr>
+            <td><input class="row-check" type="checkbox" name="sel" value="{{ r.domain }}:{{ r.id }}"></td>
+            <td class="meta">{{ r.id }}</td>
+            <td><a href="/web/{{ r.domain }}/{{ r.id }}">{{ r.headline or "(no title)" }}</a></td>
+            <td><span class="badge badge-dim">{{ r.domain }}</span></td>
+            <td class="meta">{{ r.feed_name }}</td>
+            <td class="meta">{{ r.published[:16] if r.published else "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+    {% else %}
+    <p class="meta" style="padding:1rem;">no results found</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.headline or "Entry" }} – KoreData{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/feeds">feeds</a><span class="sep">›</span>
+  <a href="/feeds/{{ domain }}">{{ domain }}</a><span class="sep">›</span>
+  #{{ entry.id }}
+</div>
+
+<div class="panel" style="margin-bottom:1rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> ENTRY #{{ entry.id }}
+    {% if entry.url %}
+    <a href="{{ entry.url }}" target="_blank" rel="noopener" style="margin-left:auto; font-size:11px; color:var(--dim);">SOURCE ↗</a>
+    {% endif %}
+  </div>
+  <div class="panel-body">
+    <p style="font-size:1rem; color:var(--text); margin-bottom:1rem; line-height:1.4;">{{ entry.headline or "(no title)" }}</p>
+
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <div class="kv">
+        <span class="kv-key">feed</span>
+        <span class="kv-val">{{ entry.feed_name }}</span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">domain</span>
+        <span class="kv-val"><span class="badge badge-dim">{{ domain }}</span></span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">published</span>
+        <span class="kv-val meta">{{ entry.published or "—" }}</span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">ingested</span>
+        <span class="kv-val meta">{{ entry.ingested_at or "—" }}</span>
+      </div>
+      {% if entry.metadata %}
+        {% if entry.metadata.author %}
+        <div class="kv">
+          <span class="kv-key">author</span>
+          <span class="kv-val">{{ entry.metadata.author }}</span>
+        </div>
+        {% endif %}
+        {% if entry.metadata.tags %}
+        <div class="kv">
+          <span class="kv-key">tags</span>
+          <span class="kv-val">{{ entry.metadata.tags | join(", ") }}</span>
+        </div>
+        {% endif %}
+        {% if entry.metadata.summary %}
+        <div class="kv" style="align-items:flex-start;">
+          <span class="kv-key">summary</span>
+          <span class="kv-val meta" style="font-style:italic;">{{ entry.metadata.summary }}</span>
+        </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> PAGE CONTENT
+  </div>
+  <div class="panel-body" style="padding:0;">
+    {% if entry.page_text %}
+    <pre>{{ entry.page_text }}</pre>
+    {% else %}
+    <p class="meta" style="padding:1rem;">no page content extracted</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

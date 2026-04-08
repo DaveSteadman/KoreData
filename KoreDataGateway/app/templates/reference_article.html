@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} — KoreReference{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/reference">reference</a>
+  {% if article.redirected_from %}
+  <span class="sep">›</span>
+  <span class="meta" title="redirected from {{ article.redirected_from }}">{{ article.redirected_from }}</span>
+  <span class="sep">→</span>
+  {% else %}
+  <span class="sep">›</span>
+  {% endif %}
+  {{ article.title }}
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 300px; gap:1rem; align-items:start;">
+
+  <!-- Main article panel -->
+  <div style="min-width:0;">
+    <div class="panel" style="margin-bottom:1rem;">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span>
+        {{ article.title }}
+        {% if article.word_count %}
+        <span class="badge badge-dim" style="margin-left:0.5rem;">{{ "{:,}".format(article.word_count) }} words</span>
+        {% endif %}
+        <a href="/reference/{{ article.title | urlencode }}/edit" style="margin-left:auto;">
+          <button type="button" style="font-size:11px; padding:3px 10px;">✎ EDIT</button>
+        </a>
+      </div>
+
+      {% if article.summary %}
+      <div class="panel-body" style="border-bottom:1px solid var(--border); font-style:italic; color:var(--dim); font-size:13px;">
+        {{ article.summary | wikilinks }}
+      </div>
+      {% endif %}
+
+      {% if article.sections %}
+      <div class="panel-body" style="padding:0.4rem 1rem; border-bottom:1px solid var(--border); font-size:11px; color:var(--dim);">
+        SECTIONS:
+        {% for s in article.sections %}
+        <a href="#sec-{{ loop.index }}" style="color:var(--dim); margin-left:0.5rem;">{{ s.title }}</a>{% if not loop.last %} ·{% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="panel-body scrollable-body" style="overflow-x:auto; font-size:13px; line-height:1.65; white-space:normal;">
+        {% if article.sections %}
+          {% for s in article.sections %}
+          <div id="sec-{{ loop.index }}" style="margin-bottom:1.2rem;">
+            <div style="font-weight:600; font-size:12px; color:var(--green); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.4rem; padding-bottom:0.2rem; border-bottom:1px solid var(--border);">{{ s.title }}</div>
+            <div>{{ s.content | wikilinks }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          {% if article.body %}
+          <div>{{ article.body | wikilinks }}</div>
+          {% else %}
+          (no content)
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div style="min-width:0;">
+    <!-- Facts -->
+    {% if article.facts %}
+    <div class="panel" style="margin-bottom:1rem;">
+      <div class="panel-header" style="font-size:11px;">
+        <span class="ph-diamond">◆</span> AT A GLANCE
+      </div>
+      <div class="panel-body" style="padding:0; font-size:12px;">
+        <table style="width:100%; table-layout:fixed;">
+          <tbody>
+            {% for pair in article.facts %}
+            <tr>
+              <td class="meta" style="padding:0.3rem 0.75rem; vertical-align:top; width:40%;">{{ pair[0] | wikilinks }}</td>
+              <td style="padding:0.3rem 0.75rem; color:var(--dim); overflow-wrap:anywhere;">{{ pair[1] | wikilinks }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Categories -->
+    {% if article.categories %}
+    <div class="panel" style="margin-bottom:1rem;">
+      <div class="panel-header" style="font-size:11px;">
+        <span class="ph-diamond">◆</span> CATEGORIES
+      </div>
+      <div class="panel-body" style="display:flex; flex-wrap:wrap; gap:0.4rem; font-size:11px; padding:0.6rem 0.75rem;">
+        {% for cat in article.categories %}
+        <a href="/reference/categories/{{ cat | urlencode }}" class="badge" style="text-decoration:none;">{{ cat }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Backlinks -->
+    {% if backlinks %}
+    <div class="panel" style="margin-bottom:1rem;">
+      <div class="panel-header" style="font-size:11px;">
+        <span class="ph-diamond">◆</span> LINKED FROM
+      </div>
+      <div class="panel-body" style="padding:0.4rem 0.75rem; font-size:12px;">
+        {% for bl in backlinks %}
+        <div style="margin-bottom:0.3rem;">
+          <a href="/reference/{{ bl.title | urlencode }}">{{ bl.title }}</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Outbound links -->
+    <div class="panel">
+      <div class="panel-header" style="font-size:11px; cursor:pointer;" onclick="toggleLinks(this)">
+        <span class="ph-diamond">◆</span> OUTBOUND LINKS <span id="links-toggle" style="margin-left:auto; color:var(--dim);">▼ hide</span>
+      </div>
+      <div id="links-panel">
+        <div class="panel-body" style="padding:0.4rem 0.75rem; font-size:12px; max-height:280px; overflow-y:auto;" id="links-list">
+          <span class="meta">loading…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.scrollable-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+  font-size: 12px;
+}
+.scrollable-body table th,
+.scrollable-body table td {
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+.scrollable-body table th {
+  background: var(--panel-header-bg, rgba(255,255,255,0.04));
+  color: var(--green);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.scrollable-body table tr:nth-child(even) td {
+  background: rgba(255,255,255,0.02);
+}
+</style>
+<script>
+function toggleLinks(header) {
+  const panel = document.getElementById('links-panel');
+  const toggle = document.getElementById('links-toggle');
+  if (panel.style.display === 'none') {
+    panel.style.display = '';
+    toggle.textContent = '▼ hide';
+    loadLinks();
+  } else {
+    panel.style.display = 'none';
+    toggle.textContent = '▶ show';
+  }
+}
+
+function loadLinks() {
+  const list = document.getElementById('links-list');
+  if (list.dataset.loaded) return;
+  list.dataset.loaded = '1';
+  fetch('/reference/{{ article.title | urlencode }}/links-json')
+    .then(r => r.json())
+    .then(links => {
+      if (!links.length) { list.innerHTML = '<span class="meta">No outbound links.</span>'; return; }
+      list.innerHTML = links.map(l => l.to_id
+        ? `<div style="margin-bottom:0.25rem;"><a href="/reference/${encodeURIComponent(l.to_title)}">${l.to_title}</a></div>`
+          : `<div style="margin-bottom:0.25rem;"><a href="/reference/${encodeURIComponent(l.to_title)}" style="color:var(--dim);" title="Not yet imported">${l.to_title}</a></div>`
+      ).join('');
+    })
+    .catch(() => { list.innerHTML = '<span class="meta">Failed to load links.</span>'; });
+}
+
+// Auto-load links on page ready (panel starts expanded)
+document.addEventListener('DOMContentLoaded', loadLinks);
+</script>
+{% endblock %}

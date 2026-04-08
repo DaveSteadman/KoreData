@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+{% block title %}Import — KoreLibrary{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/library">library</a><span class="sep">›</span>import
+</div>
+
+{% if error %}
+<div style="background:rgba(255,95,95,0.1); border:1px solid var(--red); color:var(--red); padding:0.6rem 1rem; margin-bottom:1rem; font-size:12px;">
+  ✗ {{ error }}
+</div>
+{% endif %}
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;">
+
+  <!-- ─── Manual add ──────────────────────────────── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> ADD BOOK MANUALLY
+    </div>
+    <div class="panel-body">
+      <form action="/library/import/manual" method="post">
+        <div style="display:grid; grid-template-columns:1fr; gap:0.6rem;">
+
+          <div>
+            <label for="m_title">Title <span style="color:var(--red);">*</span></label>
+            <input id="m_title" name="title" type="text" required placeholder="e.g. The Pickwick Papers">
+          </div>
+
+          <div>
+            <label for="m_author">Author</label>
+            <input id="m_author" name="author" type="text" placeholder="e.g. Charles Dickens">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+            <div>
+              <label for="m_year">Year</label>
+              <input id="m_year" name="year" type="number" placeholder="e.g. 1837" style="width:100%;">
+            </div>
+            <div>
+              <label for="m_language">Language</label>
+              <input id="m_language" name="language" type="text" placeholder="e.g. en" style="width:100%;">
+            </div>
+          </div>
+
+          <div>
+            <label for="m_genre">Genre</label>
+            <input id="m_genre" name="genre" type="text" placeholder="e.g. Fiction">
+          </div>
+
+          <div>
+            <label for="m_notes">Notes</label>
+            <input id="m_notes" name="notes" type="text" placeholder="optional editorial notes">
+          </div>
+
+          <div>
+            <label for="m_body">Body text (optional — can add/edit later)</label>
+            <textarea id="m_body" name="body" rows="8" placeholder="Paste full book text here…" style="font-size:11px; resize:vertical;"></textarea>
+          </div>
+
+          <div>
+            <button type="submit" style="width:100%;">ADD BOOK</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Kiwix import ───────────────────────────── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> IMPORT FROM KIWIX
+    </div>
+    <div class="panel-body">
+      <div style="display:grid; grid-template-columns:1fr auto; gap:0.5rem; margin-bottom:0.6rem; align-items:end;">
+        <div>
+          <label for="k_url">Kiwix server URL</label>
+          <input id="k_url" type="text" value="http://192.168.1.33:8080" placeholder="http://host:port" style="width:100%;">
+        </div>
+        <button type="button" onclick="kiwixLoadInventory()" style="white-space:nowrap; align-self:flex-end;">↺ Reload</button>
+      </div>
+
+      <!-- Paste a viewer URL directly -->
+      <div style="display:grid; grid-template-columns:1fr auto; gap:0.5rem; margin-bottom:0.75rem; align-items:end;">
+        <div>
+          <label for="k_viewer_url" style="color:var(--dim);">Or paste viewer URL</label>
+          <input id="k_viewer_url" type="text" placeholder="http://host/viewer#zim/Article%20Name.123"
+            style="width:100%; font-size:11px;"
+            onkeydown="if(event.key==='Enter') kiwixImportViewerUrl()">
+        </div>
+        <button type="button" onclick="kiwixImportViewerUrl()" style="align-self:flex-end;">IMPORT</button>
+      </div>
+
+      <div style="margin-bottom:0.75rem;">
+        <label for="k_zim">ZIM file</label>
+        <select id="k_zim" style="width:100%;" onchange="kiwixZimSelected()">
+          <option value="">— enter URL above and click Reload —</option>
+        </select>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr auto; gap:0.5rem; margin-bottom:0.5rem; align-items:end;">
+        <div>
+          <label for="k_query">Search by title or author</label>
+          <input id="k_query" type="text" placeholder="e.g. Charles Dickens, Bleak House, evolution…" onkeydown="if(event.key==='Enter') kiwixSearch()">
+        </div>
+        <button type="button" onclick="kiwixSearch()" style="align-self:flex-end;">SEARCH</button>
+      </div>
+
+      <!-- Search results -->
+      <div id="k_results_wrap" style="display:none; margin-bottom:0.5rem;">
+        <div style="border-top:1px solid var(--border); padding-top:0.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <span class="meta" id="k_result_count"></span>
+          </div>
+          <div style="max-height:320px; overflow-y:auto;">
+            <table style="width:100%;">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th style="width:90px; text-align:center;"></th>
+                </tr>
+              </thead>
+              <tbody id="k_tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="k_status" class="meta" style="margin-top:0.5rem; min-height:1.2em;"></div>
+
+      <!-- Import log -->
+      <div id="k_log_wrap" style="display:none; margin-top:0.75rem; border-top:1px solid var(--border); padding-top:0.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <span class="meta" style="font-size:11px; letter-spacing:0.04em;">IMPORT LOG</span>
+          <button type="button" onclick="clearLog()" style="font-size:10px; padding:1px 6px; background:transparent; border-color:var(--border); color:var(--dim);">CLEAR</button>
+        </div>
+        <div id="k_log" style="font-family:monospace; font-size:11px; line-height:1.7; max-height:220px; overflow-y:auto;"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Browse ZIM by letter ───────────────────────────── -->
+<div id="k_browse_panel" style="display:none; margin-top:1rem; display:none;">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;">
+
+    <!-- Title browse -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> BROWSE BY TITLE
+        <span id="bt_count" class="meta" style="margin-left:auto; font-size:11px;"></span>
+      </div>
+      <div class="panel-body">
+        <div id="bt_az" style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:0.75rem;"></div>
+        <div id="bt_status" class="meta" style="min-height:1.2em; margin-bottom:0.4rem;"></div>
+        <div style="max-height:520px; overflow-y:auto;">
+          <table style="width:100%;">
+            <thead><tr><th>Title</th><th style="width:90px; text-align:center;"></th></tr></thead>
+            <tbody id="bt_tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Author browse -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> BROWSE BY AUTHOR
+        <span id="ba_count" class="meta" style="margin-left:auto; font-size:11px;"></span>
+      </div>
+      <div class="panel-body">
+        <p class="meta" style="font-size:11px; margin-bottom:0.6rem;">Shows ZIM articles whose title starts with that letter — author pages in Gutenberg are titled e.g. “Dickens, Charles”.</p>
+        <div id="ba_az" style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:0.75rem;"></div>
+        <div id="ba_status" class="meta" style="min-height:1.2em; margin-bottom:0.4rem;"></div>
+        <div style="max-height:520px; overflow-y:auto;">
+          <table style="width:100%;">
+            <thead><tr><th>Title</th><th style="width:90px; text-align:center;"></th></tr></thead>
+            <tbody id="ba_tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ─── Helpers ────────────────────────────────────────────────
+function kiwixUrl() { return document.getElementById('k_url').value.trim(); }
+
+function stripHtml(str) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = str;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+function setStatus(msg, color) {
+  const el = document.getElementById('k_status');
+  el.textContent = msg;
+  el.style.color = color;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── Load ZIM inventory ─────────────────────────────────────
+async function kiwixLoadInventory() {
+  const sel = document.getElementById('k_zim');
+  const url = kiwixUrl();
+  if (!url) { setStatus('Enter a Kiwix server URL first.', 'var(--amber)'); return; }
+  sel.innerHTML = '<option value="">— loading… —</option>';
+  try {
+    const resp = await fetch('/library/kiwix/inventory?kiwix_url=' + encodeURIComponent(url));
+    const data = await resp.json();
+    const books = data.books || [];
+    if (!books.length) {
+      sel.innerHTML = '<option value="">— no ZIMs found (check kiwix_url) —</option>';
+      return;
+    }
+    sel.innerHTML = books.map(b =>
+      `<option value="${escHtml(b.name)}">${escHtml(b.title || b.name)}</option>`
+    ).join('');
+    kiwixZimSelected();
+  } catch (e) {
+    sel.innerHTML = '<option value="">— Kiwix unreachable —</option>';
+    setStatus('✗ Could not reach Kiwix: ' + e.message, 'var(--red)');
+  }
+}
+
+// ─── ZIM selection changed ───────────────────────────────────
+function kiwixZimSelected() {
+  const zim = document.getElementById('k_zim').value;
+  document.getElementById('k_results_wrap').style.display = 'none';
+  const panel = document.getElementById('k_browse_panel');
+  if (zim) {
+    panel.style.display = '';
+    initBrowsePanel('bt', zim, 'Choose a letter to browse by title.');
+    initBrowsePanel('ba', zim, 'Choose a letter to browse by author.');
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function initBrowsePanel(pfx, zim, hint) {
+  document.getElementById(pfx + '_tbody').innerHTML = '';
+  document.getElementById(pfx + '_count').textContent = '';
+  document.getElementById(pfx + '_status').textContent = hint;
+  document.getElementById(pfx + '_status').style.color = 'var(--dim)';
+  document.getElementById(pfx + '_az').innerHTML =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l =>
+      `<button type="button" style="font-size:11px; padding:2px 6px; min-width:28px;"
+        data-letter="${l}" data-zim="${escHtml(zim)}" data-pfx="${pfx}"
+        onclick="kiwixBrowseLetter(this.dataset.letter, this.dataset.zim, this.dataset.pfx, this)">${l}</button>`
+    ).join('');
+}
+
+async function kiwixBrowseLetter(letter, zim, pfx, btn) {
+  document.querySelectorAll(`#${pfx}_az button`).forEach(b => { b.style.borderColor = ''; b.style.color = ''; });
+  if (btn) { btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)'; }
+
+  const tbody  = document.getElementById(pfx + '_tbody');
+  const bcount = document.getElementById(pfx + '_count');
+  const bstat  = document.getElementById(pfx + '_status');
+  tbody.innerHTML = '';
+  bcount.textContent = '';
+  bstat.style.color = 'var(--dim)';
+  bstat.textContent = `Loading "${letter}"…`;
+
+  try {
+    const url = `/library/kiwix/suggest?zim=${encodeURIComponent(zim)}&pattern=${encodeURIComponent(letter)}&count=500&kiwix_url=${encodeURIComponent(kiwixUrl())}`;
+    const resp = await fetch(url);
+    if (!resp.ok) { bstat.textContent = '✗ Could not load'; bstat.style.color = 'var(--red)'; return; }
+    const items = await resp.json();
+    // For the author panel, keep only entries whose label matches the Gutenberg
+    // "Lastname, Firstname" convention — the only structural cue available from
+    // the Kiwix suggest API, which returns no type/category metadata.
+    const filtered = pfx === 'ba'
+      ? items.filter(item => /,\s*\S/.test(item.label || item.value || ''))
+      : items;
+    bstat.textContent = '';
+    bcount.textContent = filtered.length + ' result' + (filtered.length !== 1 ? 's' : '');
+    tbody.innerHTML = buildRows(filtered, zim, pfx).join('');
+  } catch (e) {
+    bstat.textContent = '✗ ' + e.message;
+    bstat.style.color = 'var(--red)';
+  }
+}
+
+// ─── Search (full-text — finds by author or title content) ───
+async function kiwixSearch() {
+  const zim = document.getElementById('k_zim').value;
+  if (!zim) { setStatus('Select a ZIM first.', 'var(--amber)'); return; }
+  const q = document.getElementById('k_query').value.trim();
+  if (!q) { setStatus('Enter a search term.', 'var(--amber)'); return; }
+
+  setStatus('Searching…', 'var(--dim)');
+  document.getElementById('k_results_wrap').style.display = 'none';
+
+  try {
+    const apiUrl = `/library/kiwix/search?zim=${encodeURIComponent(zim)}&q=${encodeURIComponent(q)}&count=100&kiwix_url=${encodeURIComponent(kiwixUrl())}`;
+    const resp = await fetch(apiUrl);
+    if (!resp.ok) { const d = await resp.json(); setStatus('✗ ' + (d.detail || resp.status), 'var(--red)'); return; }
+    const items = await resp.json();
+    renderSearchResults(items, zim);
+    setStatus('', '');
+  } catch (e) {
+    setStatus('✗ ' + e.message, 'var(--red)');
+  }
+}
+
+// ─── Render search results ───────────────────────────────────
+function renderSearchResults(items, zim) {
+  const wrap  = document.getElementById('k_results_wrap');
+  const tbody = document.getElementById('k_tbody');
+  const count = document.getElementById('k_result_count');
+
+  if (!items.length) {
+    wrap.style.display = '';
+    tbody.innerHTML = '<tr><td colspan="3" class="meta" style="padding:0.5rem;">No results</td></tr>';
+    count.textContent = '0 results';
+    return;
+  }
+  count.textContent = items.length + ' result' + (items.length !== 1 ? 's' : '');
+  tbody.innerHTML = buildRows(items, zim, 'ks', false).join('');
+  wrap.style.display = '';
+}
+
+// ─── Build table rows (shared by search + browse) ────────────
+function buildRows(items, zim, prefix, showSnippet) {
+  return items.map((item, i) => {
+    const importTitle  = stripHtml(item.value || item.label || '');
+    const displayTitle = stripHtml(item.label || item.value || '');
+    const snippet      = item.snippet || '';
+    const articleUrl   = item.url || '';
+    const rowId        = prefix + '_' + i;
+    const snippetCell  = showSnippet
+      ? `<td style="font-size:11px; font-style:italic; color:var(--dim); max-width:220px;">${escHtml(snippet)}</td>`
+      : '';
+    return `<tr id="${rowId}">
+      <td style="font-size:12px;">${escHtml(displayTitle)}</td>
+      ${snippetCell}
+      <td style="text-align:center;">
+        <button type="button" style="font-size:11px; padding:2px 8px;"
+          data-title="${escHtml(importTitle)}"
+          data-zim="${escHtml(zim)}"
+          data-article-url="${escHtml(articleUrl)}"
+          data-row="${rowId}"
+          onclick="kiwixImport(this.dataset.title, this.dataset.zim, this.dataset.articleUrl, this.dataset.row)">
+          Import
+        </button>
+      </td>
+    </tr>`;
+  });
+}
+
+// ─── Import log ─────────────────────────────────────────────
+function logLine(text, color) {
+  const wrap = document.getElementById('k_log_wrap');
+  const log  = document.getElementById('k_log');
+  wrap.style.display = '';
+  const line = document.createElement('div');
+  line.style.color = color || 'var(--text)';
+  line.textContent = text;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+function clearLog() {
+  document.getElementById('k_log').innerHTML = '';
+  document.getElementById('k_log_wrap').style.display = 'none';
+}
+
+// ─── Import a single book ───────────────────────────────────
+async function kiwixImport(title, zimName, articleUrl, rowId) {
+  const row = document.getElementById(rowId);
+  const btn = row ? row.querySelector('button') : null;
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  const payload = { zim_name: zimName, title: title, kiwix_url: kiwixUrl() };
+  if (articleUrl) payload.article_url = articleUrl;
+
+  logLine(`→ POST /library/import/kiwix`, 'var(--dim)');
+  logLine(`  zim: ${zimName}`, 'var(--dim)');
+  logLine(`  title: ${title}`, 'var(--dim)');
+  logLine(`  article_url: ${articleUrl || '(reconstructed from title)'}`, 'var(--dim)');
+  logLine(`  kiwix_url: ${kiwixUrl() || '(none — using server default)'}`, 'var(--dim)');
+
+  try {
+    const resp = await fetch('/library/import/kiwix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    logLine(`← HTTP ${resp.status}`, resp.ok ? 'var(--green)' : 'var(--red)');
+
+    let body;
+    try { body = await resp.json(); } catch(je) { body = null; logLine(`  (could not parse response JSON: ${je.message})`, 'var(--amber)'); }
+
+    if (resp.ok) {
+      logLine(`  id: ${body && body.id} — "${body && body.title}"`, 'var(--green)');
+      if (btn) {
+        btn.textContent = '✓ Done';
+        btn.style.color = 'var(--green)';
+        const td = row.querySelector('td:first-child');
+        if (td && body && body.id) td.innerHTML += ` <a href="/library/${body.id}" style="font-size:11px; color:var(--blue);">→ view</a>`;
+      }
+    } else {
+      const msg = (body && body.detail) || `Error ${resp.status}`;
+      logLine(`  detail: ${msg}`, 'var(--red)');
+      if (btn) {
+        btn.textContent = resp.status === 409 ? '✓ Exists' : '✗ Error';
+        btn.style.color = resp.status === 409 ? 'var(--amber)' : 'var(--red)';
+        btn.title = msg;
+        btn.disabled = false;
+      }
+      if (resp.status !== 409) setStatus('✗ ' + msg, 'var(--red)');
+    }
+  } catch (e) {
+    logLine(`  fetch exception: ${e.message}`, 'var(--red)');
+    setStatus('✗ ' + e.message, 'var(--red)');
+    if (btn) { btn.textContent = '✗ Error'; btn.style.color = 'var(--red)'; btn.disabled = false; }
+  }
+}
+
+// ─── Helpers ────────────────────────────────────────────────
+function setStatus(msg, color) {
+  const el = document.getElementById('k_status');
+  el.textContent = msg;
+  el.style.color = color;
+}
+
+async function kiwixImportViewerUrl() {
+  const raw = document.getElementById('k_viewer_url').value.trim();
+  if (!raw) { setStatus('Paste a viewer URL first.', 'var(--amber)'); return; }
+  const btn = document.querySelector('#k_viewer_url + button') ||
+              document.querySelector('[onclick="kiwixImportViewerUrl()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  logLine(`→ POST /library/import/kiwix/viewer`, 'var(--dim)');
+  logLine(`  viewer_url: ${raw}`, 'var(--dim)');
+  try {
+    const resp = await fetch('/library/import/kiwix/viewer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ viewer_url: raw }),
+    });
+    logLine(`← HTTP ${resp.status}`, resp.ok ? 'var(--green)' : 'var(--red)');
+    let body;
+    try { body = await resp.json(); } catch(je) { body = null; }
+    if (resp.ok) {
+      logLine(`  id: ${body && body.id} — "${body && body.title}"`, 'var(--green)');
+      setStatus(`✓ Imported: ${body && body.title}`, 'var(--green)');
+      document.getElementById('k_viewer_url').value = '';
+    } else {
+      const msg = (body && body.detail) || `Error ${resp.status}`;
+      logLine(`  detail: ${msg}`, 'var(--red)');
+      setStatus('✗ ' + msg, 'var(--red)');
+    }
+  } catch (e) {
+    logLine(`  fetch exception: ${e.message}`, 'var(--red)');
+    setStatus('✗ ' + e.message, 'var(--red)');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'IMPORT'; }
+  }
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Don't auto-load — user must confirm/set URL first
+</script>
+{% endblock %}

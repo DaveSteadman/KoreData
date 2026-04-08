@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}README — MiniFeed{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> README
+  </div>
+  <div class="panel-body prose">
+    {{ readme_html | safe }}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .prose { max-width: 860px; line-height: 1.7; }
+  .prose h1, .prose h2, .prose h3 { margin: 1.5rem 0 0.5rem; font-weight: 700; letter-spacing: 0.02em; }
+  .prose h1 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  .prose h2 { font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  .prose h3 { font-size: 1rem; }
+  .prose p { margin: 0.6rem 0; }
+  .prose ul, .prose ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+  .prose li { margin: 0.2rem 0; }
+  .prose code { background: var(--surface2, #1e1e1e); padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.88em; font-family: monospace; }
+  .prose pre { background: var(--surface2, #1e1e1e); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 0.75rem 0; }
+  .prose pre code { background: none; padding: 0; }
+  .prose table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+  .prose th, .prose td { border: 1px solid var(--border); padding: 0.4rem 0.75rem; text-align: left; }
+  .prose th { background: var(--surface2, #1e1e1e); font-weight: 600; }
+  .prose a { color: var(--accent, #7ec8e3); }
+  .prose img { max-width: 100%; border-radius: 4px; margin: 0.5rem 0; }
+  .prose blockquote { border-left: 3px solid var(--border); margin: 0.5rem 0; padding: 0.2rem 0 0.2rem 1rem; color: var(--dim); }
+  .prose hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+</style>
+{% endblock %}

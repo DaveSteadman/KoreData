@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}KoreData — Feeds{% endblock %}
+
+{% block content %}
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH
+  </div>
+  <div class="panel-body">
+    <form action="/feeds/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched — each word must appear somewhere in the headline or body. There is no phrase search.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" placeholder="search all feeds…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.6rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Since
+          <div class="date-pick">
+            <input type="date" name="since">
+            <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Until
+          <div class="date-pick">
+            <input type="date" name="until">
+            <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          No Older Than
+          <div class="num-stepper">
+            <input type="number" min="1" max="3650" style="width:52px;" oninput="setNoOlderThan(this)">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+          <span class="meta">days</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Limit
+          <div class="num-stepper">
+            <input type="number" name="limit" value="50" min="1" max="500" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="two-col">
+
+  <!-- Left: domain list -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> DOMAINS
+        <span class="badge badge-dim" style="margin-left:auto;">{{ domains|length }}</span>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        {% if domains %}
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th style="width:90px; text-align:right;">Entries</th>
+              <th style="width:100px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in domains %}
+            <tr>
+              <td><a href="/feeds/{{ d.domain }}">{{ d.domain }}</a></td>
+              <td class="meta" style="text-align:right;"><span class="badge badge-dim">{{ d.entry_count }}</span></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <form method="post" action="/feeds/domains/{{ d.domain }}/delete"
+                      style="flex-direction:row; display:inline-flex; gap:0.4rem;">
+                  <button class="btn-danger btn-sm" type="submit"
+                    onclick="return confirm('Delete domain {{ d.domain }} and all its data?')">DELETE</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="meta" style="padding:1rem;">no domains yet — create one below</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: create + rename -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> CREATE DOMAIN
+      </div>
+      <div class="panel-body">
+        <form method="post" action="/feeds/domains/create">
+          <div>
+            <label for="new_domain">Domain name</label>
+            <input id="new_domain" name="domain" type="text" placeholder="e.g. TechNews" required>
+          </div>
+          <div>
+            <button type="submit">CREATE</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if domains %}
+    <div class="panel" style="margin-top:1rem;">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> RENAME DOMAIN
+      </div>
+      <div class="panel-body">
+        <form method="post" id="rename-form" action="/feeds/domains/__DOMAIN__/rename">
+          <div>
+            <label for="rename_from">Domain</label>
+            <select id="rename_from" name="_domain_select" onchange="
+              document.getElementById('rename-form').action='/feeds/domains/'+this.value+'/rename';">
+              {% for d in domains %}
+              <option value="{{ d.domain }}">{{ d.domain }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="rename_to">New name</label>
+            <input id="rename_to" name="new_name" type="text" placeholder="NewName" required>
+          </div>
+          <div>
+            <button type="submit">RENAME</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% if all_feeds %}
+<div class="panel" style="margin-top:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> FEED STATUS
+    <span class="badge badge-dim" style="margin-left:auto;">{{ all_feeds|length }} feed{{ 's' if all_feeds|length != 1 else '' }}</span>
+  </div>
+  <div class="panel-body" style="padding:0; overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Feed</th>
+          <th style="width:60px; text-align:center;">Rate</th>
+          <th style="width:90px; text-align:center;">Last run</th>
+          <th>Status</th>
+          <th style="width:110px;">Content</th>
+          <th style="width:50px; text-align:center;">New</th>
+          <th style="width:80px; text-align:right;">Next</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in all_feeds %}
+        {% set status = f.get("last_status") %}
+        <tr>
+          <td class="meta"><a href="/feeds/{{ f.domain }}">{{ f.domain }}</a></td>
+          <td>{{ f.name }}</td>
+          <td class="meta" style="text-align:center;">{{ f.get("update_rate", 60) }}m</td>
+          <td class="meta" style="text-align:center; white-space:nowrap;">
+            {% if f.get("last_fetched_at") %}
+              {% set dur = f.get("last_duration_s") %}
+              {{ f.last_fetched_at[:16].replace("T"," ") }}
+              {% if dur is not none %}<span class="meta" title="{{ dur }}s"> ({{ dur }}s)</span>{% endif %}
+            {% else %}
+              <span class="meta">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if status == "ok" %}
+              <span style="color:var(--green);">✓ ok</span>
+            {% elif status == "error" %}
+              <span style="color:var(--red);" title="{{ f.get('last_error','') }}">✗ {{ (f.get("last_error") or "error")[:80] }}</span>
+            {% else %}
+              <span class="meta">—</span>
+            {% endif %}
+          </td>
+          <td class="meta" style="font-size:11px;">
+            {% set cs = f.get("content_status", "good") %}
+            {% if cs == "poor" %}<span style="color:var(--amber);">Poor Content</span>
+            {% elif cs == "none" %}<span style="color:var(--red);">No Content Found</span>
+            {% else %}<span class="meta">Good Feed</span>
+            {% endif %}
+          </td>
+          <td class="meta" style="text-align:center;">
+            {% if status == "ok" %}{{ f.get("last_new_entries", "—") }}{% else %}—{% endif %}
+          </td>
+          <td style="text-align:right; white-space:nowrap;">
+            {% if f._next_mins is none %}
+              <span style="color:var(--amber);">pending</span>
+            {% elif f._next_mins <= 0 %}
+              <span style="color:var(--amber);">overdue {{ (-f._next_mins) }}m</span>
+            {% else %}
+              <span class="meta">in {{ f._next_mins }}m</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

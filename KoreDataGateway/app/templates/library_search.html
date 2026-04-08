@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Search — KoreLibrary{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/library">library</a><span class="sep">›</span>search
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH BOOKS
+  </div>
+  <div class="panel-body">
+    <form action="/library/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched. Metadata fields can be used alone or combined with the text search.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" value="{{ q }}" placeholder="full-text search…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.6rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Author
+          <input type="text" name="author" value="{{ author }}" style="width:140px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Title
+          <input type="text" name="title" value="{{ title }}" style="width:160px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Year
+          <div class="num-stepper">
+            <input type="number" name="year" value="{{ year }}" min="1000" max="2100" style="width:62px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Language
+          <input type="text" name="language" value="{{ language }}" style="width:55px;" placeholder="en">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Genre
+          <input type="text" name="genre" value="{{ genre }}" style="width:120px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Limit
+          <div class="num-stepper">
+            <input type="number" name="limit" value="{{ limit }}" min="1" max="500" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if searched %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span class="badge" style="margin-left:0.5rem;">{{ results|length }}</span>
+  </div>
+  <div class="panel-body" style="padding:0;">
+    {% if results %}
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Title</th>
+          <th style="width:180px;">Author</th>
+          <th style="width:55px;">Year</th>
+          <th style="width:55px;">Lang</th>
+          <th style="width:120px;">Genre</th>
+          <th>Snippet</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td class="meta">{{ r.id }}</td>
+          <td><a href="/library/{{ r.id }}">{{ r.title }}</a></td>
+          <td class="meta">{{ r.author or "—" }}</td>
+          <td class="meta">{{ r.year or "—" }}</td>
+          <td class="meta">{{ r.language or "—" }}</td>
+          <td class="meta">{{ r.genre or "—" }}</td>
+          <td class="meta" style="font-size:11px; font-style:italic;">{{ r.snippet or "" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="meta" style="padding:1rem;">no results found</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}{% if article %}Edit {{ article.title }}{% else %}New Article{% endif %} — KoreReference{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/reference">reference</a>
+  {% if article %}
+  <span class="sep">›</span>
+  <a href="/reference/{{ article.title | urlencode }}">{{ article.title }}</a>
+  <span class="sep">›</span>edit
+  {% else %}
+  <span class="sep">›</span>new
+  {% endif %}
+</div>
+
+{% if error %}
+<div style="background:rgba(255,95,95,0.1); border:1px solid var(--red); color:var(--red); padding:0.6rem 1rem; margin-bottom:1rem; font-size:12px;">
+  ✗ {{ error }}
+</div>
+{% endif %}
+
+<div class="panel">
+  <div class="panel-header" style="gap:0.4rem;">
+    <span class="ph-diamond">◆</span>
+    {% if article %}EDIT ARTICLE{% else %}NEW ARTICLE{% endif %}
+    <span style="margin-left:auto; display:flex; gap:0.4rem; align-items:center;">
+      <button type="submit" form="edit-form" style="font-size:11px; padding:3px 10px;">
+        {% if article %}✓ SAVE{% else %}✓ CREATE{% endif %}
+      </button>
+      <a href="{% if article %}/reference/{{ article.title | urlencode }}{% else %}/reference{% endif %}">
+        <button type="button" style="font-size:11px; padding:3px 10px; background:transparent; border-color:var(--border); color:var(--dim);">✕ CANCEL</button>
+      </a>
+      {% if article %}
+      <form method="post" action="/reference/{{ article.title | urlencode }}/delete" style="margin:0;"
+            onsubmit="return confirm('Permanently delete \'{{ article.title | replace("'","\\x27") }}\'?')">
+        <button type="submit" style="background:rgba(255,95,95,0.15); border-color:var(--red); color:var(--red); font-size:11px; padding:3px 10px;">✗ DELETE</button>
+      </form>
+      {% endif %}
+    </span>
+  </div>
+
+  <div class="panel-body">
+    <form id="edit-form" method="post"
+          action="{% if article %}/reference/{{ article.title | urlencode }}/edit{% else %}/reference/new{% endif %}">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+
+        <!-- Title — editable on create, read-only on edit -->
+        <div style="grid-column:1 / -1;">
+          <label for="e_title">Title <span style="color:var(--red);">*</span></label>
+          {% if article %}
+          <input id="e_title" type="text" value="{{ article.title }}" disabled
+                 style="color:var(--dim); cursor:not-allowed;">
+          {% else %}
+          <input id="e_title" name="title" type="text" required
+                 value="{{ form.title if form else '' }}"
+                 placeholder="Article Title">
+          {% endif %}
+        </div>
+
+        <!-- Summary -->
+        <div style="grid-column:1 / -1;">
+          <label for="e_summary">Summary
+            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">(optional — auto-extracted from first body line if blank)</span>
+          </label>
+          <input id="e_summary" name="summary" type="text"
+                 value="{{ article.summary if article else (form.summary if form else '') }}"
+                 placeholder="One-sentence description…">
+        </div>
+
+        <!-- Categories -->
+        <div style="grid-column:1 / -1;">
+          <label for="e_categories">Categories
+            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">(comma-separated)</span>
+          </label>
+          <input id="e_categories" name="categories" type="text"
+                 value="{{ (article.categories | join(', ')) if article else (form.categories if form else '') }}"
+                 placeholder="Science, Physics, Quantum Mechanics">
+        </div>
+
+        <!-- Facts -->
+        <div style="grid-column:1 / -1;">
+          <label for="e_facts">Facts
+            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">one <code style="color:var(--amber);">Label: Value</code> per line &middot; values support <code style="color:var(--amber);">[[wikilinks]]</code></span>
+          </label>
+          <textarea id="e_facts" name="facts" rows="6"
+                    style="font-size:12px; line-height:1.6; resize:vertical; font-family:inherit;">{% if article and article.facts %}{% for pair in article.facts %}{{ pair[0] }}: {{ pair[1] }}
+{% endfor %}{% endif %}</textarea>
+        </div>
+
+        <!-- Redirect To -->
+        <div>
+          <label for="e_redirect">Redirect to
+            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">(leave blank for normal article)</span>
+          </label>
+          <input id="e_redirect" name="redirect_to" type="text" autocomplete="off"
+                 value="{{ article.redirect_to if article else (form.redirect_to if form else '') }}"
+                 placeholder="Target Article Title">
+        </div>
+
+      </div>
+
+      <!-- Body -->
+      <div style="margin-bottom:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.3rem;">
+          <label for="e_body">Body
+            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">
+              Use <code style="color:var(--amber);">== Heading ==</code> for sections ·
+              <code style="color:var(--amber);">[[Article Title]]</code> for links ·
+              <code style="color:var(--amber);">[[Display Text|Target Title]]</code> for aliased links
+            </span>
+          </label>
+          <span style="display:flex; align-items:center; gap:0.5rem; margin-left:1rem;">
+            {% if article and article.word_count %}
+            <span class="meta" style="font-size:11px; white-space:nowrap;">{{ "{:,}".format(article.word_count) }} words</span>
+            {% endif %}
+            <button type="button" onclick="copyBody()" style="font-size:10px; padding:2px 8px;">⎘ COPY</button>
+          </span>
+        </div>
+        <textarea id="e_body" name="body" rows="28"
+                  style="font-size:12px; line-height:1.6; resize:vertical; font-family:inherit;">{{ edit_body if edit_body is defined else (article.body if article else (form.body if form else '')) }}</textarea>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<div class="panel" style="font-size:12px; color:var(--dim);">
+  <div class="panel-header" style="font-size:11px; cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">
+    <span class="ph-diamond">◆</span> WIKI MARKUP REFERENCE
+    <span style="margin-left:auto; color:var(--dim);">▶ show</span>
+  </div>
+  <div style="display:none;">
+    <div class="panel-body" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div>
+        <div style="color:var(--green); font-size:11px; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.06em;">Sections</div>
+        <pre style="margin:0; font-size:11px;">== Overview ==
+Text for the overview section.
+
+=== Sub-section ===
+Sub-section content.</pre>
+      </div>
+      <div>
+        <div style="color:var(--green); font-size:11px; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.06em;">Links</div>
+        <pre style="margin:0; font-size:11px;">See also [[Python (language)]].
+
+An alias: [[Python|Python language]].
+
+Categories are set in the
+field above, not in body text.</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyBody() {
+  const ta = document.getElementById('e_body');
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ COPIED';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
+{% endblock %}

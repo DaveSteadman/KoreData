@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}KoreReference{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/reference">reference</a>
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> ARTICLES
+    <span class="badge badge-dim" style="margin-left:0.5rem;">{{ total }}</span>
+    <span style="margin-left:auto; display:flex; gap:0.75rem; align-items:center;">
+      <a href="/reference/categories" style="font-size:11px; color:var(--dim);">CATEGORIES ↗</a>
+      <a href="/reference/search"     style="font-size:11px; color:var(--dim);">SEARCH ↗</a>
+      <a href="/reference/import"     style="font-size:11px; color:var(--dim);">IMPORT ↗</a>
+      <a href="/reference/new"><button type="button" style="font-size:11px; padding:3px 10px;">✚ NEW ARTICLE</button></a>
+      <button type="button" style="font-size:11px; padding:3px 10px; background:var(--red,#c0392b); color:#fff; border-color:transparent;" onclick="deleteAll()">⊗ DELETE ALL</button>
+    </span>
+  </div>
+
+  <div class="panel-body" style="padding:0.5rem 1rem; border-bottom:1px solid var(--border);">
+    <form action="/reference/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched — each word must appear anywhere in the article title or body.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" placeholder="search articles…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel-body" style="padding:0; overflow-x:auto;">
+    {% if articles %}
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Title</th>
+          <th style="width:120px; text-align:right;">Words</th>
+          <th>Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in articles %}
+        <tr>
+          <td class="meta">{{ a.id }}</td>
+          <td><a href="/reference/{{ a.title | urlencode }}">{{ a.title }}</a></td>
+          <td class="meta" style="text-align:right;">
+            {% if a.word_count %}{{ "{:,}".format(a.word_count) }}{% else %}—{% endif %}
+          </td>
+          <td class="meta" style="font-size:11px;">
+            {% for cat in (a.categories or [])[:4] %}
+            <a href="/reference/categories/{{ cat | urlencode }}" style="color:var(--dim);">{{ cat }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="meta" style="padding:1rem;">No articles yet. <a href="/reference/new">Create the first article</a> or use <code>POST /import/kiwix</code> to import from Kiwix.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if offset + limit < total %}
+<div class="pagination">
+  {% if offset > 0 %}
+  <a href="/reference?limit={{ limit }}&offset={{ offset - limit }}">← PREV</a>
+  {% endif %}
+  <span class="pg-info">{{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}</span>
+  <a href="/reference?limit={{ limit }}&offset={{ offset + limit }}">NEXT →</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteAll() {
+  if (!confirm('Delete ALL articles from the reference database?\n\nThis cannot be undone.')) return;
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/reference/delete-all';
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+{% endblock %}

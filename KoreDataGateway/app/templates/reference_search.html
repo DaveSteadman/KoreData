@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Reference Search{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/reference">reference</a><span class="sep">›</span>search
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH ARTICLES
+  </div>
+  <div class="panel-body">
+    <form action="/reference/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched — each word must appear anywhere in the article title or body.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" value="{{ q }}" placeholder="search articles…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="margin-top:0.6rem;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Top hits
+          <div class="num-stepper">
+            <input type="number" name="limit" value="{{ limit }}" min="1" max="200" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if searched %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span class="badge badge-dim" style="margin-left:0.5rem;">{{ results | length }}</span>
+  </div>
+  <div class="panel-body" style="padding:0; overflow-x:auto;">
+    {% if results %}
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th style="width:120px; text-align:right;">Words</th>
+          <th>Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in results %}
+        <tr>
+          <td><a href="/reference/{{ a.title | urlencode }}">{{ a.title }}</a></td>
+          <td class="meta" style="text-align:right;">
+            {% if a.word_count %}{{ "{:,}".format(a.word_count) }}{% else %}—{% endif %}
+          </td>
+          <td class="meta" style="font-size:11px;">
+            {% for cat in (a.categories or [])[:4] %}
+            <a href="/reference/categories/{{ cat | urlencode }}" style="color:var(--dim);">{{ cat }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="meta" style="padding:1rem;">No articles matched your query.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

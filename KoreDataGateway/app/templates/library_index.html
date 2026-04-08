@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "incomplete" %}Incomplete — {% endif %}KoreLibrary{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/library">library</a>
+  {% if mode == "incomplete" %}<span class="sep">›</span>incomplete{% endif %}
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span>
+    {% if mode == "incomplete" %}INCOMPLETE RECORDS{% else %}BOOKS{% endif %}
+    <span class="badge badge-dim" style="margin-left:0.5rem;">{{ total }}</span>
+    <span style="margin-left:auto; display:flex; gap:0.75rem; align-items:center;">
+      {% if mode == "all" %}
+      <a href="/library/incomplete" style="font-size:11px; color:var(--amber);">INCOMPLETE ↗</a>
+      {% else %}
+      <a href="/library" style="font-size:11px; color:var(--dim);">ALL BOOKS ↗</a>
+      {% endif %}
+      <a href="/library/search" style="font-size:11px; color:var(--dim);">SEARCH ↗</a>
+      <a href="/library/import" style="font-size:11px; color:var(--dim);">IMPORT ↗</a>
+    </span>
+  </div>
+  {% if mode == "all" %}
+  <div class="panel-body" style="padding:0.5rem 1rem; border-bottom:1px solid var(--border);">
+    <form action="/library/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched. Metadata fields can be used alone or combined.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" placeholder="full-text search…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.6rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Author
+          <input type="text" name="author" style="width:140px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Title
+          <input type="text" name="title" style="width:160px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Year
+          <div class="num-stepper">
+            <input type="number" name="year" min="1000" max="2100" style="width:62px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Language
+          <input type="text" name="language" style="width:55px;" placeholder="en">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Genre
+          <input type="text" name="genre" style="width:120px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Limit
+          <div class="num-stepper">
+            <input type="number" name="limit" value="50" min="1" max="500" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+  {% if mode == "incomplete" %}
+  <div class="panel-body" style="padding:0.5rem 1rem; border-bottom:1px solid var(--border);">
+    <p class="meta">Books with one or more missing metadata fields.
+      Filter:
+      {% for f in ['author','year','language','genre'] %}
+      <a href="/library/incomplete?fields={{ f }}" style="font-size:11px; margin-left:0.4rem;
+        {% if filter_fields == f %}color:var(--green);{% endif %}">{{ f }}</a>
+      {% endfor %}
+      {% if filter_fields %}<a href="/library/incomplete" style="font-size:11px; margin-left:0.4rem; color:var(--dim);">clear</a>{% endif %}
+    </p>
+  </div>
+  {% endif %}
+  <div class="panel-body" style="padding:0; overflow-x:auto;">
+    {% if books %}
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Title</th>
+          <th style="width:180px;">Author</th>
+          <th style="width:55px;">Year</th>
+          <th style="width:55px;">Lang</th>
+          <th style="width:120px;">Genre</th>
+          <th style="width:70px; text-align:right;">Words</th>
+          {% if mode == "incomplete" %}<th style="width:140px;">Missing</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in books %}
+        <tr>
+          <td class="meta">{{ b.id }}</td>
+          <td><a href="/library/{{ b.id }}">{{ b.title }}</a></td>
+          <td class="meta">{{ b.author or "—" }}</td>
+          <td class="meta">{{ b.year or "—" }}</td>
+          <td class="meta">{{ b.language or "—" }}</td>
+          <td class="meta">{{ b.genre or "—" }}</td>
+          <td class="meta" style="text-align:right;">
+            {% if b.word_count %}{{ "{:,}".format(b.word_count) }}{% else %}—{% endif %}
+          </td>
+          {% if mode == "incomplete" %}
+          <td>
+            {% for mf in (b.missing_fields or []) %}
+            <span class="badge missing" style="font-size:10px; margin-right:2px;">{{ mf }}</span>
+            {% endfor %}
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="meta" style="padding:1rem;">
+      {% if mode == "incomplete" %}No incomplete records found.{% else %}No books yet.{% endif %}
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+{% if mode == "all" and offset + limit < total %}
+<div class="pagination">
+  {% if offset > 0 %}
+  <a href="/library?limit={{ limit }}&offset={{ offset - limit }}">← PREV</a>
+  {% endif %}
+  <span class="pg-info">{{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}</span>
+  <a href="/library?limit={{ limit }}&offset={{ offset + limit }}">NEXT →</a>
+</div>
+{% endif %}
+{% endblock %}

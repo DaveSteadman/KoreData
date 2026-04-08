@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% block title %}{{ domain }} – KoreData{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/feeds">feeds</a><span class="sep">›</span>{{ domain }}
+</div>
+
+<!-- ── Feed management ─────────────────────────────────────── -->
+<div class="two-col" style="margin-bottom:1.25rem;">
+
+  <div class="panel" style="margin-bottom:0;">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> FEEDS
+      <span class="badge badge-dim" style="margin-left:0.5rem;">{{ feeds|length }}</span>
+    </div>
+    <div class="panel-body" style="padding:0;">
+      {% if feeds %}
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th style="width:60px;">Rate</th>
+            <th style="width:130px;">Content</th>
+            <th style="width:70px; text-align:center;">Entries</th>
+            <th style="width:70px; text-align:right;">Next</th>
+            <th style="width:40px;"></th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="feeds-tbody">
+          {% for f in feeds %}
+          <tr>
+            <td>
+              {{ f.name }}
+              {% if f.get('type') == 'web' %}<span class="meta" style="font-size:10px; margin-left:0.4rem; border:1px solid var(--border); border-radius:3px; padding:0 3px;">WEB</span>{% endif %}
+            </td>
+            <td>
+              <div class="num-stepper rate-stepper">
+                <input class="rate-input" type="number" min="1" value="{{ f.update_rate }}"
+                  data-id="{{ f.id }}"
+                  onblur="saveRate(this)" onkeydown="if(event.key==='Enter'){this.blur()}">
+                <div class="stepper-btns">
+                  <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+                  <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+                </div>
+              </div>
+            </td>
+            <td class="meta" style="font-size:11px;">
+              {% set cs = f.get('content_status', 'good') %}
+              {% if cs == 'poor' %}<span style="color:var(--amber);">Poor Content</span>
+              {% elif cs == 'none' %}<span style="color:var(--red);">No Content Found</span>
+              {% else %}<span>Good Feed</span>
+              {% endif %}
+            </td>
+            <td style="text-align:center;">
+              {% set cnt = feed_counts.get(f.name, 0) %}
+              {% if cnt > 0 %}<span class="badge badge-dim">{{ cnt }}</span>
+              {% else %}<span class="meta" style="font-size:11px;">—</span>
+              {% endif %}
+            </td>
+            <td class="meta" data-col="next" style="text-align:right; white-space:nowrap;">
+              {% set mins = feed_refresh_mins.get(f.id) %}
+              {% if mins is none or mins <= 0 %}<span style="color:var(--amber);">now</span>
+              {% else %}{{ mins }}m
+              {% endif %}
+            </td>
+            <td>
+              <button class="btn-sm" title="Refresh now"
+                style="color:var(--green); border-color:var(--green);"
+                onclick="triggerRefresh(this, '/feeds/{{ domain }}/feeds/{{ f.id }}/refresh')">&#x21bb;</button>
+            </td>
+            <td>
+              <form method="post" action="/feeds/{{ domain }}/feeds/{{ f.id }}/delete" style="flex-direction:row;">
+                <button class="btn-danger btn-sm" type="submit"
+                  onclick="return confirm('Remove {{ f.name }}?')">&#x2715;</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="meta" style="padding:1rem;">no feeds — add one →</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:0;">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> ADD FEED
+    </div>
+    <div class="panel-body">
+      <form method="post" action="/feeds/{{ domain }}/feeds/add">
+        <div>
+          <label for="name">Feed name</label>
+          <input id="name" name="name" type="text" placeholder="TechCrunch" required>
+        </div>
+        <div>
+          <label for="feed_type">Type</label>
+          <select id="feed_type" name="feed_type" onchange="
+            var isWeb = this.value === 'web';
+            document.getElementById('url_label').textContent = isWeb ? 'Starting URL' : 'RSS URL';
+            document.getElementById('url').placeholder = isWeb ? 'https://example.com/news/' : 'https://…/feed';
+          ">
+            <option value="rss">RSS Feed</option>
+            <option value="web">Web Page</option>
+          </select>
+        </div>
+        <div>
+          <label id="url_label" for="url">RSS URL</label>
+          <input id="url" name="url" type="url" placeholder="https://…/feed" required>
+        </div>
+        <div>
+          <label for="update_rate">Update rate (minutes)</label>
+          <div class="num-stepper" style="margin-bottom:0.5rem;">
+            <input id="update_rate" name="update_rate" type="number" value="60" min="1" style="width:64px;" required>
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </div>
+        <div><button type="submit">ADD FEED</button></div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Entry management ───────────────────────────────── -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> MANAGE ENTRIES
+  </div>
+  <div class="panel-body">
+
+    <div>
+      <label style="display:block; margin-bottom:0.5rem; font-weight:600; font-size:12px; letter-spacing:.04em;">ENTRY AGE CATEGORY</label>
+      <select id="age-mode-select" onchange="showAgePanel(this.value)" style="margin-bottom:1rem; width:auto;">
+        <option value="none"            {% if age_settings.mode == 'none'            %}selected{% endif %}>No limit</option>
+        <option value="days_previous"   {% if age_settings.mode == 'days_previous'   %}selected{% endif %}>Days Previous</option>
+        <option value="calendar_period" {% if age_settings.mode == 'calendar_period' %}selected{% endif %}>Calendar Period</option>
+      </select>
+
+      <div id="age-panel-none" class="age-subpanel">
+        <form method="post" action="/feeds/{{ domain }}/settings/age-mode">
+          <input type="hidden" name="mode" value="none">
+          <p class="meta" style="margin-bottom:0.6rem;">All entries are accepted regardless of publication date.</p>
+          <button type="submit">APPLY (no limit)</button>
+        </form>
+      </div>
+
+      <div id="age-panel-days" class="age-subpanel" style="display:none;">
+        <p class="meta" style="margin-bottom:0.6rem;">Gate: skip entries published more than <strong id="days-label">{{ age_settings.days or 30 }}</strong> days ago.</p>
+        <form method="post" action="/feeds/{{ domain }}/settings/age-mode">
+          <input type="hidden" name="mode" value="days_previous">
+          <div style="display:flex; flex-direction:row; gap:0;">
+            <div class="num-stepper">
+              <input id="age-days-input" name="days" type="number" min="1"
+                     value="{{ age_settings.days or 30 }}" style="width:52px;"
+                     oninput="document.getElementById('days-label').textContent=this.value">
+              <div class="stepper-btns">
+                <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+                <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+              </div>
+            </div>
+            <button type="submit">SET GATE</button>
+          </div>
+        </form>
+        <div style="margin-top:0.6rem;">
+          <button class="btn-danger" type="button" onclick="purgeDaysPrevious()">PURGE OLDER ENTRIES NOW</button>
+        </div>
+      </div>
+
+      <div id="age-panel-calendar" class="age-subpanel" style="display:none;">
+        <p class="meta" style="margin-bottom:0.6rem;">Gate: only accept entries published within the date range.</p>
+        <form method="post" action="/feeds/{{ domain }}/settings/age-mode">
+          <input type="hidden" name="mode" value="calendar_period">
+          <div style="display:flex; flex-direction:row; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <input id="age-start-input" name="start_date" type="date" value="{{ age_settings.start_date or '' }}" style="width:160px;">
+            <span class="meta">to</span>
+            <input id="age-end-input" name="end_date" type="date" value="{{ age_settings.end_date or '' }}" style="width:160px;">
+            <button type="submit">SET GATE</button>
+          </div>
+        </form>
+        <div style="margin-top:0.6rem;">
+          <button class="btn-danger" type="button" onclick="purgeOutsideCalendar()">PURGE ENTRIES OUTSIDE RANGE</button>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-purge-days" method="post" action="/feeds/{{ domain }}/entries/delete-older-than" style="display:none;">
+      <input type="hidden" name="days" id="purge-days-val" value="{{ age_settings.days or 30 }}">
+    </form>
+    <form id="form-purge-calendar" method="post" action="/feeds/{{ domain }}/entries/delete-outside-calendar" style="display:none;">
+      <input type="hidden" name="start_date" id="purge-start-val" value="{{ age_settings.start_date or '' }}">
+      <input type="hidden" name="end_date"   id="purge-end-val"   value="{{ age_settings.end_date or '' }}">
+    </form>
+
+    {% if feeds %}
+    <div style="margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border);">
+      <form method="post" action="/feeds/{{ domain }}/entries/delete-by-feed" id="form-del-feed">
+        <label for="del_feed" style="display:block; margin-bottom:0.4rem; font-size:12px; letter-spacing:.04em; font-weight:600;">DELETE BY FEED</label>
+        <div style="display:flex; flex-direction:row; gap:0;">
+          <select id="del_feed" name="feed_name" style="flex:1;">
+            {% for f in feeds %}
+            <option value="{{ f.name }}">{{ f.name }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn-danger" type="button"
+            onclick="var n=document.getElementById('del_feed').options[document.getElementById('del_feed').selectedIndex].text; if(confirm('Delete ALL entries from '+n+'?')) document.getElementById('form-del-feed').submit()">
+            DELETE FEED
+          </button>
+        </div>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── Entry list ──────────────────────────────────────────── -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> ENTRIES
+    <span class="badge" id="entry-count" style="margin-left:0.75rem;">{{ total }}</span>
+    <form action="/feeds/search" method="get" style="flex-direction:row; display:flex; gap:0; margin-left:auto;">
+      <input type="search" name="q" placeholder="search {{ domain }}…" style="width:200px;">
+      <input type="hidden" name="domain" value="{{ domain }}">
+      <button type="submit">SEARCH</button>
+    </form>
+  </div>
+  <div class="panel-body" style="padding:0;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Headline</th>
+          <th>Feed</th>
+          <th style="width:160px; white-space:nowrap;">Published</th>
+          <th style="width:40px;"></th>
+        </tr>
+      </thead>
+      <tbody id="entries-tbody">
+        {% for e in entries %}
+        <tr>
+          <td class="meta">{{ e.id }}</td>
+          <td><a href="/feeds/{{ domain }}/{{ e.id }}">{{ e.headline or "(no title)" }}</a></td>
+          <td class="meta">{{ e.feed_name }}</td>
+          <td class="meta" style="white-space:nowrap;">{{ e.published[:16] if e.published else "—" }}</td>
+          <td>
+            <button class="btn-danger btn-sm" title="Delete entry"
+              onclick="deleteEntry(this, '/feeds/{{ domain }}/entries/{{ e.id }}/delete')">&#x2715;</button>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="meta" style="padding:1rem;">no entries yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pagination">
+  {% if offset > 0 %}
+  <a href="/feeds/{{ domain }}?limit={{ limit }}&offset={{ offset - limit }}">← PREV</a>
+  {% endif %}
+  <span class="pg-info">{{ offset + 1 }}–{{ offset + entries|length }} of {{ total }}</span>
+  {% if offset + limit < total %}
+  <a href="/feeds/{{ domain }}?limit={{ limit }}&offset={{ offset + limit }}">NEXT →</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function stepNum(btn, delta) {
+  const input = btn.closest('.num-stepper').querySelector('input[type=number]');
+  const min  = input.min !== '' ? parseInt(input.min, 10)  : -Infinity;
+  const max  = input.max !== '' ? parseInt(input.max, 10)  :  Infinity;
+  const step = input.step !== '' ? parseInt(input.step, 10) : 1;
+  let val = parseInt(input.value, 10);
+  if (isNaN(val)) val = parseInt(input.min, 10) || 1;
+  input.value = Math.min(max, Math.max(min, val + delta * step));
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  if (input.classList.contains('rate-input')) saveRate(input);
+}
+
+async function triggerRefresh(btn, url) {
+  btn.disabled = true; btn.style.opacity = '0.5';
+  try {
+    await fetch(url, { method: 'POST' });
+    btn.textContent = '\u2713';
+    btn.style.color = 'var(--green)';
+    const row = btn.closest('tr');
+    const rateInput = row.querySelector('.rate-input');
+    const nextCell  = row.querySelector('td[data-col="next"]');
+    if (nextCell && rateInput) nextCell.innerHTML = `<span style="color:var(--dim)">${rateInput.value}m</span>`;
+    setTimeout(() => { btn.innerHTML = '&#x21bb;'; btn.disabled = false; btn.style.opacity = ''; }, 1500);
+  } catch (_) { btn.disabled = false; btn.style.opacity = ''; }
+}
+
+async function saveRate(input) {
+  const val = parseInt(input.value, 10);
+  if (!val || val < 1) { input.value = input.dataset.prev || 60; return; }
+  if (val === parseInt(input.dataset.prev || input.dataset.orig || val, 10)) return;
+  try {
+    const resp = await fetch(`/api/feeds/${input.dataset.id}/rate?minutes=${val}`, { method: 'PATCH' });
+    if (resp.ok) {
+      input.dataset.prev = val;
+      input.style.borderColor = 'var(--green)';
+      setTimeout(() => input.style.borderColor = '', 800);
+    } else { input.value = input.dataset.prev || 60; }
+  } catch (_) { input.value = input.dataset.prev || 60; }
+}
+document.querySelectorAll('.rate-input').forEach(i => i.dataset.prev = i.value);
+
+async function deleteEntry(btn, url) {
+  const row = btn.closest('tr');
+  btn.disabled = true;
+  try {
+    const resp = await fetch(url, { method: 'POST' });
+    if (resp.ok || resp.redirected) {
+      row.style.transition = 'opacity 0.15s'; row.style.opacity = '0';
+      setTimeout(() => {
+        row.remove();
+        const badge = document.getElementById('entry-count');
+        if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent, 10) - 1);
+      }, 150);
+    } else { btn.disabled = false; }
+  } catch (e) { btn.disabled = false; }
+}
+
+(function () {
+  function showAgePanel(mode) {
+    document.querySelectorAll('.age-subpanel').forEach(el => el.style.display = 'none');
+    const map = { none: 'age-panel-none', days_previous: 'age-panel-days', calendar_period: 'age-panel-calendar' };
+    const target = document.getElementById(map[mode]);
+    if (target) target.style.display = '';
+  }
+  window.showAgePanel = showAgePanel;
+  const sel = document.getElementById('age-mode-select');
+  if (sel) showAgePanel(sel.value);
+
+  window.purgeDaysPrevious = function () {
+    document.getElementById('purge-days-val').value = document.getElementById('age-days-input').value;
+    document.getElementById('form-purge-days').submit();
+  };
+  window.purgeOutsideCalendar = function () {
+    document.getElementById('purge-start-val').value = document.getElementById('age-start-input').value;
+    document.getElementById('purge-end-val').value   = document.getElementById('age-end-input').value;
+    document.getElementById('form-purge-calendar').submit();
+  };
+})();
+</script>
+{% endblock %}

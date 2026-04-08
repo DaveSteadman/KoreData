@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}MiniFeed{% endblock %}
+
+{% block content %}
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH
+  </div>
+  <div class="panel-body">
+    <form action="/web/search" method="get" style="flex-direction:row; display:flex; gap:0;">
+      <input type="search" name="q" placeholder="search all feeds…" style="flex:1;"
+             title="Terms are matched individually with AND logic — 'ai defence' finds entries containing both words anywhere in the headline or body">
+      <button type="submit">SEARCH</button>
+    </form>
+    <p class="meta" style="margin-top:0.5rem;">Space or comma separated terms are AND-matched. Each word must appear somewhere in the headline or body.</p>
+  </div>
+</div>
+<div class="two-col">
+
+  <!-- Left: domain list -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> DOMAINS
+        <span class="badge badge-dim" style="margin-left:auto;">{{ domains|length }}</span>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        {% if domains %}
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th style="width:90px; text-align:right;">Entries</th>
+              <th style="width:100px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in domains %}
+            <tr>
+              <td><a href="/web/{{ d.domain }}">{{ d.domain }}</a></td>
+              <td class="meta" style="text-align:right;"><span class="badge badge-dim">{{ d.entry_count }}</span></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <form method="post" action="/web/domains/{{ d.domain }}/delete"
+                      style="flex-direction:row; display:inline-flex; gap:0.4rem;">
+                  <button class="btn-danger btn-sm" type="submit"
+                    onclick="return confirm('Delete domain {{ d.domain }} and all its data?')">DELETE</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="meta" style="padding:1rem;">no domains yet — create one below</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: create + rename -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> CREATE DOMAIN
+      </div>
+      <div class="panel-body">
+        <form method="post" action="/web/domains/create">
+          <div>
+            <label for="new_domain">Domain name</label>
+            <input id="new_domain" name="domain" type="text" placeholder="e.g. TechNews" required>
+          </div>
+          <div>
+            <button type="submit">CREATE</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if domains %}
+    <div class="panel" style="margin-top:1rem;">
+      <div class="panel-header">
+        <span class="ph-diamond">◆</span> RENAME DOMAIN
+      </div>
+      <div class="panel-body">
+        <form method="post" id="rename-form" action="/web/domains/__DOMAIN__/rename">
+          <div>
+            <label for="rename_from">Domain</label>
+            <select id="rename_from" name="_domain_select" onchange="
+              document.getElementById('rename-form').action='/web/domains/'+this.value+'/rename';">
+              {% for d in domains %}
+              <option value="{{ d.domain }}">{{ d.domain }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="rename_to">New name</label>
+            <input id="rename_to" name="new_name" type="text" placeholder="NewName" required>
+          </div>
+          <div>
+            <button type="submit">RENAME</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% if all_feeds %}
+<div class="panel" style="margin-top:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> FEED STATUS
+    <span class="badge badge-dim" style="margin-left:auto;">{{ all_feeds|length }} feed{{ 's' if all_feeds|length != 1 else '' }}</span>
+  </div>
+  <div class="panel-body" style="padding:0; overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Feed</th>
+          <th style="width:60px; text-align:center;">Rate</th>
+          <th style="width:90px; text-align:center;">Last run</th>
+          <th>Status</th>
+          <th style="width:110px;">Content</th>
+          <th style="width:50px; text-align:center;">New</th>
+          <th style="width:80px; text-align:right;">Next</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in all_feeds %}
+        {% set status = f.get("last_status") %}
+        <tr>
+          <td class="meta"><a href="/web/{{ f.domain }}">{{ f.domain }}</a></td>
+          <td>{{ f.name }}</td>
+          <td class="meta" style="text-align:center;">{{ f.get("update_rate", 60) }}m</td>
+          <td class="meta" style="text-align:center; white-space:nowrap;">
+            {% if f.get("last_fetched_at") %}
+              {% set dur = f.get("last_duration_s") %}
+              {{ f.last_fetched_at[:16].replace("T"," ") }}
+              {% if dur is not none %}<span class="meta" title="{{ dur }}s"> ({{ dur }}s)</span>{% endif %}
+            {% else %}
+              <span class="meta">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if status == "ok" %}
+              <span style="color:var(--green, #4caf50); font-weight:600;">✓ ok</span>
+            {% elif status == "error" %}
+              <span style="color:var(--red, #e57373); font-weight:600;" title="{{ f.get('last_error','') }}">✗ {{ (f.get("last_error") or "error")[:80] }}</span>
+            {% else %}
+              <span class="meta">—</span>
+            {% endif %}
+          </td>
+          <td class="meta" style="font-size:11px;">
+            {% set cs = f.get("content_status", "good") %}
+            {% if cs == "poor" %}
+              <span style="color:var(--amber, #ffb300);">Poor Content</span>
+            {% elif cs == "none" %}
+              <span style="color:var(--red, #e57373);">No Content Found</span>
+            {% else %}
+              <span class="meta">Good Feed</span>
+            {% endif %}
+          </td>
+          <td class="meta" style="text-align:center;">
+            {% if status == "ok" %}{{ f.get("last_new_entries", "—") }}{% else %}—{% endif %}
+          </td>
+          <td style="text-align:right; white-space:nowrap;">
+            {% if f._next_mins is none %}
+              <span style="color:var(--amber, #ffb300);">pending</span>
+            {% elif f._next_mins <= 0 %}
+              <span style="color:var(--amber, #ffb300);">overdue {{ (-f._next_mins) }}m</span>
+            {% else %}
+              <span class="meta">in {{ f._next_mins }}m</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

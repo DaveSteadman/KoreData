@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Search – KoreData{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/feeds">feeds</a><span class="sep">›</span>search
+  {% if domain %}<span class="sep">›</span>{{ domain }}{% endif %}
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH
+    {% if domain %}<span class="badge badge-dim" style="margin-left:0.5rem;">{{ domain }}</span>{% endif %}
+  </div>
+  <div class="panel-body">
+    <form action="/feeds/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched — each word must appear somewhere in the headline or body. There is no phrase search.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" value="{{ q }}" placeholder="search all feeds…" style="flex:1;">
+        {% if domain %}<input type="hidden" name="domain" value="{{ domain }}">{% endif %}
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.6rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Since
+          <div class="date-pick">
+            <input type="date" name="since" value="{{ since }}">
+            <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Until
+          <div class="date-pick">
+            <input type="date" name="until" value="{{ until }}">
+            <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          No Older Than
+          <div class="num-stepper">
+            <input type="number" min="1" max="3650" style="width:52px;" oninput="setNoOlderThan(this)">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+          <span class="meta">days</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Limit
+          <div class="num-stepper">
+            <input type="number" name="limit" value="{{ limit }}" min="1" max="500" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if q %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span class="badge" style="margin-left:0.5rem;">{{ results|length }}</span>
+    <span class="meta" style="margin-left:0.75rem;">for "{{ q }}"</span>
+  </div>
+  <div class="panel-body" style="padding:0;">
+    {% if results %}
+    <form method="post" action="/feeds/entries/bulk-delete">
+      <div style="display:flex; align-items:center; padding:0.4rem 0.75rem;
+                  border-bottom:1px solid var(--border); gap:0.75rem;">
+        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;
+                       text-transform:none; font-size:12px; color:var(--dim);">
+          <input type="checkbox" id="select-all"
+                 onchange="document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked)">
+          select all
+        </label>
+        <button class="btn-danger btn-sm" type="submit" style="margin-left:auto;"
+                onclick="if(!document.querySelector('.row-check:checked')){alert('Select at least one entry.');return false;}return confirm('Delete selected entries?')">
+          DELETE SELECTED
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30px;"></th>
+            <th style="width:50px;">#</th>
+            <th>Headline</th>
+            <th>Domain</th>
+            <th>Feed</th>
+            <th style="width:140px;">Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+          <tr>
+            <td><input class="row-check" type="checkbox" name="sel" value="{{ r.domain }}:{{ r.id }}"></td>
+            <td class="meta">{{ r.id }}</td>
+            <td><a href="/feeds/{{ r.domain }}/{{ r.id }}">{{ r.headline or "(no title)" }}</a></td>
+            <td><span class="badge badge-dim">{{ r.domain }}</span></td>
+            <td class="meta">{{ r.feed_name }}</td>
+            <td class="meta">{{ r.published[:16] if r.published else "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+    {% else %}
+    <p class="meta" style="padding:1rem;">no results found</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

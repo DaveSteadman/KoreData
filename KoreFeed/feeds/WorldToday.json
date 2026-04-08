@@ -1,0 +1,93 @@
+[
+  {
+    "id": "323435b0-dac1-4a5b-b426-786fb6dc8529",
+    "domain": "WorldToday",
+    "name": "lemonde",
+    "url": "https://www.lemonde.fr/en/international/rss_full.xml",
+    "update_rate": 67,
+    "last_fetched_at": "2026-04-08T21:19:28",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 5.2,
+    "last_new_entries": 1,
+    "content_status": "good"
+  },
+  {
+    "id": "e8146da9-dbea-41c8-bcaf-7a886c0c6c69",
+    "domain": "WorldToday",
+    "name": "BBCi",
+    "url": "http://feeds.bbci.co.uk/news/rss.xml",
+    "update_rate": 63,
+    "last_fetched_at": "2026-04-08T21:48:28",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 30.5,
+    "last_new_entries": 3,
+    "content_status": "good"
+  },
+  {
+    "id": "e999c5d5-5a32-48d3-a8c6-7f1e8b4de6db",
+    "domain": "WorldToday",
+    "name": "Australia ABC",
+    "url": "https://www.abc.net.au/news/feed/51120/rss.xml",
+    "update_rate": 58,
+    "last_fetched_at": "2026-04-08T21:55:30",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 11.2,
+    "last_new_entries": 8,
+    "content_status": "good"
+  },
+  {
+    "id": "30958427-bd91-45ba-9608-ac44ff9d55b3",
+    "domain": "WorldToday",
+    "name": "indianexpress",
+    "url": "https://indianexpress.com/section/india/feed/",
+    "update_rate": 61,
+    "last_fetched_at": "2026-04-08T21:55:39",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 9.1,
+    "last_new_entries": 0,
+    "content_status": "good"
+  },
+  {
+    "id": "e997e7cb-4be7-48ab-a259-e4b7d857add3",
+    "domain": "WorldToday",
+    "name": "DW",
+    "url": "https://rss.dw.com/xml/rss-en-all",
+    "update_rate": 62,
+    "last_fetched_at": "2026-04-08T21:55:49",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 9.3,
+    "last_new_entries": 0,
+    "content_status": "good"
+  },
+  {
+    "id": "8bbe65eb-643a-49b1-bfb8-b2738f12729e",
+    "domain": "WorldToday",
+    "name": "Mail / Guardian (SA)",
+    "url": "https://mg.co.za/feed/",
+    "update_rate": 60,
+    "last_fetched_at": "2026-04-08T21:55:55",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 6.5,
+    "last_new_entries": 0,
+    "content_status": "good"
+  },
+  {
+    "id": "7375ff7e-20ec-4265-baf7-4fd95e3343b2",
+    "domain": "WorldToday",
+    "name": "latimes",
+    "url": "https://www.latimes.com/world-nation/rss2.0.xml",
+    "update_rate": 58,
+    "last_fetched_at": "2026-04-08T21:55:57",
+    "last_status": "ok",
+    "last_error": null,
+    "last_duration_s": 1.7,
+    "last_new_entries": 1,
+    "content_status": "good"
+  }
+]

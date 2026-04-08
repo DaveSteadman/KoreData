@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block title %}Import — KoreReference{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/reference">reference</a><span class="sep">›</span>import
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;">
+
+  <!-- ─── Crawl form ──────────────────────────────── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> CRAWL FROM KIWIX SEED
+    </div>
+    <div class="panel-body">
+      <div style="font-size:11px; color:var(--dim); margin-bottom:0.75rem; line-height:1.65;">
+        Paste a Kiwix viewer URL. The importer fetches that article then follows
+        its wikilinks up to the chosen depth.
+        <br>
+        <span style="color:var(--amber);">⚠ Depth 2+ can queue thousands of articles — use the limit.</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.6rem;">
+
+        <div>
+          <label for="c_seed">Seed URL <span style="color:var(--red);">*</span></label>
+          <input id="c_seed" type="text"
+            placeholder="http://192.168.1.33:8080/viewer#wikipedia_en_all_maxi_2025-08/Architecture"
+            style="width:100%; font-size:11px;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem; align-items:end;">
+          <div>
+            <label for="c_depth">Max depth</label>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+              <input id="c_depth" type="range" min="0" max="3" value="1"
+                     style="width:100%; border:none; background:transparent; padding:0;"
+                     oninput="document.getElementById('c_depth_val').textContent=this.value">
+              <span id="c_depth_val" style="color:var(--green); font-size:13px; min-width:12px;">1</span>
+            </div>
+            <div id="c_depth_hint" style="font-size:10px; color:var(--dim); margin-top:0.15rem;"></div>
+          </div>
+          <div>
+            <label for="c_limit">Article limit</label>
+            <input id="c_limit" type="number" value="200" min="1" max="5000" style="width:100%; -moz-appearance:textfield;" onwheel="this.blur()">
+            <style>#c_limit::-webkit-inner-spin-button, #c_limit::-webkit-outer-spin-button { display:none; }</style>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.4rem; padding-bottom:0.1rem; align-self:end;">
+            <input id="c_resume" type="checkbox" checked style="width:auto; border:none;">
+            <label for="c_resume" style="text-transform:none; font-size:12px; letter-spacing:0; color:var(--text); cursor:pointer;">
+              Skip already-imported
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
+          <button type="button" id="c_start_btn" onclick="crawlStart()" style="flex:1;">▶ START CRAWL</button>
+          <button type="button" id="c_stop_btn"  onclick="crawlStop()"
+                  style="flex:none; background:rgba(255,95,95,0.1); border-color:var(--red); color:var(--red); display:none;">
+            ■ STOP
+          </button>
+        </div>
+
+        <div id="c_error" style="display:none; background:rgba(255,95,95,0.1); border:1px solid var(--red);
+             color:var(--red); padding:0.4rem 0.75rem; font-size:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Progress panel ─────────────────────────── -->
+  <div class="panel" id="progress_panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> PROGRESS
+      <span id="pg_badge" class="badge badge-dim" style="margin-left:0.5rem; display:none;"></span>
+    </div>
+    <div class="panel-body">
+
+      <!-- idle state -->
+      <div id="pg_idle" style="color:var(--dim); font-size:12px;">No import running.</div>
+
+      <!-- active state -->
+      <div id="pg_active" style="display:none;">
+
+        <div style="margin-bottom:0.65rem;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--dim); margin-bottom:0.25rem;">
+            <span id="pg_label">Starting…</span>
+            <span id="pg_pct"></span>
+          </div>
+          <!-- progress bar -->
+          <div style="height:6px; background:var(--border); position:relative;">
+            <div id="pg_bar" style="height:100%; background:var(--green); width:0%; transition:width 0.4s;"></div>
+          </div>
+        </div>
+
+        <table style="width:100%; font-size:12px;">
+          <tbody>
+            <tr>
+              <td class="meta" style="padding:0.2rem 0; white-space:nowrap;">Imported</td>
+              <td style="padding:0.2rem 0; color:var(--green);" id="pg_done">0</td>
+            </tr>
+            <tr>
+              <td class="meta" style="padding:0.2rem 0;">Queued</td>
+              <td style="padding:0.2rem 0;" id="pg_total">—</td>
+            </tr>
+            <tr>
+              <td class="meta" style="padding:0.2rem 0;">Errors</td>
+              <td style="padding:0.2rem 0; color:var(--red);" id="pg_errors">0</td>
+            </tr>
+            <tr id="pg_seed_row" style="display:none;">
+              <td class="meta" style="padding:0.2rem 0;">Seed</td>
+              <td style="padding:0.2rem 0; color:var(--blue); font-size:11px;" id="pg_seed"></td>
+            </tr>
+            <tr id="pg_err_row" style="display:none;">
+              <td class="meta" style="padding:0.2rem 0; color:var(--red);">Last error</td>
+              <td style="padding:0.2rem 0; color:var(--red); font-size:10px; word-break:break-all;" id="pg_last_err"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- done state -->
+      <div id="pg_done_msg" style="display:none; margin-top:0.75rem; font-size:12px; color:var(--green);"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Depth explanation table ──────────────────────── -->
+<div class="panel" style="margin-top:0.5rem;">
+  <div class="panel-header" style="font-size:11px; cursor:pointer;"
+       onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">
+    <span class="ph-diamond">◆</span> DEPTH GUIDE
+    <span style="margin-left:auto; color:var(--dim);">▶ show</span>
+  </div>
+  <div style="display:none;">
+    <div class="panel-body" style="font-size:12px;">
+      <table>
+        <thead><tr><th>Depth</th><th>What gets imported</th><th>Typical article count</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>Seed article only</td><td>1</td></tr>
+          <tr><td>1</td><td>Seed + every article it links to</td><td>50–300</td></tr>
+          <tr><td>2</td><td>Depth-1 graph + all links from those articles</td><td>1 000–10 000+</td></tr>
+          <tr><td>3</td><td>Full three-hop neighbourhood</td><td>50 000+</td></tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin-top:0.6rem; font-size:11px;">
+        The <strong>Article limit</strong> is a hard cap — the crawl stops once it is reached regardless of depth.
+        Use <em>Skip already-imported</em> to resume an interrupted crawl without re-fetching unchanged articles.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let _pollTimer = null;
+
+// ─── depth slider hint ───────────────────────────────────────
+const depthHints = [
+  'seed article only',
+  'seed + direct links (~50–300)',
+  'two-hop graph (~1 000–10 000)',
+  'three-hop graph (50 000+)',
+];
+document.getElementById('c_depth').addEventListener('input', function () {
+  document.getElementById('c_depth_hint').textContent = depthHints[+this.value] || '';
+});
+document.getElementById('c_depth_hint').textContent = depthHints[1];
+
+// ─── Reset progress panel to a blank starting state ──────────
+function resetPanel() {
+  document.getElementById('pg_idle').style.display    = 'none';
+  document.getElementById('pg_active').style.display  = '';
+  document.getElementById('pg_bar').style.width        = '0%';
+  document.getElementById('pg_pct').textContent        = '';
+  document.getElementById('pg_done').textContent       = '0';
+  document.getElementById('pg_total').textContent      = '—';
+  document.getElementById('pg_errors').textContent     = '0';
+  document.getElementById('pg_errors').style.color     = 'var(--dim)';
+  document.getElementById('pg_seed_row').style.display = 'none';
+  document.getElementById('pg_err_row').style.display  = 'none';
+  document.getElementById('pg_done_msg').style.display = 'none';
+  document.getElementById('pg_label').textContent      = 'Starting…';
+  const badge = document.getElementById('pg_badge');
+  badge.style.display     = '';
+  badge.textContent       = 'RUNNING';
+  badge.style.borderColor = 'var(--green)';
+  badge.style.color       = 'var(--green)';
+}
+
+// ─── Start crawl ─────────────────────────────────────────────
+async function crawlStart() {
+  const seed  = document.getElementById('c_seed').value.trim();
+  const depth = parseInt(document.getElementById('c_depth').value, 10);
+  const limit = parseInt(document.getElementById('c_limit').value, 10) || 200;
+  const resume = document.getElementById('c_resume').checked;
+
+  const errEl = document.getElementById('c_error');
+  errEl.style.display = 'none';
+
+  if (!seed) { showError('Enter a seed URL.'); return; }
+
+  document.getElementById('c_start_btn').disabled = true;
+  document.getElementById('c_stop_btn').style.display = '';
+
+  try {
+    const resp = await fetch('/reference/import/crawl', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seed_url: seed, max_depth: depth, limit: limit, resume: resume }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { showError(data.detail || `Error ${resp.status}`); return; }
+    resetPanel();
+    startPolling();
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+// ─── Stop crawl ──────────────────────────────────────────────
+async function crawlStop() {
+  await fetch('/reference/import/stop', { method: 'POST' });
+}
+
+// ─── Error display ───────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('c_error');
+  el.textContent = '✗ ' + msg;
+  el.style.display = '';
+  document.getElementById('c_start_btn').disabled = false;
+  document.getElementById('c_stop_btn').style.display = 'none';
+}
+
+// ─── Polling ─────────────────────────────────────────────────
+function startPolling() {
+  if (_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(pollStatus, 1200);
+  pollStatus();
+}
+
+async function pollStatus() {
+  try {
+    const resp = await fetch('/reference/import/status');
+    if (!resp.ok) return;
+    const s = await resp.json();
+    renderStatus(s);
+    if (!s.running) {
+      clearInterval(_pollTimer);
+      _pollTimer = null;
+      document.getElementById('c_start_btn').disabled = false;
+      document.getElementById('c_stop_btn').style.display = 'none';
+    }
+  } catch (_) {}
+}
+
+function renderStatus(s) {
+  document.getElementById('pg_idle').style.display   = 'none';
+  document.getElementById('pg_active').style.display = '';
+
+  const done  = s.done  || 0;
+  const total = s.total || 0;
+  const pct   = s.running && total > 0 ? Math.min(99, Math.round(done / total * 100)) : (done > 0 ? 100 : 0);
+
+  document.getElementById('pg_bar').style.width = pct + '%';
+  document.getElementById('pg_pct').textContent = s.running && total > 0 ? pct + '%' : (done > 0 ? '100%' : '');
+  document.getElementById('pg_done').textContent  = done.toLocaleString();
+  document.getElementById('pg_total').textContent = total > 0 ? total.toLocaleString() : '—';
+  document.getElementById('pg_errors').textContent = (s.errors || 0).toLocaleString();
+  document.getElementById('pg_errors').style.color = s.errors ? 'var(--red)' : 'var(--dim)';
+
+  const badge = document.getElementById('pg_badge');
+  badge.style.display = '';
+  badge.textContent = s.running ? 'RUNNING' : 'DONE';
+  badge.style.borderColor = s.running ? 'var(--green)' : 'var(--border)';
+  badge.style.color        = s.running ? 'var(--green)' : 'var(--dim)';
+
+  const seedRow = document.getElementById('pg_seed_row');
+  if (s.seed) {
+    seedRow.style.display = '';
+    document.getElementById('pg_seed').textContent = s.seed;
+  } else {
+    seedRow.style.display = 'none';
+  }
+
+  const errRow = document.getElementById('pg_err_row');
+  if (s.last_error) {
+    errRow.style.display = '';
+    document.getElementById('pg_last_err').textContent = s.last_error;
+  } else {
+    errRow.style.display = 'none';
+  }
+
+  const modeLabel = s.mode === 'crawl' ? `BFS crawl from "${s.seed || '?'}"` : 'Prefix import';
+  document.getElementById('pg_label').textContent = s.running
+    ? `${modeLabel} — importing…`
+    : `${modeLabel} — finished`;
+
+  const msg = document.getElementById('pg_done_msg');
+  if (!s.running && done > 0) {
+    msg.style.display = '';
+    msg.innerHTML = `✓ Done — ${done.toLocaleString()} article${done !== 1 ? 's' : ''} imported.
+      <a href="/reference" style="margin-left:0.5rem;">View all articles →</a>`;
+  } else {
+    msg.style.display = 'none';
+  }
+}
+
+// ─── Resume state on page load ───────────────────────────────
+(async function () {
+  try {
+    const resp = await fetch('/reference/import/status');
+    if (!resp.ok) return;
+    const s = await resp.json();
+    if (s.running) {
+      document.getElementById('c_start_btn').disabled = true;
+      document.getElementById('c_stop_btn').style.display = '';
+      startPolling();
+    } else if (s.done > 0) {
+      renderStatus(s);
+    }
+  } catch (_) {}
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,7 @@
+{
+  "port": 8000,
+  "host": "0.0.0.0",
+  "data_dir": "data",
+  "feeds_dir": "feeds",
+  "log_level": "info"
+}

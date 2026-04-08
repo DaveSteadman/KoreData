@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% block title %}KoreData — Home{% endblock %}
+
+{% block content %}
+<style>
+  /* ─── service health grid ─────────────────────── */
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 800px) { .svc-grid { grid-template-columns: 1fr; } }
+
+  .svc-card {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 1rem 1.1rem;
+  }
+  .svc-card.online  { border-left: 3px solid var(--green); }
+  .svc-card.offline { border-left: 3px solid var(--red); }
+
+  .svc-name {
+    font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--text); margin-bottom: 0.4rem;
+  }
+  .svc-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; letter-spacing: 0.06em; font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .svc-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .svc-badge.online  { color: var(--green); }
+  .svc-badge.online  .dot { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  .svc-badge.offline { color: var(--red); }
+  .svc-badge.offline .dot { background: var(--red); }
+
+  .svc-stats { display: flex; flex-direction: column; gap: 3px; margin-bottom: 0.8rem; }
+  .svc-stat  { display: flex; gap: 0.5rem; font-size: 12px; }
+  .svc-stat-key { color: var(--dim); min-width: 130px; }
+  .svc-stat-val { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .svc-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .svc-links a { font-size: 11px; color: var(--blue); letter-spacing: 0.04em; }
+
+  /* ─── search panel ────────────────────────────── */
+  #sq-spinner { display: none; color: var(--dim); font-size: 12px; letter-spacing: 0.06em; }
+
+  .result-tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 0.9rem;
+  }
+  .result-tab {
+    padding: 0.3rem 0.9rem; font-size: 11px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--dim); cursor: pointer; border: none;
+    background: transparent; border-bottom: 2px solid transparent;
+    font-family: inherit;
+    transition: color .1s;
+  }
+  .result-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .result-tab:hover   { color: var(--text); }
+
+  /* result cards */
+  .result-card {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.65rem;
+  }
+  .result-card:last-child { margin-bottom: 0; }
+  .rc-type {
+    font-size: 10px; letter-spacing: 0.08em; color: var(--dim);
+    text-transform: uppercase; margin-bottom: 0.25rem;
+  }
+  .rc-title {
+    font-size: 0.95rem; color: var(--blue); margin-bottom: 0.3rem;
+    text-decoration: none;
+  }
+  .rc-title:hover { text-decoration: underline; color: var(--text); }
+  .rc-meta  { color: var(--dim); font-size: 11px; margin-bottom: 0.35rem; }
+  .rc-snippet { font-size: 12px; color: var(--text); line-height: 1.6; }
+  .rc-no-results { color: var(--dim); font-size: 12px; font-style: italic; }
+  .rc-domain-heading {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--dim); padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 0.6rem; margin-top: 1rem;
+  }
+  .rc-domain-heading:first-child { margin-top: 0; }
+  .rc-error { color: var(--red); font-size: 12px; font-style: italic; }
+
+  /* JSON highlight */
+  pre.json { font-size: 12px; line-height: 1.6; }
+  .jt-key    { color: var(--blue); }
+  .jt-str    { color: var(--green); }
+  .jt-num    { color: var(--amber); }
+  .jt-bool   { color: var(--red); }
+  .jt-null   { color: var(--dim); }
+</style>
+
+<!-- ═══════════════════════════════════ HEALTH PANEL ═══════════════════ -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SERVICES
+    <button class="btn btn-sm" style="margin-left:auto" onclick="refreshHealth()">↺ REFRESH</button>
+  </div>
+  <div class="panel-body">
+    <div class="svc-grid" id="svc-grid">
+      {% for svc in services %}
+      {% set cls = "online" if svc.healthy else "offline" %}
+      <div class="svc-card {{ cls }}" id="svc-{{ svc.slug }}">
+        <div class="svc-name">{{ svc.label }}</div>
+        <div class="svc-badge {{ cls }}">
+          <span class="dot"></span>
+          {{ "ONLINE" if svc.healthy else "OFFLINE" }}
+        </div>
+        <div class="svc-stats">
+          {% if svc.slug == "feeds" %}
+            <div class="svc-stat"><span class="svc-stat-key">feeds</span><span class="svc-stat-val">{{ svc.stats.get("total_feeds", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">domains</span><span class="svc-stat-val">{{ svc.stats.get("total_domains", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">entries</span><span class="svc-stat-val">{{ svc.stats.get("total_entries", "—") }}</span></div>
+          {% elif svc.slug == "library" %}
+            <div class="svc-stat"><span class="svc-stat-key">books</span><span class="svc-stat-val">{{ svc.stats.get("total_books", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">incomplete</span><span class="svc-stat-val">{{ svc.stats.get("incomplete_records", "—") }}</span></div>
+          {% elif svc.slug == "reference" %}
+            <div class="svc-stat"><span class="svc-stat-key">articles</span><span class="svc-stat-val">{{ svc.stats.get("total_articles", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">redirects</span><span class="svc-stat-val">{{ svc.stats.get("total_redirects", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">links</span><span class="svc-stat-val">{{ svc.stats.get("total_links", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">categories</span><span class="svc-stat-val">{{ svc.stats.get("total_categories", "—") }}</span></div>
+          {% endif %}
+        </div>
+        <div class="svc-links">
+          <a href="/{{ svc.slug }}">Browse</a>
+          {% if svc.slug == "feeds" %}
+            <a href="/feeds/search">Search</a>
+          {% elif svc.slug == "library" %}
+            <a href="/library/search">Search</a>
+            <a href="/library/import">Import</a>
+          {% elif svc.slug == "reference" %}
+            <a href="/reference/search">Search</a>
+            <a href="/reference/import">Import</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SEARCH PANEL ══════ -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH
+    <span class="meta" style="margin-left:0.5rem;font-size:11px">— agent API  ·  POST /search</span>
+  </div>
+  <div class="panel-body">
+    <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched across all selected services.</p>
+    <div style="display:flex; flex-direction:row; gap:0; margin-bottom:0.75rem;">
+      <input id="sq-query" type="search" placeholder="e.g. climate change arctic ice" autocomplete="off"
+             style="flex:1;" onkeydown="if(event.key==='Enter') runSearch()">
+      <button onclick="runSearch()">SEARCH</button>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;
+                padding:0.5rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+                margin-bottom:0.75rem;">
+      <span style="font-size:11px; color:var(--dim); letter-spacing:0.05em; text-transform:uppercase;">Services</span>
+      <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text); cursor:pointer; text-transform:none; letter-spacing:normal;">
+        <input type="checkbox" class="sq-domain" value="feeds" checked style="accent-color:var(--green); width:auto; cursor:pointer;"> Feeds
+      </label>
+      <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text); cursor:pointer; text-transform:none; letter-spacing:normal;">
+        <input type="checkbox" class="sq-domain" value="reference" checked style="accent-color:var(--green); width:auto; cursor:pointer;"> Reference
+      </label>
+      <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text); cursor:pointer; text-transform:none; letter-spacing:normal;">
+        <input type="checkbox" class="sq-domain" value="library" checked style="accent-color:var(--green); width:auto; cursor:pointer;"> Library
+      </label>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.75rem; align-items:center;">
+      <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+        Since
+        <div class="date-pick">
+          <input id="sq-since" name="since" type="date">
+          <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+        </div>
+      </label>
+      <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+        Until
+        <div class="date-pick">
+          <input id="sq-until" name="until" type="date">
+          <span class="cal-icon" onclick="this.previousElementSibling.showPicker()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="10" height="9" rx="1"/><line x1="1" y1="5" x2="11" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="8" y1="1" x2="8" y2="3"/></svg></span>
+        </div>
+      </label>
+      <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+        No Older Than
+        <div class="num-stepper">
+          <input type="number" min="1" max="3650" style="width:52px;"
+                 oninput="if(parseInt(this.value)>=1){const d=new Date();d.setDate(d.getDate()-parseInt(this.value));document.getElementById('sq-since').value=d.toISOString().slice(0,10);}">
+          <div class="stepper-btns">
+            <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+            <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+          </div>
+        </div>
+        <span class="meta">days</span>
+      </label>
+      <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+        Limit
+        <div class="num-stepper">
+          <input id="sq-limit" type="number" value="5" min="1" max="20" style="width:52px;">
+          <div class="stepper-btns">
+            <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+            <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <span id="sq-spinner">searching…</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════ RESULTS PANEL ═════════════════ -->
+<div id="sq-results-panel" class="panel" style="display:none">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span id="sq-results-meta" class="meta" style="margin-left:0.5rem;font-size:11px"></span>
+  </div>
+  <div class="panel-body">
+    <div class="result-tabs">
+      <button class="result-tab active" id="tab-cards" onclick="showTab('cards')">CARDS</button>
+      <button class="result-tab"        id="tab-json"  onclick="showTab('json')">JSON</button>
+    </div>
+    <div id="sq-cards-view"></div>
+    <div id="sq-json-view"><pre class="json" id="sq-json-pre"></pre></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── tab switching ──────────────────────────────────────────────────────
+function showTab(t) {
+  document.getElementById('sq-cards-view').style.display = t === 'cards' ? '' : 'none';
+  document.getElementById('sq-json-view').style.display  = t === 'json'  ? '' : 'none';
+  document.getElementById('tab-cards').classList.toggle('active', t === 'cards');
+  document.getElementById('tab-json').classList.toggle('active', t === 'json');
+}
+showTab('cards');
+
+// ── JSON syntax highlighter ───────────────────────────────────────────
+function highlightJson(obj) {
+  const raw = JSON.stringify(obj, null, 2);
+  return raw
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/("(\\u[0-9a-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null)/g, m => {
+      if (/^"/.test(m)) {
+        return m.endsWith(':') ? `<span class="jt-key">${m}</span>` : `<span class="jt-str">${m}</span>`;
+      }
+      if (/true|false/.test(m)) return `<span class="jt-bool">${m}</span>`;
+      if (/null/.test(m))       return `<span class="jt-null">${m}</span>`;
+      return `<span class="jt-num">${m}</span>`;
+    });
+}
+
+// ── render card view ──────────────────────────────────────────────────
+function renderCards(data) {
+  const container = document.getElementById('sq-cards-view');
+  const domains   = data.domains_searched || [];
+  let html = '';
+  for (const dom of domains) {
+    const items = data.results[dom];
+    html += `<div class="rc-domain-heading">${dom.toUpperCase()}</div>`;
+    if (!items) {
+      html += `<div class="rc-no-results">No results.</div>`;
+    } else if (items.error) {
+      html += `<div class="rc-error">Error: ${escHtml(items.error)}</div>`;
+    } else if (!Array.isArray(items) || items.length === 0) {
+      html += `<div class="rc-no-results">No results.</div>`;
+    } else {
+      for (const r of items) {
+        html += renderCard(r);
+      }
+    }
+  }
+  container.innerHTML = html || '<div class="rc-no-results">No results.</div>';
+}
+
+function renderCard(r) {
+  const title   = escHtml(r.title || '(untitled)');
+  const url     = escHtml(r.url  || '#');
+  const snippet = escHtml(r.snippet || r.summary || '');
+  let meta = '';
+  if (r.type === 'feed_entry') {
+    const src = r.source ? escHtml(r.source) : '';
+    const ts  = r.published_at ? `  ·  ${escHtml(r.published_at.slice(0,10))}` : '';
+    meta = `${src}${ts}`;
+  } else if (r.type === 'reference_article') {
+    meta = r.word_count ? `${r.word_count.toLocaleString()} words` : '';
+  } else if (r.type === 'library_book') {
+    meta = r.author ? escHtml(r.author) : '';
+  }
+  const typeLabel = (r.type || '').replace('_', ' ');
+  return `<div class="result-card">
+    <div class="rc-type">${escHtml(typeLabel)}</div>
+    <a class="rc-title" href="${url}">${title}</a>
+    ${meta ? `<div class="rc-meta">${meta}</div>` : ''}
+    ${snippet ? `<div class="rc-snippet">${snippet}</div>` : ''}
+  </div>`;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ── main search handler ───────────────────────────────────────────────
+async function runSearch() {
+  const query = document.getElementById('sq-query').value.trim();
+  if (!query) { document.getElementById('sq-query').focus(); return; }
+
+  const domains = [...document.querySelectorAll('.sq-domain:checked')].map(e => e.value);
+  const since   = document.getElementById('sq-since').value;
+  const until   = document.getElementById('sq-until').value;
+  const limit   = parseInt(document.getElementById('sq-limit').value, 10) || 5;
+
+  const payload = { query, domains, limit };
+  if (since) payload.since = since;
+  if (until) payload.until = until;
+
+  document.getElementById('sq-spinner').style.display = '';
+  document.getElementById('sq-results-panel').style.display = 'none';
+
+  try {
+    const resp = await fetch('/search', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const data = await resp.json();
+
+    // meta line
+    const total = Object.values(data.results || {}).reduce((n, v) => n + (Array.isArray(v) ? v.length : 0), 0);
+    document.getElementById('sq-results-meta').textContent =
+      `"${data.query}"  ·  ${total} result${total !== 1 ? 's' : ''} across [${(data.domains_searched||[]).join(', ')}]`;
+
+    // JSON view
+    document.getElementById('sq-json-pre').innerHTML = highlightJson(data);
+
+    // cards view
+    renderCards(data);
+
+    document.getElementById('sq-results-panel').style.display = '';
+    showTab('cards');
+  } catch (e) {
+    document.getElementById('sq-results-meta').textContent = 'Error: ' + e.message;
+    document.getElementById('sq-results-panel').style.display = '';
+  } finally {
+    document.getElementById('sq-spinner').style.display = 'none';
+  }
+}
+
+// ── health auto-refresh ───────────────────────────────────────────────
+const _SVC_STATS = {
+  feeds:     [['domains','total_domains'],['feeds','total_feeds'],['entries','total_entries']],
+  library:   [['books','total_books'],['incomplete','incomplete_records']],
+  reference: [['articles','total_articles'],['redirects','total_redirects'],['links','total_links'],['categories','total_categories']],
+};
+
+async function refreshHealth() {
+  try {
+    const r    = await fetch('/status');
+    const data = await r.json();
+    for (const [slug, child] of Object.entries(data.children || {})) {
+      const card = document.getElementById('svc-' + slug);
+      if (!card) continue;
+      const online = child.healthy;
+      card.classList.toggle('online',  online);
+      card.classList.toggle('offline', !online);
+      const badge = card.querySelector('.svc-badge');
+      if (badge) {
+        badge.className = `svc-badge ${online ? 'online' : 'offline'}`;
+        badge.innerHTML = `<span class="dot"></span> ${online ? 'ONLINE' : 'OFFLINE'}`;
+      }
+      const statsEl = card.querySelector('.svc-stats');
+      if (statsEl && _SVC_STATS[slug]) {
+        statsEl.innerHTML = _SVC_STATS[slug].map(([lbl, key]) =>
+          `<div class="svc-stat"><span class="svc-stat-key">${lbl}</span><span class="svc-stat-val">${child[key] ?? '—'}</span></div>`
+        ).join('');
+      }
+    }
+  } catch (_) {}
+}
+setInterval(refreshHealth, 60000);
+</script>
+{% endblock %}

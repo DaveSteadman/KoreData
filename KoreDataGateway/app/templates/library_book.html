@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }} – KoreLibrary{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/library">library</a><span class="sep">›</span>
+  #{{ book.id }}
+</div>
+
+<div class="panel" style="margin-bottom:1rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> BOOK #{{ book.id }}
+    <a href="/library/{{ book.id }}/edit" style="margin-left:auto; font-size:11px; color:var(--dim);">✎ EDIT</a>
+  </div>
+  <div class="panel-body">
+    <p style="font-size:1.1rem; color:var(--text); margin-bottom:1rem; line-height:1.4; font-weight:600;">{{ book.title }}</p>
+
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <div class="kv">
+        <span class="kv-key">author</span>
+        <span class="kv-val {% if not book.author %}meta{% endif %}">{{ book.author or "—" }}</span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">year</span>
+        <span class="kv-val {% if not book.year %}meta{% endif %}">{{ book.year or "—" }}</span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">language</span>
+        <span class="kv-val {% if not book.language %}meta{% endif %}">{{ book.language or "—" }}</span>
+      </div>
+      <div class="kv">
+        <span class="kv-key">genre</span>
+        <span class="kv-val {% if not book.genre %}meta{% endif %}">{{ book.genre or "—" }}</span>
+      </div>
+      {% if book.word_count %}
+      <div class="kv">
+        <span class="kv-key">word count</span>
+        <span class="kv-val meta">{{ "{:,}".format(book.word_count) }}</span>
+      </div>
+      {% endif %}
+      {% if book.notes %}
+      <div class="kv" style="align-items:flex-start;">
+        <span class="kv-key">notes</span>
+        <span class="kv-val meta" style="font-style:italic;">{{ book.notes }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> BODY TEXT
+    {% if book.word_count %}
+    <span class="badge badge-dim" style="margin-left:auto;">{{ "{:,}".format(book.word_count) }} words</span>
+    {% endif %}
+    {% if book.body and 'KORE\\_ANCHOR\\_' in book.body %}
+    <form method="post" action="/library/{{ book.id }}/repair-anchors" style="margin-left:{% if not book.word_count %}auto{% else %}0.5rem{% endif %};">
+      <button type="submit" class="btn btn-dim" title="Fix broken TOC anchor links">↺ repair anchors</button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="panel-body" style="padding:0;">
+    {% if book.body %}
+    <div id="book-body" class="scrollable-body book-md"></div>
+    <script>const _bookRaw = {{ book.body | tojson }};</script>
+    {% else %}
+    <p class="meta" style="padding:1rem;">no body text</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if book.body %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  marked.use({ breaks: false, gfm: true });
+  const container = document.getElementById('book-body');
+  container.innerHTML = marked.parse(_bookRaw);
+
+  function scrollToId(id) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    // container itself is the overflow-y:auto scroll box
+    const offsetTop = target.getBoundingClientRect().top
+                    - container.getBoundingClientRect().top
+                    + container.scrollTop - 10;
+    container.scrollTo({ top: offsetTop, behavior: 'smooth' });
+  }
+
+  // Handle page-load fragment — defer until after browser layout
+  if (window.location.hash) {
+    requestAnimationFrame(function() {
+      scrollToId(decodeURIComponent(window.location.hash.slice(1)));
+    });
+  }
+
+  // Intercept TOC #fragment link clicks and scroll inside the container
+  container.addEventListener('click', function(e) {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = decodeURIComponent(a.getAttribute('href').slice(1));
+    if (!document.getElementById(id)) return;
+    e.preventDefault();
+    scrollToId(id);
+  });
+</script>
+{% endif %}
+{% endblock %}

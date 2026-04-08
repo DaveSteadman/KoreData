@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Edit #{{ book.id }} — KoreLibrary{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/library">library</a><span class="sep">›</span>
+  <a href="/library/{{ book.id }}">#{{ book.id }}</a><span class="sep">›</span>edit
+</div>
+
+{% if error %}
+<div style="background:rgba(255,95,95,0.1); border:1px solid var(--red); color:var(--red); padding:0.6rem 1rem; margin-bottom:1rem; font-size:12px;">
+  ✗ {{ error }}
+</div>
+{% endif %}
+
+<div style="display:grid; grid-template-columns:1fr; gap:1rem;">
+
+  <div class="panel">
+    <div class="panel-header" style="gap:0.4rem;">
+      <span class="ph-diamond">◆</span> EDIT BOOK #{{ book.id }}
+      <span style="margin-left:auto; display:flex; gap:0.4rem; align-items:center;">
+        <button type="submit" form="edit-form" style="font-size:11px; padding:3px 10px;">✓ SAVE</button>
+        <a href="/library/{{ book.id }}">
+          <button type="button" style="font-size:11px; padding:3px 10px; background:transparent; border-color:var(--border); color:var(--dim);">✕ CANCEL</button>
+        </a>
+        <form method="post" action="/library/{{ book.id }}/delete" style="margin:0;"
+              onsubmit="return confirm('Permanently delete {{ book.title | replace("'","\\x27") }}?')">
+          <button type="submit" style="background:rgba(255,95,95,0.15); border-color:var(--red); color:var(--red); font-size:11px; padding:3px 10px;">✗ DELETE</button>
+        </form>
+      </span>
+    </div>
+
+    <div class="panel-body">
+      <form id="edit-form" method="post" action="/library/{{ book.id }}/edit">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+
+          <div style="grid-column:1 / -1;">
+            <label for="e_title">Title <span style="color:var(--red);">*</span></label>
+            <input id="e_title" name="title" type="text" required value="{{ book.title }}">
+          </div>
+
+          <div>
+            <label for="e_author">Author</label>
+            <input id="e_author" name="author" type="text" value="{{ book.author or '' }}">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+            <div>
+              <label for="e_year">Year</label>
+              <input id="e_year" name="year" type="number" value="{{ book.year or '' }}" style="width:100%;">
+            </div>
+            <div>
+              <label for="e_language">Language</label>
+              <input id="e_language" name="language" type="text" value="{{ book.language or '' }}" placeholder="en" style="width:100%;">
+            </div>
+          </div>
+
+          <div>
+            <label for="e_genre">Genre</label>
+            <input id="e_genre" name="genre" type="text" value="{{ book.genre or '' }}">
+          </div>
+
+          <div>
+            <label for="e_notes">Notes</label>
+            <input id="e_notes" name="notes" type="text" value="{{ book.notes or '' }}">
+          </div>
+
+          <div style="grid-column:1 / -1;">
+            <label for="e_source">Source</label>
+            <input id="e_source" name="source" type="text" value="{{ book.source or '' }}">
+          </div>
+
+        </div>
+
+        <div style="margin-bottom:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.3rem;">
+            <label for="e_body">Body text</label>
+            {% if book.word_count %}
+            <span class="meta" style="font-size:11px;">{{ "{:,}".format(book.word_count) }} words</span>
+            {% endif %}
+          </div>
+          <textarea id="e_body" name="body" rows="22"
+            style="font-size:11px; line-height:1.55; resize:vertical; white-space:pre-wrap;">{{ book.body or '' }}</textarea>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
