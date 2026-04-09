@@ -68,16 +68,6 @@
                  placeholder="One-sentence description…">
         </div>
 
-        <!-- Categories -->
-        <div style="grid-column:1 / -1;">
-          <label for="e_categories">Categories
-            <span style="font-size:10px; color:var(--dim); text-transform:none; letter-spacing:0;">(comma-separated)</span>
-          </label>
-          <input id="e_categories" name="categories" type="text"
-                 value="{{ (article.categories | join(', ')) if article else (form.categories if form else '') }}"
-                 placeholder="Science, Physics, Quantum Mechanics">
-        </div>
-
         <!-- Facts -->
         <div style="grid-column:1 / -1;">
           <label for="e_facts">Facts
@@ -144,10 +134,7 @@ Sub-section content.</pre>
         <div style="color:var(--green); font-size:11px; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.06em;">Links</div>
         <pre style="margin:0; font-size:11px;">See also [[Python (language)]].
 
-An alias: [[Python|Python language]].
-
-Categories are set in the
-field above, not in body text.</pre>
+An alias: [[Python|Python language]].</pre>
       </div>
     </div>
   </div>

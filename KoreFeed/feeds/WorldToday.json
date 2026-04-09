@@ -5,11 +5,11 @@
     "name": "lemonde",
     "url": "https://www.lemonde.fr/en/international/rss_full.xml",
     "update_rate": 67,
-    "last_fetched_at": "2026-04-09T05:53:05",
+    "last_fetched_at": "2026-04-09T21:27:04",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 4.9,
-    "last_new_entries": 3,
+    "last_duration_s": 6.0,
+    "last_new_entries": 1,
     "content_status": "good"
   },
   {
@@ -18,11 +18,11 @@
     "name": "BBCi",
     "url": "http://feeds.bbci.co.uk/news/rss.xml",
     "update_rate": 63,
-    "last_fetched_at": "2026-04-09T05:53:15",
+    "last_fetched_at": "2026-04-09T21:07:06",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 9.8,
-    "last_new_entries": 7,
+    "last_duration_s": 21.3,
+    "last_new_entries": 3,
     "content_status": "good"
   },
   {
@@ -31,11 +31,11 @@
     "name": "Australia ABC",
     "url": "https://www.abc.net.au/news/feed/51120/rss.xml",
     "update_rate": 58,
-    "last_fetched_at": "2026-04-09T05:53:27",
+    "last_fetched_at": "2026-04-09T22:11:42",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 11.4,
-    "last_new_entries": 19,
+    "last_duration_s": 11.8,
+    "last_new_entries": 8,
     "content_status": "good"
   },
   {
@@ -44,11 +44,11 @@
     "name": "indianexpress",
     "url": "https://indianexpress.com/section/india/feed/",
     "update_rate": 61,
-    "last_fetched_at": "2026-04-09T05:53:37",
+    "last_fetched_at": "2026-04-09T21:05:40",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 10.9,
-    "last_new_entries": 2,
+    "last_duration_s": 11.2,
+    "last_new_entries": 1,
     "content_status": "good"
   },
   {
@@ -57,10 +57,10 @@
     "name": "DW",
     "url": "https://rss.dw.com/xml/rss-en-all",
     "update_rate": 62,
-    "last_fetched_at": "2026-04-09T05:53:43",
+    "last_fetched_at": "2026-04-09T21:05:47",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 5.6,
+    "last_duration_s": 6.8,
     "last_new_entries": 1,
     "content_status": "good"
   },
@@ -70,10 +70,10 @@
     "name": "Mail / Guardian (SA)",
     "url": "https://mg.co.za/feed/",
     "update_rate": 60,
-    "last_fetched_at": "2026-04-09T05:53:50",
+    "last_fetched_at": "2026-04-09T21:05:53",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 7.0,
+    "last_duration_s": 6.7,
     "last_new_entries": 0,
     "content_status": "good"
   },
@@ -83,11 +83,11 @@
     "name": "latimes",
     "url": "https://www.latimes.com/world-nation/rss2.0.xml",
     "update_rate": 58,
-    "last_fetched_at": "2026-04-09T05:53:53",
+    "last_fetched_at": "2026-04-09T22:11:30",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 2.4,
-    "last_new_entries": 1,
+    "last_duration_s": 2.3,
+    "last_new_entries": 0,
     "content_status": "good"
   }
 ]

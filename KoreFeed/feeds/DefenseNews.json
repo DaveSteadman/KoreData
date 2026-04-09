@@ -78,19 +78,6 @@
     "content_status": "good"
   },
   {
-    "id": "35855629-18f0-4ab1-8d14-cc518a500ab5",
-    "domain": "DefenseNews",
-    "name": "thinkdefence",
-    "url": "https://www.thinkdefence.co.uk/feed/",
-    "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:40",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 0.1,
-    "last_new_entries": 0,
-    "content_status": "none"
-  },
-  {
     "id": "3f1963f1-77ac-4d4e-85bf-b7fb823a187b",
     "domain": "DefenseNews",
     "name": "defenceiq - defence-technology",
@@ -137,11 +124,11 @@
     "url": "https://www.janes.com/osint-insights/defence-news",
     "update_rate": 3000,
     "type": "web",
-    "last_fetched_at": "2026-04-07T18:20:36",
+    "last_fetched_at": "2026-04-09T20:23:05",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 10.1,
-    "last_new_entries": 23,
+    "last_duration_s": 11.3,
+    "last_new_entries": 9,
     "content_status": "good"
   }
 ]

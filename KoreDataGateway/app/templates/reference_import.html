@@ -109,14 +109,15 @@
           </div>
         </div>
 
-        <table style="width:100%; font-size:12px;">
+        <table style="width:100%; font-size:12px; table-layout:fixed;">
+          <colgroup><col style="width:80px;"><col></colgroup>
           <tbody>
             <tr>
               <td class="meta" style="padding:0.2rem 0; white-space:nowrap;">Imported</td>
               <td style="padding:0.2rem 0; color:var(--green);" id="pg_done">0</td>
             </tr>
             <tr>
-              <td class="meta" style="padding:0.2rem 0;">Queued</td>
+              <td class="meta" style="padding:0.2rem 0;">Target</td>
               <td style="padding:0.2rem 0;" id="pg_total">—</td>
             </tr>
             <tr>
@@ -125,7 +126,7 @@
             </tr>
             <tr id="pg_seed_row" style="display:none;">
               <td class="meta" style="padding:0.2rem 0;">Seed</td>
-              <td style="padding:0.2rem 0; color:var(--blue); font-size:11px;" id="pg_seed"></td>
+              <td style="padding:0.2rem 0; color:var(--blue); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="pg_seed"></td>
             </tr>
             <tr id="pg_err_row" style="display:none;">
               <td class="meta" style="padding:0.2rem 0; color:var(--red);">Last error</td>
@@ -136,7 +137,15 @@
       </div>
 
       <!-- done state -->
-      <div id="pg_done_msg" style="display:none; margin-top:0.75rem; font-size:12px; color:var(--green);"></div>
+      <div id="pg_done_msg" style="display:none; text-align:center; padding:1.5rem 0.5rem;">
+        <div style="font-size:2rem; color:var(--green); line-height:1; margin-bottom:0.5rem;">✓</div>
+        <div id="pg_done_title" style="font-size:14px; font-weight:600; color:var(--green); margin-bottom:0.4rem;"></div>
+        <div id="pg_done_detail" style="font-size:11px; color:var(--dim); margin-bottom:1.25rem; word-break:break-all;"></div>
+        <div style="display:flex; gap:0.5rem; justify-content:center;">
+          <a href="/reference"><button type="button" style="font-size:11px; padding:3px 10px;">View articles →</button></a>
+          <button type="button" onclick="resetToIdle()" style="font-size:11px; padding:3px 10px; background:transparent; border-color:var(--dim); color:var(--dim);">⟳ Import another</button>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -213,6 +222,17 @@ function detectUrlType(url) {
     badge.style.color = 'var(--green)';
     rateRow.style.display = 'none';
   }
+}
+
+// ─── Reset progress panel to idle (no import ever / after dismissal) ──────
+function resetToIdle() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+  document.getElementById('pg_idle').style.display     = '';
+  document.getElementById('pg_active').style.display   = 'none';
+  document.getElementById('pg_done_msg').style.display = 'none';
+  document.getElementById('pg_badge').style.display    = 'none';
+  document.getElementById('c_start_btn').disabled      = false;
+  document.getElementById('c_stop_btn').style.display  = 'none';
 }
 
 // ─── Reset progress panel to a blank starting state ──────────
@@ -313,58 +333,64 @@ async function pollStatus() {
 }
 
 function renderStatus(s) {
-  document.getElementById('pg_idle').style.display   = 'none';
-  document.getElementById('pg_active').style.display = '';
+  const done   = s.done   || 0;
+  const limit  = s.limit  || 0;
+  const errors = s.errors || 0;
 
-  const done  = s.done  || 0;
-  const total = s.total || 0;
-  const pct   = s.running && total > 0 ? Math.min(99, Math.round(done / total * 100)) : (done > 0 ? 100 : 0);
+  if (s.running) {
+    // ── Active ──────────────────────────────────────────────────
+    document.getElementById('pg_idle').style.display     = 'none';
+    document.getElementById('pg_active').style.display   = '';
+    document.getElementById('pg_done_msg').style.display = 'none';
 
-  document.getElementById('pg_bar').style.width = pct + '%';
-  document.getElementById('pg_pct').textContent = s.running && total > 0 ? pct + '%' : (done > 0 ? '100%' : '');
-  document.getElementById('pg_done').textContent  = done.toLocaleString();
-  document.getElementById('pg_total').textContent = total > 0 ? total.toLocaleString() : '—';
-  document.getElementById('pg_errors').textContent = (s.errors || 0).toLocaleString();
-  document.getElementById('pg_errors').style.color = s.errors ? 'var(--red)' : 'var(--dim)';
+    const pct = limit > 0 ? Math.min(99, Math.round(done / limit * 100)) : 0;
+    document.getElementById('pg_bar').style.width   = pct + '%';
+    document.getElementById('pg_pct').textContent   = limit > 0 ? pct + '%' : '';
+    document.getElementById('pg_done').textContent  = done.toLocaleString();
+    document.getElementById('pg_total').textContent = limit > 0 ? limit.toLocaleString() : '—';
+    document.getElementById('pg_errors').textContent = errors.toLocaleString();
+    document.getElementById('pg_errors').style.color = errors ? 'var(--red)' : 'var(--dim)';
 
-  const badge = document.getElementById('pg_badge');
-  badge.style.display = '';
-  badge.textContent = s.running ? 'RUNNING' : 'DONE';
-  badge.style.borderColor = s.running ? 'var(--green)' : 'var(--border)';
-  badge.style.color        = s.running ? 'var(--green)' : 'var(--dim)';
+    const badge = document.getElementById('pg_badge');
+    badge.style.display = ''; badge.textContent = 'RUNNING';
+    badge.style.borderColor = 'var(--green)'; badge.style.color = 'var(--green)';
 
-  const seedRow = document.getElementById('pg_seed_row');
-  if (s.seed) {
-    seedRow.style.display = '';
-    document.getElementById('pg_seed').textContent = s.seed;
+    const seedRow = document.getElementById('pg_seed_row');
+    if (s.seed) { seedRow.style.display = ''; document.getElementById('pg_seed').textContent = s.seed; }
+    else { seedRow.style.display = 'none'; }
+
+    const errRow = document.getElementById('pg_err_row');
+    if (s.last_error) { errRow.style.display = ''; document.getElementById('pg_last_err').textContent = s.last_error; }
+    else { errRow.style.display = 'none'; }
+
+    const modeLabel = s.mode === 'wikipedia' ? `Wikipedia crawl from "${s.seed || '?'}"` :
+                      s.mode === 'crawl'      ? `BFS crawl from "${s.seed || '?'}"` : 'Import';
+    document.getElementById('pg_label').textContent = `${modeLabel} — importing…`;
+
   } else {
-    seedRow.style.display = 'none';
-  }
+    // ── Complete ──────────────────────────────────────────────────
+    if (!s.seed && done === 0) {
+      // status endpoint has no prior run
+      document.getElementById('pg_idle').style.display     = '';
+      document.getElementById('pg_active').style.display   = 'none';
+      document.getElementById('pg_done_msg').style.display = 'none';
+      document.getElementById('pg_badge').style.display    = 'none';
+      return;
+    }
+    document.getElementById('pg_idle').style.display     = 'none';
+    document.getElementById('pg_active').style.display   = 'none';
+    document.getElementById('pg_done_msg').style.display = '';
 
-  const errRow = document.getElementById('pg_err_row');
-  if (s.last_error) {
-    errRow.style.display = '';
-    document.getElementById('pg_last_err').textContent = s.last_error;
-  } else {
-    errRow.style.display = 'none';
-  }
+    const badge = document.getElementById('pg_badge');
+    badge.style.display = ''; badge.textContent = 'COMPLETE';
+    badge.style.borderColor = 'var(--green)'; badge.style.color = 'var(--green)';
 
-  const modeLabel = s.mode === 'wikipedia'
-    ? `Wikipedia crawl from "${s.seed || '?'}"`
-    : s.mode === 'crawl'
-      ? `BFS crawl from "${s.seed || '?'}"`
-      : 'Prefix import';
-  document.getElementById('pg_label').textContent = s.running
-    ? `${modeLabel} — importing…`
-    : `${modeLabel} — finished`;
-
-  const msg = document.getElementById('pg_done_msg');
-  if (!s.running && done > 0) {
-    msg.style.display = '';
-    msg.innerHTML = `✓ Done — ${done.toLocaleString()} article${done !== 1 ? 's' : ''} imported.
-      <a href="/reference" style="margin-left:0.5rem;">View all articles →</a>`;
-  } else {
-    msg.style.display = 'none';
+    document.getElementById('pg_done_title').textContent =
+      done > 0 ? `${done.toLocaleString()} article${done !== 1 ? 's' : ''} imported` : 'Import finished';
+    const parts = [];
+    if (s.seed) parts.push(s.seed);
+    if (errors)  parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);
+    document.getElementById('pg_done_detail').textContent = parts.join(' · ');
   }
 }
 

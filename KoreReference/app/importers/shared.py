@@ -64,34 +64,17 @@ def extract_facts(soup: BeautifulSoup) -> list[list[str]]:
     return facts
 
 
-def extract_article_html(content_div) -> tuple[str, list[dict], Optional[str]]:
-    """Build body text, sections list, and summary from a BeautifulSoup content element.
+def extract_article_html(content_div) -> tuple[str, Optional[str]]:
+    """Build body text and summary from a BeautifulSoup content element.
+
+    Encodes headings inline as ``== Heading ==`` so that sections can be
+    derived from body at read time — avoiding duplicate storage.
 
     Caller must have already:
       - Removed noise tags via remove_noise()
       - Rewritten internal <a> hrefs to [[wikilink]] markup
       - Extracted and decomposed infoboxes via extract_facts()
     """
-    sections: list[dict] = []
-    current_heading: Optional[str] = None
-    current_parts: list[str] = []
-    for el in content_div.find_all(["h2", "h3", "h4", "p", "ul", "ol", "table"]):
-        if _inside_table(el):
-            continue
-        if el.name in ("h2", "h3", "h4"):
-            if current_heading is not None:
-                sections.append({"title": current_heading, "content": "\n".join(current_parts).strip()})
-            current_heading = _EDIT_RE.sub('', el.get_text(strip=True))
-            current_parts = []
-        elif el.name == "table":
-            current_parts.append(f"{TABLE_OPEN}{_clean_table(el)}{TABLE_CLOSE}")
-        else:
-            text = fix_spacing(el.get_text(separator=" ", strip=True))
-            if text:
-                current_parts.append(text)
-    if current_heading is not None:
-        sections.append({"title": current_heading, "content": "\n".join(current_parts).strip()})
-
     body_parts: list[str] = []
     for el in content_div.find_all(["p", "ul", "ol", "h2", "h3", "h4", "table"]):
         if _inside_table(el):
@@ -114,4 +97,4 @@ def extract_article_html(content_div) -> tuple[str, list[dict], Optional[str]]:
             summary = text
             break
 
-    return body, sections, summary
+    return body, summary

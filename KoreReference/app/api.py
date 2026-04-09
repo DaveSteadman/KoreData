@@ -12,13 +12,11 @@ from app.database import (
     delete_article,
     get_article_by_title,
     get_backlinks,
-    get_category_articles,
     get_links,
     get_random_article,
     get_status,
     init_db,
     list_articles,
-    list_categories,
     resolve_article,
     resolve_links,
     search_articles,
@@ -60,8 +58,6 @@ class ArticleCreate(BaseModel):
     title: str
     body: Optional[str] = None
     summary: Optional[str] = None
-    sections: Optional[list] = None
-    categories: Optional[list[str]] = None
     facts: Optional[list] = None
     redirect_to: Optional[str] = None
     link_titles: Optional[list[str]] = None
@@ -135,7 +131,6 @@ def route_get_summary(title: str):
         "title":      article["title"],
         "summary":    article.get("summary"),
         "word_count": article.get("word_count"),
-        "categories": article.get("categories", []),
     }
 
 
@@ -168,22 +163,12 @@ def route_get_backlinks(title: str, limit: int = 50, offset: int = 0):
     return get_backlinks(title, limit=limit, offset=offset)
 
 
-@app.get("/articles/{title}/categories", summary="Categories for an article")
-def route_get_article_categories(title: str):
-    article = get_article_by_title(title, full=False)
-    if article is None:
-        raise HTTPException(status_code=404, detail=f"Article not found: {title!r}")
-    return {"title": article["title"], "categories": article["categories"]}
-
-
 @app.post("/articles", status_code=201, summary="Add or upsert an article")
 def route_upsert_article(data: ArticleCreate):
     return upsert_article(
         title=data.title,
         body=data.body,
         summary=data.summary,
-        sections=data.sections,
-        categories=data.categories,
         facts=data.facts,
         redirect_to=data.redirect_to,
         link_titles=data.link_titles,
@@ -211,33 +196,15 @@ def route_delete_article(title: str):
 def route_search(
     q: Optional[str] = None,
     title: Optional[str] = None,
-    category: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
 ):
-    if not any([q, title, category]):
+    if not any([q, title]):
         raise HTTPException(
             status_code=400,
-            detail="Provide at least one of: q, title, category",
+            detail="Provide at least one of: q, title",
         )
-    return search_articles(q=q, title=title, category=category, limit=limit, offset=offset)
-
-
-# ---------------------------------------------------------------------------
-# Categories
-# ---------------------------------------------------------------------------
-
-@app.get("/categories", summary="List all categories with article counts")
-def route_list_categories():
-    return list_categories()
-
-
-@app.get("/categories/{name}", summary="List articles in a category")
-def route_category_articles(name: str, limit: int = 100, offset: int = 0):
-    articles = get_category_articles(name, limit=limit, offset=offset)
-    if not articles and not list_categories():
-        raise HTTPException(status_code=404, detail=f"Category not found: {name!r}")
-    return articles
+    return search_articles(q=q, title=title, limit=limit, offset=offset)
 
 
 # ---------------------------------------------------------------------------

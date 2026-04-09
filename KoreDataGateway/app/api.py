@@ -266,14 +266,12 @@ def _parse_year(value: Optional[str]) -> Optional[int]:
 def _parse_article_form(
     body: Optional[str],
     summary: Optional[str],
-    categories: Optional[str],
     redirect_to: Optional[str],
     facts_raw: Optional[str] = None,
 ) -> dict:
     """Parse and normalise the shared form fields for new-article and edit-article POST handlers."""
     body = body.replace("\r\n", "\n").replace("\r", "\n").strip() if body else None
     summary = summary.strip() if summary else None
-    cats = [c.strip() for c in (categories or "").split(",") if c.strip()]
     links = _parse_wiki_links(body or "")
     sections = _parse_wiki_sections(body or "")
     facts: list[list[str]] = []
@@ -288,7 +286,6 @@ def _parse_article_form(
     return {
         "body":        body,
         "summary":     summary or _extract_summary(body or ""),
-        "cats":        cats,
         "links":       links,
         "sections":    sections,
         "facts":       facts,
@@ -995,27 +992,6 @@ async def ref_search(
     )
 
 
-@app.get("/reference/categories", response_class=HTMLResponse)
-async def ref_categories(request: Request):
-    r = await _ref_client.get("/categories")
-    categories = r.json() if r.status_code == 200 else []
-    return templates.TemplateResponse(
-        request, "reference_categories.html",
-        {"categories": categories},
-    )
-
-
-@app.get("/reference/categories/{name}", response_class=HTMLResponse)
-async def ref_category(request: Request, name: str, limit: int = 100, offset: int = 0):
-    r = await _ref_client.get(f"/categories/{name}", params={"limit": limit, "offset": offset})
-    articles = r.json() if r.status_code == 200 else []
-    return templates.TemplateResponse(
-        request, "reference_categories.html",
-        {"categories": None, "category_name": name, "articles": articles,
-         "limit": limit, "offset": offset},
-    )
-
-
 @app.get("/reference/new", response_class=HTMLResponse)
 async def ref_article_new(request: Request):
     return templates.TemplateResponse(
@@ -1030,17 +1006,15 @@ async def ref_article_new_post(
     title:       str            = Form(...),
     summary:     Optional[str]  = Form(None),
     body:        Optional[str]  = Form(None),
-    categories:  Optional[str]  = Form(None),
     facts:       Optional[str]  = Form(None),
     redirect_to: Optional[str]  = Form(None),
 ):
     title = title.strip()
-    f = _parse_article_form(body, summary, categories, redirect_to, facts)
+    f = _parse_article_form(body, summary, redirect_to, facts)
     payload: dict = {"title": title}
     if f["body"]:        payload["body"]        = f["body"]
     if f["summary"]:     payload["summary"]     = f["summary"]
     if f["sections"]:    payload["sections"]    = f["sections"]
-    if f["cats"]:        payload["categories"]  = f["cats"]
     if f["facts"]:       payload["facts"]       = f["facts"]
     if f["redirect_to"]: payload["redirect_to"] = f["redirect_to"]
     if f["links"]:       payload["link_titles"] = f["links"]
@@ -1052,7 +1026,7 @@ async def ref_article_new_post(
         request, "reference_edit.html",
         {"article": None, "error": r.json().get("detail", f"Error {r.status_code}"),
          "form": {"title": title, "summary": summary or "", "body": f["body"] or "",
-                  "categories": categories or "", "redirect_to": redirect_to or ""}},
+                  "redirect_to": redirect_to or ""}},
         status_code=400,
     )
 
@@ -1075,16 +1049,14 @@ async def ref_article_edit_post(
     title:       str,
     summary:     Optional[str]  = Form(None),
     body:        Optional[str]  = Form(None),
-    categories:  Optional[str]  = Form(None),
     facts:       Optional[str]  = Form(None),
     redirect_to: Optional[str]  = Form(None),
 ):
-    f = _parse_article_form(body, summary, categories, redirect_to, facts)
+    f = _parse_article_form(body, summary, redirect_to, facts)
     payload: dict = {"title": title}
     if f["body"] is not None: payload["body"]       = f["body"]
     if f["summary"]:          payload["summary"]    = f["summary"]
     payload["sections"]    = f["sections"] or []
-    payload["categories"]  = f["cats"]
     payload["facts"]       = f["facts"]
     payload["link_titles"] = f["links"]
     if f["redirect_to"]:   payload["redirect_to"] = f["redirect_to"]

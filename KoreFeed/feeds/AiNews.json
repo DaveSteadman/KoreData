@@ -5,11 +5,11 @@
     "name": "HuggingFace Blog",
     "url": "https://huggingface.co/blog/feed.xml",
     "update_rate": 360,
-    "last_fetched_at": "2026-04-09T05:50:53",
+    "last_fetched_at": "2026-04-09T18:48:03",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 121.8,
-    "last_new_entries": 0,
+    "last_duration_s": 124.7,
+    "last_new_entries": 1,
     "content_status": "good"
   },
   {
@@ -18,11 +18,11 @@
     "name": "understandingai",
     "url": "https://www.understandingai.org/feed",
     "update_rate": 300,
-    "last_fetched_at": "2026-04-09T05:51:00",
+    "last_fetched_at": "2026-04-09T16:46:12",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 6.9,
-    "last_new_entries": 1,
+    "last_duration_s": 7.4,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -31,10 +31,10 @@
     "name": "Ollama Blog",
     "url": "https://ollama.com/blog/rss.xml",
     "update_rate": 301,
-    "last_fetched_at": "2026-04-09T05:51:09",
+    "last_fetched_at": "2026-04-09T16:48:07",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 9.0,
+    "last_duration_s": 8.7,
     "last_new_entries": 0,
     "content_status": "good"
   }

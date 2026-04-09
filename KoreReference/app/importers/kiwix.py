@@ -101,18 +101,11 @@ def parse_kiwix_article(html: str, title: str) -> dict:
     # and bail out before wasting time on a parse that will produce no content.
     if soup.find("meta", attrs={"http-equiv": lambda v: v and v.lower() == "refresh"}):
         return {"redirect": True, "body": "", "summary": None,
-                "sections": [], "categories": [], "link_titles": [], "facts": []}
+                "link_titles": [], "facts": []}
 
     remove_noise(soup)
 
-    # Categories come from #mw-normal-catlinks (absent in 2025+ ZIM files)
-    categories: list[str] = []
-    cat_div = soup.find(id="mw-normal-catlinks")
-    if cat_div:
-        categories = [a.get_text(strip=True) for a in cat_div.find_all("a")[1:]]
-        cat_div.decompose()
-
-    # Collect internal link titles (first pass — before rewriting hrefs)
+    # Single pass: collect link titles and rewrite <a> tags to [[wikilink]] markup
     link_titles: list[str] = []
     seen_links: set[str] = set()
     for a in soup.find_all("a", href=True):
@@ -122,34 +115,24 @@ def parse_kiwix_article(html: str, title: str) -> dict:
         raw = _resolve_href(href)
         if raw is None:
             continue
-        linked_title = raw.replace("_", " ").strip()
-        if linked_title and linked_title not in seen_links and linked_title != title:
-            link_titles.append(linked_title)
-            seen_links.add(linked_title)
-
-    # Rewrite <a> tags to [[wikilink]] markup (second pass)
-    for a in soup.find_all("a", href=True):
-        href = unquote(a["href"]).split("#")[0].strip()
-        if not href or "://" in href or href.startswith("mailto:") or href.startswith("/"):
-            continue
-        raw = _resolve_href(href)
-        if raw is None:
-            continue
         target = raw.replace("_", " ").strip()
+        if not target:
+            continue
+        if target not in seen_links and target != title:
+            link_titles.append(target)
+            seen_links.add(target)
         display = a.get_text(strip=True)
-        if target and display:
+        if display:
             wikilink = f"[[{target}]]" if display == target else f"[[{display}|{target}]]"
             a.replace_with(wikilink)
 
     facts = extract_facts(soup)
     content_div = soup.find(id="mw-content-text") or soup.find("body") or soup
-    body, sections, summary = extract_article_html(content_div)
+    body, summary = extract_article_html(content_div)
 
     return {
         "body": body,
         "summary": summary,
-        "sections": sections,
-        "categories": categories,
         "link_titles": link_titles,
         "facts": facts,
     }
@@ -172,8 +155,6 @@ def import_one(
         title=title,
         body=parsed["body"],
         summary=parsed["summary"],
-        sections=parsed["sections"],
-        categories=parsed["categories"],
         facts=parsed["facts"],
         link_titles=parsed["link_titles"],
     )
@@ -211,8 +192,8 @@ def run_kiwix_import(
                 import_state["errors"] += 1
                 import_state["last_error"] = f"{title}: {exc}"
 
-    resolve_links(limit=500_000)
     import_state["running"] = False
+    resolve_links(limit=500_000)
 
 
 def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> None:
@@ -226,6 +207,7 @@ def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> 
     queue: deque[tuple[str, int]] = deque([(start_title, 0)])
     visited: set[str] = {start_title}
     import_state["total"] = 1
+    import_state["limit"] = limit
 
     with httpx.Client(timeout=30.0, follow_redirects=True) as client:
         while queue and import_state["running"]:
@@ -240,14 +222,11 @@ def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> 
                 if existing is not None:
                     db_links = get_links(title) if depth < max_depth else []
                     if db_links or depth >= max_depth:
-                        import_state["done"] += 1
                         for lnk in db_links:
                             lt = (lnk.get("to_title") or "").strip()
                             if lt and lt not in visited:
-                                if import_state["done"] + len(queue) < limit:
-                                    visited.add(lt)
-                                    queue.append((lt, depth + 1))
-                        import_state["total"] = max(import_state["total"], len(visited))
+                                visited.add(lt)
+                                queue.append((lt, depth + 1))
                         continue
                     # Article exists but has no links and we need depth expansion —
                     # fall through to re-fetch so links get extracted and saved
@@ -263,8 +242,6 @@ def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> 
                     title=title,
                     body=parsed["body"],
                     summary=parsed["summary"],
-                    sections=parsed["sections"],
-                    categories=parsed["categories"],
                     facts=parsed["facts"],
                     link_titles=parsed["link_titles"],
                 )
@@ -283,5 +260,5 @@ def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> 
                 import_state["errors"] += 1
                 import_state["last_error"] = f"{title}: {exc}"
 
-    resolve_links(limit=500_000)
     import_state["running"] = False
+    resolve_links(limit=500_000)

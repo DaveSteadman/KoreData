@@ -44,7 +44,7 @@ def parse_wikipedia_url(url: str) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 
 def parse_wikipedia_article(
-    html: str, title: str, api_categories: list[str], api_links: list[str]
+    html: str, title: str, api_links: list[str]
 ) -> dict:
     """Parse Wikipedia Action API rendered HTML.
 
@@ -77,13 +77,11 @@ def parse_wikipedia_article(
         or soup.find("body")
         or soup
     )
-    body, sections, summary = extract_article_html(content_div)
+    body, summary = extract_article_html(content_div)
 
     return {
         "body": body,
         "summary": summary,
-        "sections": sections,
-        "categories": api_categories,
         "link_titles": api_links,
         "facts": facts,
     }
@@ -123,6 +121,7 @@ def run_wikipedia_crawl(
     queue: deque[tuple[str, int]] = deque([(start_title, 0)])
     visited: set[str] = {start_title}
     import_state["total"] = 1
+    import_state["limit"] = limit
     _already_fetched = False  # first HTTP request is immediate; subsequent ones wait
 
     with httpx.Client(timeout=30.0, follow_redirects=True, headers=headers) as client:
@@ -138,14 +137,11 @@ def run_wikipedia_crawl(
                 if existing is not None:
                     db_links = get_links(title) if depth < max_depth else []
                     if db_links or depth >= max_depth:
-                        import_state["done"] += 1
                         for lnk in db_links:
                             lt = (lnk.get("to_title") or "").strip()
                             if lt and lt not in visited:
-                                if import_state["done"] + len(queue) < limit:
-                                    visited.add(lt)
-                                    queue.append((lt, depth + 1))
-                        import_state["total"] = max(import_state["total"], len(visited))
+                                visited.add(lt)
+                                queue.append((lt, depth + 1))
                         continue
 
             # Polite delay — never before the very first HTTP request
@@ -157,7 +153,7 @@ def run_wikipedia_crawl(
                 params = {
                     "action": "parse",
                     "page": title,
-                    "prop": "text|categories|links",
+                    "prop": "text|links",
                     "format": "json",
                     "maxlag": "5",
                     "redirects": "1",
@@ -175,12 +171,6 @@ def run_wikipedia_crawl(
                     import_state["done"] += 1
                     continue
                 html_text  = parsed_api.get("text", {}).get("*", "")
-                # Categories: exclude hidden maintenance categories
-                api_categories = [
-                    c["*"].replace("_", " ")
-                    for c in parsed_api.get("categories", [])
-                    if "hidden" not in c
-                ]
                 # Links: article namespace (ns=0) only, must exist on the wiki
                 api_links = [
                     lnk["*"]
@@ -188,13 +178,11 @@ def run_wikipedia_crawl(
                     if lnk.get("ns") == 0 and "exists" in lnk
                 ]
 
-                parsed = parse_wikipedia_article(html_text, title, api_categories, api_links)
+                parsed = parse_wikipedia_article(html_text, title, api_links)
                 upsert_article(
                     title=title,
                     body=parsed["body"],
                     summary=parsed["summary"],
-                    sections=parsed["sections"],
-                    categories=parsed["categories"],
                     facts=parsed["facts"],
                     link_titles=parsed["link_titles"],
                 )
@@ -213,5 +201,5 @@ def run_wikipedia_crawl(
                 import_state["errors"] += 1
                 import_state["last_error"] = f"{title}: {exc}"
 
-    resolve_links(limit=500_000)
     import_state["running"] = False
+    resolve_links(limit=500_000)

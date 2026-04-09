@@ -11,7 +11,6 @@
     <span class="ph-diamond">◆</span> ARTICLES
     <span class="badge badge-dim" style="margin-left:0.5rem;">{{ total }}</span>
     <span style="margin-left:auto; display:flex; gap:0.75rem; align-items:center;">
-      <a href="/reference/categories" style="font-size:11px; color:var(--dim);">CATEGORIES ↗</a>
       <a href="/reference/search"     style="font-size:11px; color:var(--dim);">SEARCH ↗</a>
       <a href="/reference/import"     style="font-size:11px; color:var(--dim);">IMPORT ↗</a>
       <a href="/reference/new"><button type="button" style="font-size:11px; padding:3px 10px;">✚ NEW ARTICLE</button></a>
@@ -37,7 +36,6 @@
           <th style="width:50px;">#</th>
           <th>Title</th>
           <th style="width:120px; text-align:right;">Words</th>
-          <th>Categories</th>
         </tr>
       </thead>
       <tbody>
@@ -47,11 +45,6 @@
           <td><a href="/reference/{{ a.title | urlencode }}">{{ a.title }}</a></td>
           <td class="meta" style="text-align:right;">
             {% if a.word_count %}{{ "{:,}".format(a.word_count) }}{% else %}—{% endif %}
-          </td>
-          <td class="meta" style="font-size:11px;">
-            {% for cat in (a.categories or [])[:4] %}
-            <a href="/reference/categories/{{ cat | urlencode }}" style="color:var(--dim);">{{ cat }}</a>{% if not loop.last %}, {% endif %}
-            {% endfor %}
           </td>
         </tr>
         {% endfor %}

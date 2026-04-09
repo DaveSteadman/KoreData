@@ -127,7 +127,6 @@
             <div class="svc-stat"><span class="svc-stat-key">articles</span><span class="svc-stat-val">{{ svc.stats.get("total_articles", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">redirects</span><span class="svc-stat-val">{{ svc.stats.get("total_redirects", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">links</span><span class="svc-stat-val">{{ svc.stats.get("total_links", "—") }}</span></div>
-            <div class="svc-stat"><span class="svc-stat-key">categories</span><span class="svc-stat-val">{{ svc.stats.get("total_categories", "—") }}</span></div>
           {% endif %}
         </div>
         <div class="svc-links">
@@ -366,7 +365,7 @@ async function runSearch() {
 const _SVC_STATS = {
   feeds:     [['domains','total_domains'],['feeds','total_feeds'],['entries','total_entries']],
   library:   [['books','total_books'],['incomplete','incomplete_records']],
-  reference: [['articles','total_articles'],['redirects','total_redirects'],['links','total_links'],['categories','total_categories']],
+  reference: [['articles','total_articles'],['redirects','total_redirects'],['links','total_links']],
 };
 
 async function refreshHealth() {
