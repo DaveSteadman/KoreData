@@ -187,6 +187,34 @@ document.getElementById('c_depth').addEventListener('input', function () {
 });
 document.getElementById('c_depth_hint').textContent = depthHints[1];
 
+// ─── URL type detection ──────────────────────────────────────
+function isWikipediaUrl(url) {
+  return /^https?:\/\/[a-z]{2,3}\.m?\.?wikipedia\.org\/wiki\//i.test(url);
+}
+function detectUrlType(url) {
+  const badge = document.getElementById('c_source_badge');
+  const rateRow = document.getElementById('c_rate_row');
+  const val = url.trim();
+  if (!val) {
+    badge.style.display = 'none';
+    rateRow.style.display = 'none';
+    return;
+  }
+  if (isWikipediaUrl(val)) {
+    badge.textContent = 'WIKIPEDIA';
+    badge.style.display = '';
+    badge.style.borderColor = 'var(--amber)';
+    badge.style.color = 'var(--amber)';
+    rateRow.style.display = '';
+  } else {
+    badge.textContent = 'KIWIX';
+    badge.style.display = '';
+    badge.style.borderColor = 'var(--green)';
+    badge.style.color = 'var(--green)';
+    rateRow.style.display = 'none';
+  }
+}
+
 // ─── Reset progress panel to a blank starting state ──────────
 function resetPanel() {
   document.getElementById('pg_idle').style.display    = 'none';
@@ -224,10 +252,20 @@ async function crawlStart() {
   document.getElementById('c_stop_btn').style.display = '';
 
   try {
-    const resp = await fetch('/reference/import/crawl', {
+    let endpoint, body;
+    if (isWikipediaUrl(seed)) {
+      const rate = parseFloat(document.getElementById('c_rate').value) || 3;
+      endpoint = '/reference/import/wikipedia';
+      body = { seed_url: seed, max_depth: depth, limit: limit, resume: resume,
+               rate_min: Math.max(1, rate - 0.5), rate_max: rate + 0.5 };
+    } else {
+      endpoint = '/reference/import/crawl';
+      body = { seed_url: seed, max_depth: depth, limit: limit, resume: resume };
+    }
+    const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ seed_url: seed, max_depth: depth, limit: limit, resume: resume }),
+      body: JSON.stringify(body),
     });
     const data = await resp.json();
     if (!resp.ok) { showError(data.detail || `Error ${resp.status}`); return; }

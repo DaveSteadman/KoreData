@@ -95,6 +95,14 @@ def _resolve_href(href: str) -> Optional[str]:
 def parse_kiwix_article(html: str, title: str) -> dict:
     """Extract body, summary, sections, categories, facts, and wikilinks from Kiwix HTML."""
     soup = BeautifulSoup(html, "html.parser")
+
+    # Kiwix serves redirect articles as a meta-refresh page with an empty <body>.
+    # httpx only follows HTTP 3xx, not <meta http-equiv="refresh">, so we detect
+    # and bail out before wasting time on a parse that will produce no content.
+    if soup.find("meta", attrs={"http-equiv": lambda v: v and v.lower() == "refresh"}):
+        return {"redirect": True, "body": "", "summary": None,
+                "sections": [], "categories": [], "link_titles": [], "facts": []}
+
     remove_noise(soup)
 
     # Categories come from #mw-normal-catlinks (absent in 2025+ ZIM files)
@@ -158,6 +166,8 @@ def import_one(
     resp = client.get(article_url(kiwix_base, zim_name, title))
     resp.raise_for_status()
     parsed = parse_kiwix_article(resp.text, title)
+    if parsed.get("redirect") or not (parsed["body"] or parsed["summary"]):
+        return  # redirect or empty stub — skip
     upsert_article(
         title=title,
         body=parsed["body"],
@@ -246,6 +256,9 @@ def run_kiwix_crawl(seed_url: str, max_depth: int, limit: int, resume: bool) -> 
                 resp = client.get(article_url(kiwix_base, zim_name, title))
                 resp.raise_for_status()
                 parsed = parse_kiwix_article(resp.text, title)
+                if parsed.get("redirect") or not (parsed["body"] or parsed["summary"]):
+                    import_state["done"] += 1
+                    continue  # redirect or empty stub — skip without storing
                 upsert_article(
                     title=title,
                     body=parsed["body"],

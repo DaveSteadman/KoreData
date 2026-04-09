@@ -143,6 +143,34 @@
 
 </div>
 
+<!-- ─── Batch import from viewer URLs ──────────────────────── -->
+<div style="margin-top:1rem;">
+  <div class="panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> BATCH IMPORT FROM VIEWER URLS
+    </div>
+    <div class="panel-body">
+      <p class="meta" style="font-size:11px; margin-bottom:0.6rem;">
+        Paste one Kiwix viewer URL per line (e.g. <code>http://host/viewer#zim/Article_Name.123</code>). Blank lines are ignored. Already-imported titles are skipped.
+      </p>
+      <div style="display:grid; grid-template-columns:1fr auto; gap:0.5rem; margin-bottom:0.6rem; align-items:start;">
+        <textarea id="batch_urls" rows="8"
+          placeholder="http://192.168.1.33:8080/viewer#gutenberg_en_all_2023-09/A/Adventures_of_Huckleberry_Finn.1837&#10;http://192.168.1.33:8080/viewer#gutenberg_en_all_2023-09/A/Moby-Dick.2701&#10;…one URL per line"
+          style="font-family:monospace; font-size:11px; resize:vertical; width:100%;"></textarea>
+        <div style="display:flex; flex-direction:column; gap:0.4rem;">
+          <button type="button" onclick="batchImport()" id="batch_btn" style="white-space:nowrap;">START IMPORT</button>
+          <button type="button" onclick="batchClear()" style="font-size:10px; padding:2px 6px; background:transparent; border-color:var(--border); color:var(--dim); white-space:nowrap;">CLEAR LOG</button>
+        </div>
+      </div>
+      <div id="batch_status" class="meta" style="min-height:1.2em; margin-bottom:0.4rem;"></div>
+      <div id="batch_log_wrap" style="display:none;">
+        <div style="font-size:11px; letter-spacing:0.04em; color:var(--dim); margin-bottom:0.3rem;">IMPORT LOG</div>
+        <div id="batch_log" style="font-family:monospace; font-size:11px; line-height:1.7; max-height:280px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Browse ZIM by letter ───────────────────────────── -->
 <div id="k_browse_panel" style="display:none; margin-top:1rem; display:none;">
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;">
@@ -481,5 +509,81 @@ function escHtml(str) {
 }
 
 // Don't auto-load — user must confirm/set URL first
+
+// ─── Batch import ────────────────────────────────────────────
+function batchLog(text, color) {
+  const wrap = document.getElementById('batch_log_wrap');
+  const log  = document.getElementById('batch_log');
+  wrap.style.display = '';
+  const line = document.createElement('div');
+  line.style.color = color || 'var(--text)';
+  line.textContent = text;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function batchClear() {
+  document.getElementById('batch_log').innerHTML = '';
+  document.getElementById('batch_log_wrap').style.display = 'none';
+  document.getElementById('batch_status').textContent = '';
+}
+
+async function batchImport() {
+  const ta  = document.getElementById('batch_urls');
+  const btn = document.getElementById('batch_btn');
+  const stat = document.getElementById('batch_status');
+
+  const urls = ta.value.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
+  if (!urls.length) { stat.textContent = 'Paste at least one URL.'; stat.style.color = 'var(--amber)'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '…';
+  stat.textContent = `Importing ${urls.length} URL${urls.length !== 1 ? 's' : ''}…`;
+  stat.style.color = 'var(--dim)';
+  batchLog(`→ Starting batch import of ${urls.length} URL(s)`, 'var(--dim)');
+
+  try {
+    const resp = await fetch('/library/import/kiwix/viewer/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ urls }),
+    });
+    let data;
+    try { data = await resp.json(); } catch(je) { data = null; }
+
+    if (!resp.ok || !data) {
+      const msg = (data && data.detail) || `HTTP ${resp.status}`;
+      batchLog(`✗ Batch request failed: ${msg}`, 'var(--red)');
+      stat.textContent = '✗ ' + msg;
+      stat.style.color = 'var(--red)';
+      return;
+    }
+
+    const results = data.results || [];
+    for (const r of results) {
+      if (r.status === 'ok') {
+        batchLog(`✓ [${r.id}] ${r.title}`, 'var(--green)');
+      } else if (r.status === 'exists') {
+        batchLog(`— already exists: ${r.title || r.url}`, 'var(--amber)');
+      } else {
+        batchLog(`✗ ${r.url}`, 'var(--red)');
+        if (r.detail) batchLog(`    ${r.detail}`, 'var(--red)');
+      }
+    }
+
+    const s = data.summary || {};
+    const summary = `Done — ${s.ok || 0} imported, ${s.exists || 0} already existed, ${s.error || 0} errors`;
+    batchLog(summary, 'var(--dim)');
+    stat.textContent = summary;
+    stat.style.color = s.error > 0 ? 'var(--amber)' : 'var(--green)';
+  } catch (e) {
+    batchLog(`✗ fetch exception: ${e.message}`, 'var(--red)');
+    stat.textContent = '✗ ' + e.message;
+    stat.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'START IMPORT';
+  }
+}
 </script>
 {% endblock %}

@@ -554,6 +554,66 @@ class KiwixViewerImportRequest(BaseModel):
     language: str = "en"
 
 
+class KiwixViewerBatchRequest(BaseModel):
+    urls: list[str]
+    language: str = "en"
+    kiwix_url: Optional[str] = None
+
+
+async def _fetch_and_import_viewer_url(viewer_url: str, language: str, kiwix_url: Optional[str]) -> dict:
+    """Shared logic for single and batch viewer-URL imports.
+
+    Returns a result dict with keys: status ('ok'|'exists'|'error'), title, id, detail.
+    Never raises — errors are captured in the result dict.
+    """
+    result: dict = {"url": viewer_url, "status": "error", "title": None, "id": None, "detail": None}
+    try:
+        up = _urlparse(viewer_url)
+        host = kiwix_url or f"{up.scheme}://{up.netloc}"
+        fragment = up.fragment
+        if not fragment or '/' not in fragment:
+            result["detail"] = "URL must contain a fragment like #zim/Article"
+            return result
+        slash = fragment.index('/')
+        zim = fragment[:slash]
+        article_path = fragment[slash + 1:]
+
+        content_url = f"{host}/content/{zim}/{article_path}"
+        try:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                r = await client.get(content_url)
+            if r.status_code == 404:
+                result["detail"] = f"Not found in Kiwix: {content_url}"
+                return result
+            r.raise_for_status()
+        except httpx.HTTPError as exc:
+            result["detail"] = f"Kiwix fetch failed: {exc}"
+            return result
+
+        parsed = _parse_gutenberg_html(r.text)
+        title = parsed["title"] or _urlunquote(article_path.rsplit('.', 1)[0].replace('_', ' '))
+        result["title"] = title
+
+        if title_exists(title):
+            result["status"] = "exists"
+            result["detail"] = f"Already imported: {title!r}"
+            return result
+
+        book = add_book(
+            title=title,
+            body=parsed["body"],
+            author=parsed["author"],
+            year=parsed["year"],
+            language=language,
+            genre=parsed["genre"],
+        )
+        result["status"] = "ok"
+        result["id"] = book["id"]
+    except Exception as exc:
+        result["detail"] = str(exc)
+    return result
+
+
 @app.post("/import/kiwix/viewer", status_code=201, summary="Import a Kiwix article by its viewer URL")
 async def import_kiwix_viewer(data: KiwixViewerImportRequest):
     """
@@ -561,40 +621,28 @@ async def import_kiwix_viewer(data: KiwixViewerImportRequest):
     and imports the article directly.  The host, ZIM name, and article path
     are all derived from the URL — no guessing required.
     """
-    up = _urlparse(data.viewer_url)
-    host = data.kiwix_url or f"{up.scheme}://{up.netloc}"
-    fragment = up.fragment  # "zim/Article%20Name.123"
-    if not fragment or '/' not in fragment:
-        raise HTTPException(status_code=422, detail="URL must contain a fragment like #zim/Article")
-    slash = fragment.index('/')
-    zim = fragment[:slash]
-    article_path = fragment[slash + 1:]   # already percent-encoded by the browser
+    r = await _fetch_and_import_viewer_url(data.viewer_url, data.language, data.kiwix_url)
+    if r["status"] == "error":
+        raise HTTPException(status_code=502, detail=r["detail"])
+    if r["status"] == "exists":
+        raise HTTPException(status_code=409, detail=r["detail"])
+    return get_book(r["id"], include_body=False)
 
-    content_url = f"{host}/content/{zim}/{article_path}"
-    try:
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            r = await client.get(content_url)
-        if r.status_code == 404:
-            raise HTTPException(status_code=404, detail=f"Not found in Kiwix: {content_url}")
-        r.raise_for_status()
-    except HTTPException:
-        raise
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"Kiwix fetch failed: {exc}") from exc
 
-    parsed = _parse_gutenberg_html(r.text)
-    title = parsed["title"] or _urlunquote(article_path.rsplit('.', 1)[0].replace('_', ' '))
-    if title_exists(title):
-        raise HTTPException(status_code=409, detail=f"Already imported: {title!r}")
-
-    return add_book(
-        title=title,
-        body=parsed["body"],
-        author=parsed["author"],
-        year=parsed["year"],
-        language=data.language,
-        genre=parsed["genre"],
-    )
+@app.post("/import/kiwix/viewer/batch", summary="Batch-import Kiwix articles from a list of viewer URLs")
+async def import_kiwix_viewer_batch(data: KiwixViewerBatchRequest):
+    """Processes each URL in order, skipping blank lines. Never aborts early."""
+    results = []
+    for raw in data.urls:
+        url = raw.strip()
+        if not url or url.startswith('#'):
+            continue
+        result = await _fetch_and_import_viewer_url(url, data.language, data.kiwix_url)
+        results.append(result)
+    ok    = sum(1 for r in results if r["status"] == "ok")
+    exist = sum(1 for r in results if r["status"] == "exists")
+    err   = sum(1 for r in results if r["status"] == "error")
+    return {"results": results, "summary": {"ok": ok, "exists": exist, "error": err}}
 
 
 # ---------------------------------------------------------------------------

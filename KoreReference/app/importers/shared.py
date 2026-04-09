@@ -5,6 +5,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 _PUNCT_SPACE_RE = re.compile(r' +([,\.;:!?])')
+_EDIT_RE = re.compile(r'\s*\[edit\]\s*$', re.IGNORECASE)
 
 TABLE_OPEN  = "<<<TABLE>>>"
 TABLE_CLOSE = "<<<ENDTABLE>>>"
@@ -14,7 +15,8 @@ _ALLOWED_TABLE_ATTRS = frozenset({"colspan", "rowspan", "scope"})
 _NOISE_SELECTOR = (
     "sup, .reference, .reflist, .navbox, "
     ".thumb, .gallery, .mw-editsection, #toc, "
-    ".hatnote, .noprint, style, script"
+    ".hatnote, .noprint, style, script, "
+    ".redirectMsg, .mw-redirectedfrom"
 )
 
 
@@ -79,7 +81,7 @@ def extract_article_html(content_div) -> tuple[str, list[dict], Optional[str]]:
         if el.name in ("h2", "h3", "h4"):
             if current_heading is not None:
                 sections.append({"title": current_heading, "content": "\n".join(current_parts).strip()})
-            current_heading = el.get_text(strip=True).rstrip("[edit]").strip()
+            current_heading = _EDIT_RE.sub('', el.get_text(strip=True))
             current_parts = []
         elif el.name == "table":
             current_parts.append(f"{TABLE_OPEN}{_clean_table(el)}{TABLE_CLOSE}")
@@ -95,7 +97,7 @@ def extract_article_html(content_div) -> tuple[str, list[dict], Optional[str]]:
         if _inside_table(el):
             continue
         if el.name in ("h2", "h3", "h4"):
-            heading = el.get_text(strip=True).rstrip("[edit]").strip()
+            heading = _EDIT_RE.sub('', el.get_text(strip=True))
             body_parts.append(f"== {heading} ==")
         elif el.name == "table":
             body_parts.append(f"{TABLE_OPEN}{_clean_table(el)}{TABLE_CLOSE}")

@@ -831,6 +831,13 @@ async def lib_import_kiwix_viewer(request: Request):
     return JSONResponse(content=r.json(), status_code=r.status_code)
 
 
+@app.post("/library/import/kiwix/viewer/batch")
+async def lib_import_kiwix_viewer_batch(request: Request):
+    payload = await request.json()
+    r = await _lib_client.post("/import/kiwix/viewer/batch", json=payload)
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
 @app.get("/library/{book_id}/edit", response_class=HTMLResponse)
 async def lib_book_edit(request: Request, book_id: int):
     r = await _lib_client.get(f"/books/{book_id}")

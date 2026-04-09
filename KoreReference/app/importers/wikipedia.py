@@ -160,6 +160,7 @@ def run_wikipedia_crawl(
                     "prop": "text|categories|links",
                     "format": "json",
                     "maxlag": "5",
+                    "redirects": "1",
                 }
                 resp = client.get(api_base, params=params)
                 resp.raise_for_status()
@@ -168,6 +169,11 @@ def run_wikipedia_crawl(
                     raise ValueError(data["error"].get("info", str(data["error"])))
 
                 parsed_api = data.get("parse", {})
+                # Skip redirect articles — their canonical target will be crawled
+                # under its own title when encountered in the link graph.
+                if parsed_api.get("redirects"):
+                    import_state["done"] += 1
+                    continue
                 html_text  = parsed_api.get("text", {}).get("*", "")
                 # Categories: exclude hidden maintenance categories
                 api_categories = [
