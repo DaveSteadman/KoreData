@@ -80,11 +80,7 @@
   function scrollToId(id) {
     const target = document.getElementById(id);
     if (!target) return;
-    // container itself is the overflow-y:auto scroll box
-    const offsetTop = target.getBoundingClientRect().top
-                    - container.getBoundingClientRect().top
-                    + container.scrollTop - 10;
-    container.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // Handle page-load fragment — defer until after browser layout

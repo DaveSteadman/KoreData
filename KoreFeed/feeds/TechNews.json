@@ -5,11 +5,11 @@
     "name": "TechCrunch",
     "url": "https://techcrunch.com/feed/",
     "update_rate": 360,
-    "last_fetched_at": "2026-04-08T18:15:41",
+    "last_fetched_at": "2026-04-09T05:52:06",
     "last_status": "ok",
     "last_error": null,
     "last_duration_s": 1.5,
-    "last_new_entries": 13,
+    "last_new_entries": 9,
     "content_status": "good"
   },
   {
@@ -18,11 +18,11 @@
     "name": "Ars Technica",
     "url": "https://feeds.arstechnica.com/arstechnica/index",
     "update_rate": 360,
-    "last_fetched_at": "2026-04-08T18:15:53",
+    "last_fetched_at": "2026-04-09T05:52:17",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 12.5,
-    "last_new_entries": 7,
+    "last_duration_s": 11.7,
+    "last_new_entries": 8,
     "content_status": "good"
   },
   {
@@ -31,11 +31,11 @@
     "name": "Hacker News",
     "url": "https://hnrss.org/frontpage",
     "update_rate": 361,
-    "last_fetched_at": "2026-04-08T18:16:01",
+    "last_fetched_at": "2026-04-09T05:52:27",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 7.9,
-    "last_new_entries": 20,
+    "last_duration_s": 9.8,
+    "last_new_entries": 10,
     "content_status": "good"
   },
   {
@@ -44,11 +44,11 @@
     "name": "The Verge",
     "url": "https://www.theverge.com/rss/index.xml",
     "update_rate": 359,
-    "last_fetched_at": "2026-04-08T18:16:02",
+    "last_fetched_at": "2026-04-09T05:52:28",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 1.2,
-    "last_new_entries": 10,
+    "last_duration_s": 1.1,
+    "last_new_entries": 6,
     "content_status": "good"
   },
   {
@@ -57,11 +57,11 @@
     "name": "Wired",
     "url": "https://www.wired.com/feed/rss",
     "update_rate": 360,
-    "last_fetched_at": "2026-04-08T21:56:06",
+    "last_fetched_at": "2026-04-09T05:52:38",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 9.4,
-    "last_new_entries": 3,
+    "last_duration_s": 9.9,
+    "last_new_entries": 18,
     "content_status": "good"
   },
   {
@@ -70,11 +70,11 @@
     "name": "MIT Technology Review",
     "url": "https://www.technologyreview.com/feed/",
     "update_rate": 362,
-    "last_fetched_at": "2026-04-08T18:16:13",
+    "last_fetched_at": "2026-04-09T05:52:39",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 0.8,
-    "last_new_entries": 2,
+    "last_duration_s": 0.9,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -83,10 +83,10 @@
     "name": "IEEE Spectrum",
     "url": "https://spectrum.ieee.org/feeds/feed.rss",
     "update_rate": 363,
-    "last_fetched_at": "2026-04-08T18:16:20",
+    "last_fetched_at": "2026-04-09T05:52:54",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 7.4,
+    "last_duration_s": 14.4,
     "last_new_entries": 0,
     "content_status": "good"
   },
@@ -96,11 +96,11 @@
     "name": "Tom's Hardware",
     "url": "https://www.tomshardware.com/feeds/all",
     "update_rate": 358,
-    "last_fetched_at": "2026-04-08T18:16:35",
+    "last_fetched_at": "2026-04-09T05:53:00",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 14.9,
-    "last_new_entries": 16,
+    "last_duration_s": 6.6,
+    "last_new_entries": 1,
     "content_status": "good"
   }
 ]

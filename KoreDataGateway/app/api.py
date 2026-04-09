@@ -926,6 +926,13 @@ async def ref_import_crawl(request: Request):
     return JSONResponse(content=r.json(), status_code=r.status_code)
 
 
+@app.post("/reference/import/wikipedia")
+async def ref_import_wikipedia(request: Request):
+    payload = await request.json()
+    r = await _ref_client.post("/import/wikipedia/crawl", json=payload)
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
 @app.get("/reference/import/status")
 async def ref_import_status():
     r = await _ref_client.get("/import/status")

@@ -11,12 +11,12 @@
   <!-- ─── Crawl form ──────────────────────────────── -->
   <div class="panel">
     <div class="panel-header">
-      <span class="ph-diamond">◆</span> CRAWL FROM KIWIX SEED
+      <span class="ph-diamond">◆</span> CRAWL FROM <span id="c_source_label">SEED URL</span>
     </div>
     <div class="panel-body">
       <div style="font-size:11px; color:var(--dim); margin-bottom:0.75rem; line-height:1.65;">
-        Paste a Kiwix viewer URL. The importer fetches that article then follows
-        its wikilinks up to the chosen depth.
+        Paste a Kiwix or Wikipedia URL. The importer fetches that article then follows
+        its wikilinks up to the chosen depth. Wikipedia imports use a polite rate limit.
         <br>
         <span style="color:var(--amber);">⚠ Depth 2+ can queue thousands of articles — use the limit.</span>
       </div>
@@ -24,9 +24,12 @@
       <div style="display:flex; flex-direction:column; gap:0.6rem;">
 
         <div>
-          <label for="c_seed">Seed URL <span style="color:var(--red);">*</span></label>
+          <label for="c_seed">Seed URL <span style="color:var(--red);">*</span>
+            <span id="c_source_badge" class="badge" style="margin-left:0.4rem; font-size:9px; display:none;"></span>
+          </label>
           <input id="c_seed" type="text"
-            placeholder="http://192.168.1.33:8080/viewer#wikipedia_en_all_maxi_2025-08/Architecture"
+            placeholder="Kiwix: http://host/viewer#zim/Article  or  Wikipedia: https://en.wikipedia.org/wiki/Article"
+            oninput="detectUrlType(this.value)"
             style="width:100%; font-size:11px;">
         </div>
 
@@ -52,6 +55,19 @@
               Skip already-imported
             </label>
           </div>
+        </div>
+
+        <div id="c_rate_row" style="display:none;">
+          <label for="c_rate">Delay between requests</label>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+            <span style="font-size:10px; color:var(--dim);">1s</span>
+            <input id="c_rate" type="range" min="1" max="5" step="0.5" value="3"
+                   style="flex:1; border:none; background:transparent; padding:0;"
+                   oninput="document.getElementById('c_rate_val').textContent=this.value+'s'">
+            <span style="font-size:10px; color:var(--dim);">5s</span>
+            <span id="c_rate_val" style="color:var(--amber); font-size:13px; min-width:26px;">3s</span>
+          </div>
+          <div style="font-size:10px; color:var(--dim); margin-top:0.1rem;">Random delay to be polite to Wikipedia's servers.</div>
         </div>
 
         <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
@@ -295,7 +311,11 @@ function renderStatus(s) {
     errRow.style.display = 'none';
   }
 
-  const modeLabel = s.mode === 'crawl' ? `BFS crawl from "${s.seed || '?'}"` : 'Prefix import';
+  const modeLabel = s.mode === 'wikipedia'
+    ? `Wikipedia crawl from "${s.seed || '?'}"`
+    : s.mode === 'crawl'
+      ? `BFS crawl from "${s.seed || '?'}"`
+      : 'Prefix import';
   document.getElementById('pg_label').textContent = s.running
     ? `${modeLabel} — importing…`
     : `${modeLabel} — finished`;
