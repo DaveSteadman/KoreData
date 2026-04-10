@@ -15,8 +15,8 @@
     </div>
     <div class="panel-body">
       <div style="font-size:11px; color:var(--dim); margin-bottom:0.75rem; line-height:1.65;">
-        Paste a Kiwix or Wikipedia URL. The importer fetches that article then follows
-        its wikilinks up to the chosen depth. Wikipedia imports use a polite rate limit.
+        Paste a Kiwix URL. The importer fetches that article then follows
+        its wikilinks up to the chosen depth.
         <br>
         <span style="color:var(--amber);">⚠ Depth 2+ can queue thousands of articles — use the limit.</span>
       </div>
@@ -28,7 +28,7 @@
             <span id="c_source_badge" class="badge" style="margin-left:0.4rem; font-size:9px; display:none;"></span>
           </label>
           <input id="c_seed" type="text"
-            placeholder="Kiwix: http://host/viewer#zim/Article  or  Wikipedia: https://en.wikipedia.org/wiki/Article"
+            placeholder="http://host/viewer#zim/Article  or  http://host/zim/A/Article_Title"
             oninput="detectUrlType(this.value)"
             style="width:100%; font-size:11px;">
         </div>
@@ -55,19 +55,6 @@
               Skip already-imported
             </label>
           </div>
-        </div>
-
-        <div id="c_rate_row" style="display:none;">
-          <label for="c_rate">Delay between requests</label>
-          <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
-            <span style="font-size:10px; color:var(--dim);">1s</span>
-            <input id="c_rate" type="range" min="1" max="5" step="0.5" value="3"
-                   style="flex:1; border:none; background:transparent; padding:0;"
-                   oninput="document.getElementById('c_rate_val').textContent=this.value+'s'">
-            <span style="font-size:10px; color:var(--dim);">5s</span>
-            <span id="c_rate_val" style="color:var(--amber); font-size:13px; min-width:26px;">3s</span>
-          </div>
-          <div style="font-size:10px; color:var(--dim); margin-top:0.1rem;">Random delay to be polite to Wikipedia's servers.</div>
         </div>
 
         <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
@@ -197,31 +184,14 @@ document.getElementById('c_depth').addEventListener('input', function () {
 document.getElementById('c_depth_hint').textContent = depthHints[1];
 
 // ─── URL type detection ──────────────────────────────────────
-function isWikipediaUrl(url) {
-  return /^https?:\/\/[a-z]{2,3}\.m?\.?wikipedia\.org\/wiki\//i.test(url);
-}
 function detectUrlType(url) {
   const badge = document.getElementById('c_source_badge');
-  const rateRow = document.getElementById('c_rate_row');
   const val = url.trim();
-  if (!val) {
-    badge.style.display = 'none';
-    rateRow.style.display = 'none';
-    return;
-  }
-  if (isWikipediaUrl(val)) {
-    badge.textContent = 'WIKIPEDIA';
-    badge.style.display = '';
-    badge.style.borderColor = 'var(--amber)';
-    badge.style.color = 'var(--amber)';
-    rateRow.style.display = '';
-  } else {
-    badge.textContent = 'KIWIX';
-    badge.style.display = '';
-    badge.style.borderColor = 'var(--green)';
-    badge.style.color = 'var(--green)';
-    rateRow.style.display = 'none';
-  }
+  if (!val) { badge.style.display = 'none'; return; }
+  badge.textContent = 'KIWIX';
+  badge.style.display = '';
+  badge.style.borderColor = 'var(--green)';
+  badge.style.color = 'var(--green)';
 }
 
 // ─── Reset progress panel to idle (no import ever / after dismissal) ──────
@@ -272,16 +242,8 @@ async function crawlStart() {
   document.getElementById('c_stop_btn').style.display = '';
 
   try {
-    let endpoint, body;
-    if (isWikipediaUrl(seed)) {
-      const rate = parseFloat(document.getElementById('c_rate').value) || 3;
-      endpoint = '/reference/import/wikipedia';
-      body = { seed_url: seed, max_depth: depth, limit: limit, resume: resume,
-               rate_min: Math.max(1, rate - 0.5), rate_max: rate + 0.5 };
-    } else {
-      endpoint = '/reference/import/crawl';
-      body = { seed_url: seed, max_depth: depth, limit: limit, resume: resume };
-    }
+    const endpoint = '/reference/import/crawl';
+    const body = { seed_url: seed, max_depth: depth, limit: limit, resume: resume };
     const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -363,8 +325,7 @@ function renderStatus(s) {
     if (s.last_error) { errRow.style.display = ''; document.getElementById('pg_last_err').textContent = s.last_error; }
     else { errRow.style.display = 'none'; }
 
-    const modeLabel = s.mode === 'wikipedia' ? `Wikipedia crawl from "${s.seed || '?'}"` :
-                      s.mode === 'crawl'      ? `BFS crawl from "${s.seed || '?'}"` : 'Import';
+    const modeLabel = s.mode === 'crawl' ? `BFS crawl from "${s.seed || '?'}"` : 'Import';
     document.getElementById('pg_label').textContent = `${modeLabel} — importing…`;
 
   } else {

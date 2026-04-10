@@ -5,25 +5,26 @@
     "name": "HuggingFace Blog",
     "url": "https://huggingface.co/blog/feed.xml",
     "update_rate": 360,
-    "last_fetched_at": "2026-04-09T18:48:03",
+    "last_fetched_at": "2026-04-10T16:15:19",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 124.7,
+    "last_duration_s": 120.9,
     "last_new_entries": 1,
     "content_status": "good"
   },
   {
     "id": "508ed384-c9b5-44bf-b23a-10c5115e1dae",
     "domain": "AiNews",
-    "name": "understandingai",
+    "name": "Understanding AI",
     "url": "https://www.understandingai.org/feed",
-    "update_rate": 300,
-    "last_fetched_at": "2026-04-09T22:13:23",
+    "update_rate": 310,
+    "last_fetched_at": "2026-04-10T21:51:33",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 6.3,
+    "last_duration_s": 7.0,
     "last_new_entries": 0,
-    "content_status": "good"
+    "content_status": "good",
+    "type": "rss"
   },
   {
     "id": "3f3fbea4-6122-4a56-9e6b-6d76a6b096bb",
@@ -31,10 +32,10 @@
     "name": "Ollama Blog",
     "url": "https://ollama.com/blog/rss.xml",
     "update_rate": 301,
-    "last_fetched_at": "2026-04-09T22:13:32",
+    "last_fetched_at": "2026-04-10T17:40:03",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 8.8,
+    "last_duration_s": 8.7,
     "last_new_entries": 0,
     "content_status": "good"
   }

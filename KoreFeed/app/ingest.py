@@ -339,7 +339,19 @@ def _worker() -> None:
 def schedule_feeds() -> None:
     """Rebuild the scheduler job list from the current feed inventory."""
     scheduler.remove_all_jobs()
+    now = datetime.utcnow()
     for feed in load_feeds():
+        # Align the first tick to last_fetched_at + update_rate so the scheduler
+        # doesn't drift relative to actual fetch times after a restart.
+        next_run = None
+        last = feed.get("last_fetched_at")
+        if last:
+            try:
+                next_run = datetime.fromisoformat(last) + timedelta(minutes=feed["update_rate"])
+                if next_run < now:
+                    next_run = now  # already overdue — fire immediately
+            except Exception:
+                pass
         scheduler.add_job(
             _enqueue,
             "interval",
@@ -347,6 +359,7 @@ def schedule_feeds() -> None:
             args=[feed],
             id=feed["id"],
             replace_existing=True,
+            next_run_time=next_run,
         )
 
 

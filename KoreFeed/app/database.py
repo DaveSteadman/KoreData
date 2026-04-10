@@ -437,3 +437,16 @@ def rename_domain_db(old: str, new: str) -> bool:
     new_path = get_db_path(new)
     old_path.rename(new_path)
     return True
+
+
+def rename_feed_entries(domain: str, old_name: str, new_name: str) -> int:
+    """Update feed_name on all entries (including deleted) for a renamed feed. Returns row count."""
+    try:
+        with db_connection(domain) as conn:
+            cur = conn.execute(
+                "UPDATE entries SET feed_name = ? WHERE feed_name = ?",
+                [new_name, old_name],
+            )
+            return cur.rowcount
+    except Exception:
+        return 0

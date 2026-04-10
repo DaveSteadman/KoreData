@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.config import cfg
+from app.database import rename_feed_entries
 
 FEEDS_DIR = Path(cfg["feeds_dir"])
 
@@ -159,6 +160,28 @@ def update_feed_rate(feed_id: str, minutes: int) -> bool:
                     json.dump(feeds, fh, indent=2)
                 return True
     return False
+
+
+def update_feed(feed_id: str, name: str, url: str, update_rate: int, feed_type: str) -> Optional[dict]:
+    """Update name, url, update_rate and type for a feed. Returns updated feed or None if not found."""
+    FEEDS_DIR.mkdir(exist_ok=True)
+    for path in FEEDS_DIR.glob("*.json"):
+        with open(path, encoding="utf-8") as f:
+            feeds = json.load(f)
+        for feed in feeds:
+            if feed["id"] == feed_id:
+                old_name = feed["name"]
+                domain = feed.get("domain", path.stem)
+                feed["name"] = name
+                feed["url"] = url
+                feed["update_rate"] = update_rate
+                feed["type"] = feed_type
+                with open(path, "w", encoding="utf-8") as fh:
+                    json.dump(feeds, fh, indent=2)
+                if old_name != name:
+                    rename_feed_entries(domain, old_name, name)
+                return feed
+    return None
 
 
 def rename_domain_feeds(old: str, new: str) -> bool:

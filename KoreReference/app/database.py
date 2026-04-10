@@ -6,6 +6,17 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
+from app.importers.shared import TABLE_OPEN, TABLE_CLOSE, table_to_fts_text
+
+_TABLE_MARKER_RE = re.compile(rf'{re.escape(TABLE_OPEN)}(.*?){re.escape(TABLE_CLOSE)}', re.DOTALL)
+
+
+def _body_for_fts(body: Optional[str]) -> str:
+    """Replace <<<TABLE>>>...<<<ENDTABLE>>> blocks with plain cell text for FTS indexing."""
+    if not body:
+        return ""
+    return _TABLE_MARKER_RE.sub(lambda m: table_to_fts_text(m.group(1)), body)
+
 
 def _compress(text: Optional[str]) -> Optional[bytes]:
     if not text:
@@ -103,7 +114,7 @@ def init_db() -> None:
                 conn.execute("UPDATE articles SET body=? WHERE id=?", (_blob, _row["id"]))
                 conn.execute(
                     "INSERT INTO articles_fts(rowid, title, body) VALUES (?,?,?)",
-                    (_row["id"], _row["title"] or "", _row["body"] or ""),
+                    (_row["id"], _row["title"] or "", _body_for_fts(_row["body"] or "")),
                 )
         # Migrate: add facts column if not present (for databases created before this feature)
         _cols = {row[1] for row in conn.execute("PRAGMA table_info(articles)")}
@@ -266,19 +277,19 @@ def upsert_article(
             "SELECT id FROM articles WHERE title = ?", (title,)
         ).fetchone()
 
-        plain_body = body or ""
+        fts_body = _body_for_fts(body)
         compressed_body = _compress(body)
 
         if existing:
             article_id = existing["id"]
-            # Update FTS with plain text before storing compressed
+            # Update FTS with tag-stripped text before storing compressed
             conn.execute(
                 "INSERT INTO articles_fts(articles_fts, rowid, title, body) VALUES('delete',?,?,?)",
-                (article_id, title, plain_body),
+                (article_id, title, fts_body),
             )
             conn.execute(
                 "INSERT INTO articles_fts(rowid, title, body) VALUES(?,?,?)",
-                (article_id, title, plain_body),
+                (article_id, title, fts_body),
             )
             conn.execute("""
                 UPDATE articles
@@ -297,10 +308,10 @@ def upsert_article(
             """, (title, redirect_to, summary, compressed_body,
                   facts_json, wc))
             article_id = cur.lastrowid
-            # Sync FTS with plain text after insert
+            # Sync FTS with tag-stripped text after insert
             conn.execute(
                 "INSERT INTO articles_fts(rowid, title, body) VALUES(?,?,?)",
-                (article_id, title, plain_body),
+                (article_id, title, fts_body),
             )
 
         # Insert links (to_id resolved later)
@@ -327,12 +338,19 @@ def delete_article(title: str) -> bool:
 
 
 def delete_all_articles() -> int:
-    """Delete every article row. Returns number of rows deleted."""
+    """Delete all articles, links, and FTS data, then vacuum. Returns number of article rows deleted."""
     with db_connection() as conn:
         count = conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
+        conn.execute("DELETE FROM links")
         conn.execute("DELETE FROM articles")
         conn.execute("DELETE FROM articles_fts")
-        return count
+    # VACUUM must run outside any transaction (autocommit mode)
+    conn = sqlite3.connect(str(get_db_path()), isolation_level=None)
+    try:
+        conn.execute("VACUUM")
+    finally:
+        conn.close()
+    return count
 
 
 def get_random_article() -> Optional[dict]:
@@ -349,7 +367,7 @@ def get_random_article() -> Optional[dict]:
 # Links
 # ---------------------------------------------------------------------------
 
-def resolve_links(limit: int = 5000) -> int:
+def resolve_links() -> int:
     """Fill in to_id for unresolved links. Returns count resolved."""
     with db_connection() as conn:
         cur = conn.execute("""
@@ -357,9 +375,26 @@ def resolve_links(limit: int = 5000) -> int:
                 SELECT id FROM articles WHERE title = links.to_title
             )
             WHERE to_id IS NULL
-            LIMIT ?
-        """, (limit,))
+        """)
         return cur.rowcount
+
+
+def get_unresolved_link_titles(limit: int = 10_000) -> list[str]:
+    """Return distinct to_title values in links that have no matching articles row.
+
+    These are the titles that were linked to but never imported — likely redirects
+    or articles just outside the crawl boundary.
+    """
+    with db_connection() as conn:
+        rows = conn.execute("""
+            SELECT DISTINCT l.to_title
+            FROM links l
+            WHERE l.to_id IS NULL
+              AND l.to_title IS NOT NULL
+            ORDER BY l.to_title
+            LIMIT ?
+        """, (limit,)).fetchall()
+    return [r["to_title"] for r in rows]
 
 
 def get_links(title: str) -> list[dict]:

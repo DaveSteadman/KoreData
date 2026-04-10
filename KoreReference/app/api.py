@@ -15,6 +15,7 @@ from app.database import (
     get_links,
     get_random_article,
     get_status,
+    get_unresolved_link_titles,
     init_db,
     list_articles,
     resolve_article,
@@ -25,14 +26,12 @@ from app.database import (
 from app.importers.kiwix import (
     import_one,
     parse_seed_url,
+    run_kiwix_backfill,
     run_kiwix_crawl,
     run_kiwix_import,
 )
 from app.importers.state import import_lock, import_state
-from app.importers.wikipedia import (
-    parse_wikipedia_url,
-    run_wikipedia_crawl,
-)
+
 from app.version import __version__
 
 
@@ -77,14 +76,6 @@ class KiwixCrawlRequest(BaseModel):
     limit: int = 200         # hard cap on total articles imported
     resume: bool = True      # skip articles already in DB
 
-
-class WikipediaCrawlRequest(BaseModel):
-    seed_url: str            # Wikipedia article URL: https://en.wikipedia.org/wiki/Title
-    max_depth: int = 1       # 0 = seed only, 1 = seed + direct links, …
-    limit: int = 200         # hard cap on total articles imported
-    resume: bool = True      # skip articles already in DB
-    rate_min: float = 1.0    # minimum seconds between requests (be polite)
-    rate_max: float = 5.0    # maximum seconds between requests
 
 
 # ---------------------------------------------------------------------------
@@ -218,6 +209,7 @@ def route_import_kiwix(req: KiwixImportRequest, background_tasks: BackgroundTask
     import_state.update({
         "running": True, "done": 0, "total": 0,
         "errors": 0, "last_error": None, "mode": "prefix", "seed": None,
+        "redirects_stored": 0, "last_redirect": None,
     })
     import_lock.release()
     background_tasks.add_task(
@@ -238,6 +230,7 @@ def route_import_kiwix_crawl(req: KiwixCrawlRequest, background_tasks: Backgroun
     import_state.update({
         "running": True, "done": 0, "total": 1,
         "errors": 0, "last_error": None, "mode": "crawl", "seed": start_title,
+        "redirects_stored": 0, "last_redirect": None,
     })
     import_lock.release()
     background_tasks.add_task(
@@ -245,29 +238,6 @@ def route_import_kiwix_crawl(req: KiwixCrawlRequest, background_tasks: Backgroun
     )
     return {"started": True, "seed": start_title, "max_depth": req.max_depth, "limit": req.limit}
 
-
-@app.post("/import/wikipedia/crawl", status_code=202, summary="BFS crawl from a Wikipedia article URL")
-def route_import_wikipedia_crawl(req: WikipediaCrawlRequest, background_tasks: BackgroundTasks):
-    if not import_lock.acquire(blocking=False):
-        raise HTTPException(status_code=409, detail="Import already running")
-    try:
-        lang, start_title = parse_wikipedia_url(req.seed_url)
-    except ValueError as exc:
-        import_lock.release()
-        raise HTTPException(status_code=422, detail=str(exc))
-    import_state.update({
-        "running": True, "done": 0, "total": 1,
-        "errors": 0, "last_error": None, "mode": "wikipedia", "seed": start_title,
-    })
-    import_lock.release()
-    background_tasks.add_task(
-        run_wikipedia_crawl,
-        req.seed_url, req.max_depth, req.limit, req.resume, req.rate_min, req.rate_max,
-    )
-    return {
-        "started": True, "seed": start_title, "lang": lang,
-        "max_depth": req.max_depth, "limit": req.limit,
-    }
 
 
 @app.post("/import/stop", summary="Abort in-progress import or crawl")
@@ -284,7 +254,7 @@ def route_import_article(zim_name: str, title: str):
     """Synchronous single-article import — useful for testing and on-demand fetch."""
     kiwix_base = cfg["kiwix_url"].rstrip("/")
     try:
-        with httpx.Client(timeout=30.0, follow_redirects=True) as client:
+        with httpx.Client(timeout=30.0, follow_redirects=False) as client:
             import_one(client, kiwix_base, zim_name, title, resume=True)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
@@ -294,6 +264,36 @@ def route_import_article(zim_name: str, title: str):
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc))
     return get_article_by_title(title, full=False)
+
+
+class KiwixBackfillRequest(BaseModel):
+    zim_name: str
+    limit: int = 10_000
+
+
+@app.post("/import/kiwix/backfill", status_code=202, summary="Fetch unresolved link targets from Kiwix")
+def route_import_kiwix_backfill(req: KiwixBackfillRequest, background_tasks: BackgroundTasks):
+    """Fetch every link target that exists in the links table but has no article row.
+
+    This repairs the historical gap where redirect pages were silently dropped during
+    import.  Titles like 'colour', 'NYC', 'World War 2' are stored as links.to_title
+    but were never imported; this endpoint fetches each one and stores it — either as
+    a redirect row or as a full article if it turns out to be a real page.
+    """
+    if not import_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Import already running")
+    pending = get_unresolved_link_titles(limit=req.limit)
+    if not pending:
+        import_lock.release()
+        return {"started": False, "detail": "No unresolved link targets found"}
+    import_state.update({
+        "running": True, "done": 0, "total": len(pending),
+        "errors": 0, "last_error": None, "mode": "backfill", "seed": None,
+        "redirects_stored": 0, "last_redirect": None,
+    })
+    import_lock.release()
+    background_tasks.add_task(run_kiwix_backfill, req.zim_name, req.limit)
+    return {"started": True, "pending": len(pending), "zim_name": req.zim_name}
 
 
 @app.get("/import/status", summary="Progress of in-progress import")

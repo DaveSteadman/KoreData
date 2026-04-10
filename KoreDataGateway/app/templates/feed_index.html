@@ -74,14 +74,14 @@
           </thead>
           <tbody>
             {% for d in domains %}
-            <tr>
-              <td><a href="/feeds/{{ d.domain }}">{{ d.domain }}</a></td>
+            <tr style="cursor:pointer;" onclick="editDomain('{{ d.domain }}')">
+              <td><a href="/feeds/{{ d.domain }}" onclick="event.stopPropagation()">{{ d.domain }}</a></td>
               <td class="meta" style="text-align:right;"><span class="badge badge-dim">{{ d.entry_count }}</span></td>
               <td style="text-align:right; white-space:nowrap;">
                 <form method="post" action="/feeds/domains/{{ d.domain }}/delete"
                       style="flex-direction:row; display:inline-flex; gap:0.4rem;">
                   <button class="btn-danger btn-sm" type="submit"
-                    onclick="return confirm('Delete domain {{ d.domain }} and all its data?')">DELETE</button>
+                    onclick="event.stopPropagation(); return confirm('Delete domain {{ d.domain }} and all its data?')">DELETE</button>
                 </form>
               </td>
             </tr>
@@ -95,14 +95,16 @@
     </div>
   </div>
 
-  <!-- Right: create + rename -->
+  <!-- Right: create / rename panel -->
   <div>
     <div class="panel">
       <div class="panel-header">
-        <span class="ph-diamond">◆</span> CREATE DOMAIN
+        <span class="ph-diamond">◆</span> <span id="domain-panel-label">CREATE DOMAIN</span>
       </div>
       <div class="panel-body">
-        <form method="post" action="/feeds/domains/create">
+
+        <!-- Create form -->
+        <form id="create-domain-form" method="post" action="/feeds/domains/create">
           <div>
             <label for="new_domain">Domain name</label>
             <input id="new_domain" name="domain" type="text" placeholder="e.g. TechNews" required>
@@ -111,36 +113,25 @@
             <button type="submit">CREATE</button>
           </div>
         </form>
-      </div>
-    </div>
 
-    {% if domains %}
-    <div class="panel" style="margin-top:1rem;">
-      <div class="panel-header">
-        <span class="ph-diamond">◆</span> RENAME DOMAIN
-      </div>
-      <div class="panel-body">
-        <form method="post" id="rename-form" action="/feeds/domains/__DOMAIN__/rename">
+        <!-- Rename form (hidden until a row is clicked) -->
+        <form id="rename-domain-form" method="post" action="" style="display:none;">
           <div>
-            <label for="rename_from">Domain</label>
-            <select id="rename_from" name="_domain_select" onchange="
-              document.getElementById('rename-form').action='/feeds/domains/'+this.value+'/rename';">
-              {% for d in domains %}
-              <option value="{{ d.domain }}">{{ d.domain }}</option>
-              {% endfor %}
-            </select>
+            <label for="rename_current">Domain</label>
+            <input id="rename_current" type="text" disabled style="color:var(--dim);">
           </div>
           <div>
             <label for="rename_to">New name</label>
             <input id="rename_to" name="new_name" type="text" placeholder="NewName" required>
           </div>
-          <div>
+          <div style="display:flex; gap:0.5rem;">
             <button type="submit">RENAME</button>
+            <button type="button" class="btn-secondary" onclick="cancelEditDomain()">CANCEL</button>
           </div>
         </form>
+
       </div>
     </div>
-    {% endif %}
   </div>
 
 </div>
@@ -215,4 +206,22 @@
   </div>
 </div>
 {% endif %}
+
+<script>
+function editDomain(name) {
+  document.getElementById('create-domain-form').style.display = 'none';
+  document.getElementById('rename-domain-form').style.display = '';
+  document.getElementById('rename-domain-form').action = '/feeds/domains/' + encodeURIComponent(name) + '/rename';
+  document.getElementById('rename_current').value = name;
+  document.getElementById('rename_to').value = '';
+  document.getElementById('rename_to').focus();
+  document.getElementById('domain-panel-label').textContent = 'RENAME DOMAIN';
+}
+function cancelEditDomain() {
+  document.getElementById('rename-domain-form').style.display = 'none';
+  document.getElementById('create-domain-form').style.display = '';
+  document.getElementById('domain-panel-label').textContent = 'CREATE DOMAIN';
+  document.getElementById('new_domain').value = '';
+}
+</script>
 {% endblock %}

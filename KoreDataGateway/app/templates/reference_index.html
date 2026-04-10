@@ -14,7 +14,6 @@
       <a href="/reference/search"     style="font-size:11px; color:var(--dim);">SEARCH ↗</a>
       <a href="/reference/import"     style="font-size:11px; color:var(--dim);">IMPORT ↗</a>
       <a href="/reference/new"><button type="button" style="font-size:11px; padding:3px 10px;">✚ NEW ARTICLE</button></a>
-      <button type="button" style="font-size:11px; padding:3px 10px; background:var(--red,#c0392b); color:#fff; border-color:transparent;" onclick="deleteAll()">⊗ DELETE ALL</button>
     </span>
   </div>
 
@@ -67,15 +66,4 @@
 {% endif %}
 {% endblock %}
 
-{% block scripts %}
-<script>
-function deleteAll() {
-  if (!confirm('Delete ALL articles from the reference database?\n\nThis cannot be undone.')) return;
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/reference/delete-all';
-  document.body.appendChild(form);
-  form.submit();
-}
-</script>
-{% endblock %}
+

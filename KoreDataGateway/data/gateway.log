@@ -11206,3 +11206,975 @@ INFO:     127.0.0.1:49360 - "GET /reference/import/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:49360 - "GET /reference/import/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:49360 - "GET /reference/import/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:57310 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49879 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56802 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56072 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51643 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57818 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59357 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58008 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57058 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51568 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53619 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60398 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61598 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24680]
+INFO:     Started server process [6800]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [6800]
+INFO:     Started server process [37488]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [37488]
+ERROR:    Traceback (most recent call last):
+  File "C:\Util\Python310\lib\site-packages\uvicorn\_compat.py", line 60, in asyncio_run
+    return loop.run_until_complete(main)
+  File "C:\Util\Python310\lib\asyncio\base_events.py", line 636, in run_until_complete
+    self.run_forever()
+  File "C:\Util\Python310\lib\asyncio\windows_events.py", line 321, in run_forever
+    super().run_forever()
+  File "C:\Util\Python310\lib\asyncio\base_events.py", line 603, in run_forever
+    self._run_once()
+  File "C:\Util\Python310\lib\asyncio\base_events.py", line 1909, in _run_once
+    handle._run()
+  File "C:\Util\Python310\lib\asyncio\events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Util\Python310\lib\site-packages\uvicorn\server.py", line 78, in serve
+    with self.capture_signals():
+  File "C:\Util\Python310\lib\contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "C:\Util\Python310\lib\site-packages\uvicorn\server.py", line 339, in capture_signals
+    signal.raise_signal(captured_signal)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Util\Python310\lib\site-packages\starlette\routing.py", line 645, in lifespan
+    await receive()
+  File "C:\Util\Python310\lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+  File "C:\Util\Python310\lib\asyncio\queues.py", line 159, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+INFO:     Started server process [36232]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60135 - "GET / HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [36232]
+INFO:     Started server process [28248]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [28248]
+INFO:     Started server process [22132]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57406 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49254 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61227 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61824 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57309 - "GET /reference HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22132]
+INFO:     Started server process [8440]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52930 - "POST /reference/delete-all HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:52930 - "GET /reference HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8440]
+INFO:     Started server process [34896]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52091 - "POST /reference/delete-all HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:52091 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63140 - "POST /reference/delete-all HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:63140 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64002 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64002 - "GET /reference/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64002 - "POST /reference/new HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Util\Python310\lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "C:\Util\Python310\lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Util\Python310\lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Util\Python310\lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Util\Python310\lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Util\Python310\lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Util\Python310\lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Util\Python310\lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Util\Python310\lib\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+  File "C:\Util\Python310\lib\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+  File "C:\Util\Python310\lib\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+  File "C:\Util\GithubRepos\KoreData\KoreDataGateway\app\api.py", line 1020, in ref_article_new_post
+    {"article": None, "error": r.json().get("detail", f"Error {r.status_code}"),
+  File "C:\Util\Python310\lib\site-packages\httpx\_models.py", line 832, in json
+    return jsonlib.loads(self.content, **kwargs)
+  File "C:\Util\Python310\lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "C:\Util\Python310\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Util\Python310\lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+INFO:     127.0.0.1:59253 - "GET /reference HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [34896]
+INFO:     Started server process [32448]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:63490 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63490 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:65362 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65362 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60330 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60254 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60254 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60254 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60214 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62533 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62533 - "GET /reference/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56830 - "POST /reference/new HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:56830 - "GET /reference/colour HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50180 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /reference/search?q=color HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /reference/Color HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57415 - "GET /reference/Color/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50702 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50702 - "GET /reference/new HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "POST /reference/new HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:57852 - "GET /reference/Colour HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET /reference/Color/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54649 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54649 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54649 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:54649 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54649 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62206 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:57223 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57223 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64171 - "GET /reference/Colour HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64171 - "GET /reference/Colour/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61532 - "GET /reference/Color HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61532 - "GET /reference/Color/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54925 - "GET /reference/Colour HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54925 - "GET /reference/Colour/links-json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [32448]
+INFO:     Started server process [32368]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:64969 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64969 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64969 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55260 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:55260 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55260 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65109 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:65109 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65109 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62588 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54833 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54833 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53332 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:53332 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53332 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60567 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:60567 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60567 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [32368]
+INFO:     Started server process [3732]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50689 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50689 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50689 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:50689 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50689 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3732]
+INFO:     Started server process [33292]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51241 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51241 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51241 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:51241 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51241 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [33292]
+INFO:     Started server process [37636]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58114 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58114 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58114 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:58114 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58114 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [37636]
+INFO:     Started server process [21328]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51483 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51483 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51483 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:51483 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51483 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64853 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64853 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64853 - "GET /reference/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52261 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:52261 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52261 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [21328]
+INFO:     Started server process [30808]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56102 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56102 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64292 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50348 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50348 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54218 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53486 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54733 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51560 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60212 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65371 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53969 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54393 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59655 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64492 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53024 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61569 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62741 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [30808]
+INFO:     Started server process [38192]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51184 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51184 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51184 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51184 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51184 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:62920 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/Angular%20diameter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/Angular%20diameter/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/Day HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62920 - "GET /reference/Day/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64630 - "GET /reference/Light-second HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64630 - "GET /reference/Light-second/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65455 - "GET /reference/Mass HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65455 - "GET /reference/Mass/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /reference?limit=100&offset=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /reference/Moon HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /reference/Moon/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53962 - "GET /reference/Mercury%20%28planet%29 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53962 - "GET /reference/Mercury%20%28planet%29/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55355 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55355 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/101955%20Bennu HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62230 - "GET /reference/101955%20Bennu/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64147 - "GET /reference/Huginn%20and%20Muninn HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59360 - "GET /reference/3200%20Phaethon HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51333 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51333 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59050 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59050 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59050 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59050 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53240 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53746 - "GET /reference/search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53746 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53746 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63947 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60415 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52420 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60878 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "POST /feeds/WorldToday/feeds/e8146da9-dbea-41c8-bcaf-7a886c0c6c69/refresh HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61181 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62306 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62306 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [38192]
+INFO:     Started server process [33332]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61566 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61566 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61566 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61566 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64742 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63038 - "GET /feeds/DefenseNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52551 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55159 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55159 - "GET /feeds/search?q=ai&since=&until=&limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55919 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55256 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [33332]
+INFO:     Started server process [13360]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57707 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57453 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:57453 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55067 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:55067 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55067 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55067 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51593 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51593 - "GET /feeds/TechNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64182 - "GET /feeds/TechNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64182 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64182 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55048 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55048 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51613 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56671 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/refresh HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49670 - "GET /feeds/AiNews/3616 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51128 - "POST /feeds/AiNews/entries/delete-by-feed HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:51128 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52043 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:52043 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55642 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:55642 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13360]
+INFO:     Started server process [31108]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52544 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50175 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:50175 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52479 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:52479 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61390 - "POST /feeds/AiNews/feeds/508ed384-c9b5-44bf-b23a-10c5115e1dae/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:61390 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64693 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51377 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54695 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65305 - "POST /feeds/AiNews/settings/age-mode HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:65305 - "GET /feeds/AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64025 - "GET /feeds/search?q=quant&domain=AiNews HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52087 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52087 - "GET /feeds/search?q=quant&since=&until=&limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52087 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58038 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65110 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65110 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65110 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65110 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65110 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63918 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63918 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63918 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63918 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63918 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59081 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59081 - "GET /reference/Africa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59081 - "GET /reference/Africa/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61751 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63054 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64049 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54400 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53187 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53864 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63247 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52223 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62112 - "GET /feeds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62112 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55775 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56064 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49237 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63447 - "POST /feeds/WorldToday/settings/age-mode HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:63447 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63447 - "POST /feeds/WorldToday/feeds/30958427-bd91-45ba-9608-ac44ff9d55b3/update HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:63447 - "GET /feeds/WorldToday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62708 - "GET /library HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62708 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62708 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55724 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55724 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "POST /reference/import/crawl HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58574 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63826 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55520 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53705 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53705 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59070 - "GET /reference HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59070 - "GET /reference/3%20Juno HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59070 - "GET /reference/3%20Juno/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59070 - "GET /reference/Karl%20Ludwig%20Harding HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52629 - "GET /reference/Orbital%20eccentricity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52629 - "GET /reference/Orbital%20eccentricity/links-json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52629 - "GET /reference/Orbital%20energy HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63952 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61091 - "GET /reference/import/status HTTP/1.1" 200 OK

@@ -13,7 +13,7 @@ _ALLOWED_TABLE_TAGS  = frozenset({"table", "thead", "tbody", "tfoot", "tr", "th"
 _ALLOWED_TABLE_ATTRS = frozenset({"colspan", "rowspan", "scope"})
 
 _NOISE_SELECTOR = (
-    "sup, .reference, .reflist, .navbox, "
+    "sup, .reference, .reflist, .navbox, .sidebar, "
     ".thumb, .gallery, .mw-editsection, #toc, "
     ".hatnote, .noprint, style, script, "
     ".redirectMsg, .mw-redirectedfrom"
@@ -25,10 +25,14 @@ def fix_spacing(text: str) -> str:
     return _PUNCT_SPACE_RE.sub(r'\1', text)
 
 
+_TAG_RE = re.compile(r'<[^>]+>')
+
+
 def _clean_table(tbl_tag) -> str:
     """Return structural-only HTML for a table: no class, style, or id attributes."""
     tbl = deepcopy(tbl_tag)
-    for tag in tbl.find_all(True):
+    # Process root element AND all descendants (find_all skips the root itself)
+    for tag in [tbl] + tbl.find_all(True):
         if tag.name not in _ALLOWED_TABLE_TAGS:
             tag.unwrap()
             continue
@@ -36,6 +40,11 @@ def _clean_table(tbl_tag) -> str:
             if attr not in _ALLOWED_TABLE_ATTRS:
                 del tag.attrs[attr]
     return str(tbl)
+
+
+def table_to_fts_text(table_html: str) -> str:
+    """Strip all HTML tags from a table block, leaving only cell text for FTS indexing."""
+    return _TAG_RE.sub(' ', table_html)
 
 
 def _inside_table(el) -> bool:

@@ -35,6 +35,7 @@ from app.feed_manager import (
     load_feeds_for_domain,
     remove_feed,
     rename_domain_feeds,
+    update_feed,
     update_feed_rate,
 )
 from app.ingest import schedule_feeds, scheduler, start_scheduler, trigger_immediate
@@ -128,6 +129,23 @@ def api_remove_feed(feed_id: str):
         raise HTTPException(status_code=404, detail="Feed not found")
     schedule_feeds()
     return {"deleted": feed_id}
+
+
+class FeedUpdate(BaseModel):
+    name: str
+    url: HttpUrl
+    update_rate: int = 60
+    feed_type: str = "rss"
+
+
+@app.put("/api/feeds/{feed_id}", tags=["feeds"])
+def api_update_feed(feed_id: str, body: FeedUpdate):
+    """Update name, url, update_rate and type for an existing feed."""
+    updated = update_feed(feed_id, body.name, str(body.url), body.update_rate, body.feed_type)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Feed not found")
+    schedule_feeds()
+    return updated
 
 
 @app.get("/api/domains", tags=["domains"])

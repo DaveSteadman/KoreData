@@ -576,6 +576,22 @@ async def web_delete_feed(domain: str, feed_id: str):
     return RedirectResponse(f"/feeds/{domain}", status_code=303)
 
 
+@app.post("/feeds/{domain}/feeds/{feed_id}/update")
+async def web_update_feed(
+    domain: str,
+    feed_id: str,
+    name: str = Form(...),
+    url: str = Form(...),
+    update_rate: int = Form(60),
+    feed_type: str = Form("rss"),
+):
+    await _feed_client.put(f"/api/feeds/{feed_id}", json={
+        "name": name, "url": url,
+        "update_rate": update_rate, "feed_type": feed_type,
+    })
+    return RedirectResponse(f"/feeds/{domain}", status_code=303)
+
+
 @app.post("/feeds/{domain}/feeds/{feed_id}/refresh")
 async def web_refresh_feed(domain: str, feed_id: str):
     await _feed_client.post(f"/api/feeds/{feed_id}/trigger")
@@ -625,6 +641,7 @@ async def web_bulk_delete_entries(request: Request, sel: list[str] = Form(defaul
 
 @app.post("/feeds/{domain}/settings/age-mode")
 async def web_set_age_mode(
+    request: Request,
     domain: str,
     mode: str = Form(...),
     days: Optional[int] = Form(None),
@@ -635,6 +652,8 @@ async def web_set_age_mode(
         f"/api/domains/{domain}/age-settings",
         json={"mode": mode, "days": days, "start_date": start_date, "end_date": end_date},
     )
+    if "application/json" in request.headers.get("accept", ""):
+        return {"ok": True}
     return RedirectResponse(f"/feeds/{domain}", status_code=303)
 
 
@@ -927,13 +946,6 @@ async def ref_import(request: Request):
 async def ref_import_crawl(request: Request):
     payload = await request.json()
     r = await _ref_client.post("/import/kiwix/crawl", json=payload)
-    return JSONResponse(content=r.json(), status_code=r.status_code)
-
-
-@app.post("/reference/import/wikipedia")
-async def ref_import_wikipedia(request: Request):
-    payload = await request.json()
-    r = await _ref_client.post("/import/wikipedia/crawl", json=payload)
     return JSONResponse(content=r.json(), status_code=r.status_code)
 
 
