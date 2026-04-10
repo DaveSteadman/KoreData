@@ -4,3 +4,5 @@
 /KoreReference/data
 /KoreLibrary/app/__pycache__
 /KoreReference/app/importers/__pycache__
+KoreDataGateway/data/gateway.log
+KoreFeed/actions.log

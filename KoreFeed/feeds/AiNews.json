@@ -18,10 +18,10 @@
     "name": "understandingai",
     "url": "https://www.understandingai.org/feed",
     "update_rate": 300,
-    "last_fetched_at": "2026-04-09T16:46:12",
+    "last_fetched_at": "2026-04-09T22:13:23",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 7.4,
+    "last_duration_s": 6.3,
     "last_new_entries": 0,
     "content_status": "good"
   },
@@ -31,10 +31,10 @@
     "name": "Ollama Blog",
     "url": "https://ollama.com/blog/rss.xml",
     "update_rate": 301,
-    "last_fetched_at": "2026-04-09T16:48:07",
+    "last_fetched_at": "2026-04-09T22:13:32",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 8.7,
+    "last_duration_s": 8.8,
     "last_new_entries": 0,
     "content_status": "good"
   }
