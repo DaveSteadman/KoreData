@@ -15,8 +15,6 @@ from app.database import (
     search_chunks,
     update_chunk,
 )
-from app.version import __version__
-
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
@@ -27,7 +25,6 @@ async def _lifespan(app: FastAPI):
 app = FastAPI(
     title="KoreRAG",
     description="Retrieval-augmented generation chunk storage service",
-    version=__version__,
     lifespan=_lifespan,
 )
 
@@ -56,9 +53,7 @@ class ChunkUpdate(BaseModel):
 
 @app.get("/status", summary="Service health and stats")
 def route_status():
-    s = get_status()
-    s["version"] = __version__
-    return s
+    return get_status()
 
 
 # ---------------------------------------------------------------------------

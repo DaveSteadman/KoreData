@@ -127,6 +127,7 @@ def insert_entry(
     metadata: dict,
     page_text: str,
 ) -> bool:
+    init_db(domain)
     with db_connection(domain) as conn:
         cur = conn.execute(
             """

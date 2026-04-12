@@ -29,8 +29,6 @@ from app.database import (
     update_book_body,
     COMPLETENESS_FIELDS,
 )
-from app.version import __version__
-
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
@@ -41,7 +39,6 @@ async def _lifespan(app: FastAPI):
 app = FastAPI(
     title="KoreLibrary",
     description="Long-form text storage and retrieval service",
-    version=__version__,
     lifespan=_lifespan,
 )
 
@@ -721,6 +718,5 @@ def route_status():
     stats = get_status()
     return {
         "service": "KoreLibrary",
-        "version": __version__,
         **stats,
     }

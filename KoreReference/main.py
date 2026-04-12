@@ -1,7 +1,6 @@
 import uvicorn
 from datetime import datetime
 from app.config import cfg
-from app.version import __version__
 
 _W = 80
 
@@ -16,7 +15,7 @@ def _print_banner() -> None:
     lines = [
         "",
         sep,
-        f"  KOREREFERENCE {__version__}  [{now}]",
+        f"  KOREREFERENCE  [{now}]",
         sep,
         "",
         row("Host:", f"http://{cfg['host']}:{cfg['port']}/"),

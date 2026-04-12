@@ -20,27 +20,28 @@ KoreData provides structured, searchable content across three domains — live n
 | **KoreDataGateway** | 8800 | Planned | Unified agent API; proxies and aggregates results from all child services |
 | **KoreFeed** | 8801 | Working | RSS ingest with full-text scraping and per-domain SQLite/FTS5 storage |
 | **KoreLibrary** | 8802 | In development | Long-form ebook and document store, imported from Kiwix / Project Gutenberg |
+| **KoreRAG** | 8803 | Planned | Vector chunk store for RAG; segments and embeds documents for semantic retrieval |
 | **KoreReference** | 8804 | Planned | Wikipedia-scale encyclopedic articles with wikilink traversal |
 
 ---
 
 ## Get Running Fast
 
-KoreFeed is the active service. Start it from a fresh clone:
-
 ```powershell
 git clone https://github.com/DaveSteadman/KoreData.git
-cd KoreData\KoreFeed
+cd KoreData
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python main.py
 ```
 
+`main.py` at the repo root launches KoreDataGateway, which starts and supervises all child services.
+
 Then open:
 
 ```text
-http://localhost:8801/
+http://localhost:8800/
 ```
 
 The feed scheduler starts immediately. Configured feeds are fetched on their own intervals; a restart respects each feed's last-fetched timestamp so nothing is re-ingested unnecessarily.
@@ -90,6 +91,7 @@ KoreDataGateway  :8800
     ├── POST /search   ◄── primary agent endpoint
     ├── /feeds/*       ──► KoreFeed      :8801
     ├── /library/*     ──► KoreLibrary   :8802
+    ├── /rag/*         ──► KoreRAG       :8803
     └── /reference/*   ──► KoreReference :8804
 ```
 

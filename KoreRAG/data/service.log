@@ -326,3 +326,75 @@ INFO:     127.0.0.1:49226 - "GET /status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52455 - "GET /status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:60113 - "GET /status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:64157 - "GET /status HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "C:\Util\Data\GitRepos\KoreData\KoreRAG\main.py", line 5, in <module>
+    from app.version import __version__
+ModuleNotFoundError: No module named 'app.version'
+Traceback (most recent call last):
+  File "C:\Util\Data\GitRepos\KoreData\KoreRAG\main.py", line 5, in <module>
+    from app.version import __version__
+ModuleNotFoundError: No module named 'app.version'
+INFO:     Started server process [26468]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8803 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG  [16:06:28]
+================================================================================
+
+  Host:                  http://0.0.0.0:8803/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          0
+  DB size:               28,672 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:57642 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64257 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Started server process [25412]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8803 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG  [16:09:24]
+================================================================================
+
+  Host:                  http://0.0.0.0:8803/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          0
+  DB size:               28,672 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:61988 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [25412]
+INFO:     Started server process [2076]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8803 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG  [16:10:06]
+================================================================================
+
+  Host:                  http://0.0.0.0:8803/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          0
+  DB size:               28,672 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:54430 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52012 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62812 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62813 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62326 - "GET /status HTTP/1.1" 200 OK

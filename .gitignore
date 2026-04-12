@@ -8,3 +8,5 @@ KoreDataGateway/data/gateway.log
 KoreFeed/actions.log
 KoreDataGateway/data/gateway.log
 /KoreRAG/app/__pycache__
+/KoreDataGateway/__pycache__
+/Data

@@ -32,8 +32,6 @@ from app.importers.kiwix import (
 )
 from app.importers.state import import_lock, import_state
 
-from app.version import __version__
-
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
@@ -44,7 +42,6 @@ async def _lifespan(app: FastAPI):
 app = FastAPI(
     title="KoreReference",
     description="Wikipedia-scale encyclopedia service for LLM agents",
-    version=__version__,
     lifespan=_lifespan,
 )
 
@@ -309,6 +306,5 @@ def route_import_status():
 def route_status():
     return {
         "service": "KoreReference",
-        "version": __version__,
         **get_status(),
     }

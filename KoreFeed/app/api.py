@@ -39,8 +39,6 @@ from app.feed_manager import (
     update_feed_rate,
 )
 from app.ingest import schedule_feeds, scheduler, start_scheduler, trigger_immediate
-from app.version import __version__
-
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
     # Migrate all existing databases (adds `deleted` column if absent, etc.)
@@ -55,7 +53,6 @@ async def _lifespan(app: FastAPI):
 app = FastAPI(
     title="MiniFeed",
     description="RSS ingest server for LLM agents",
-    version=__version__,
     lifespan=_lifespan,
 )
 
@@ -73,7 +70,6 @@ def api_status():
     return {
         "status": "ok",
         "service": "KoreFeed",
-        "version": __version__,
         "total_domains": len(domains),
         "total_feeds": len(all_feeds),
         "total_entries": total_entries,

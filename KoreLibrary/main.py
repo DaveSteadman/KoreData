@@ -2,7 +2,6 @@ import uvicorn
 from datetime import datetime
 from app.config import cfg
 from app.database import get_status
-from app.version import __version__
 
 _W = 80
 
@@ -23,7 +22,7 @@ def _print_banner() -> None:
     lines = [
         "",
         sep,
-        f"  KORELIBRARY {__version__}  [{now}]",
+        f"  KORELIBRARY  [{now}]",
         sep,
         "",
         row("Host:", f"http://{host}:{port}/"),

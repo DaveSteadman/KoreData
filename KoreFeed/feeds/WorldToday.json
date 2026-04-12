@@ -6,10 +6,10 @@
     "url": "https://www.lemonde.fr/en/international/rss_full.xml",
     "update_rate": 67,
     "last_fetched_at": "2026-04-12T08:29:40",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 4.3,
-    "last_new_entries": 1,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 2.0,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -19,10 +19,10 @@
     "url": "http://feeds.bbci.co.uk/news/rss.xml",
     "update_rate": 63,
     "last_fetched_at": "2026-04-12T08:29:52",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 12.4,
-    "last_new_entries": 4,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 1.9,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -32,10 +32,10 @@
     "url": "https://www.abc.net.au/news/feed/51120/rss.xml",
     "update_rate": 58,
     "last_fetched_at": "2026-04-12T08:30:02",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 9.9,
-    "last_new_entries": 15,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 3.3,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -45,9 +45,9 @@
     "url": "https://indianexpress.com/section/india/feed/",
     "update_rate": 61,
     "last_fetched_at": "2026-04-12T08:30:14",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 2.6,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 1.7,
     "last_new_entries": 0,
     "content_status": "good",
     "type": "rss"
@@ -59,10 +59,10 @@
     "url": "https://rss.dw.com/xml/rss-en-all",
     "update_rate": 62,
     "last_fetched_at": "2026-04-12T08:24:44",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 4.7,
-    "last_new_entries": 5,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 3.5,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -72,9 +72,9 @@
     "url": "https://mg.co.za/feed/",
     "update_rate": 60,
     "last_fetched_at": "2026-04-12T08:30:12",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 3.2,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 2.2,
     "last_new_entries": 0,
     "content_status": "good"
   },
@@ -85,9 +85,9 @@
     "url": "https://www.latimes.com/world-nation/rss2.0.xml",
     "update_rate": 58,
     "last_fetched_at": "2026-04-12T08:30:09",
-    "last_status": "ok",
-    "last_error": null,
-    "last_duration_s": 0.2,
+    "last_status": "error",
+    "last_error": "OperationalError: no such table: entries",
+    "last_duration_s": 1.7,
     "last_new_entries": 0,
     "content_status": "good"
   }

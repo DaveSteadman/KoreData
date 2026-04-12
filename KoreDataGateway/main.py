@@ -49,6 +49,7 @@ def _print_banner() -> None:
         row("Gateway:", f"http://localhost:{cfg['port']}/"),
         row("KoreFeed:", cfg["korefeed_url"]),
         row("KoreLibrary:", cfg["korelibrary_url"]),
+        row("KoreRAG:", cfg["korerag_url"]),
         row("KoreReference:", cfg["korereference_url"]),
         row("Log level:", cfg["log_level"].upper()),
         "",
