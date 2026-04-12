@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}RAG Search{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/">home</a><span class="sep">›</span>
+  <a href="/rag">rag</a><span class="sep">›</span>search
+</div>
+
+<div class="panel" style="margin-bottom:1.25rem;">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> SEARCH CHUNKS
+  </div>
+  <div class="panel-body">
+    <form action="/rag/search" method="get">
+      <p class="meta" style="margin-bottom:0.4rem;">Space or comma separated terms are AND-matched against title, source, tags, and content.</p>
+      <div style="display:flex; flex-direction:row; gap:0;">
+        <input type="search" name="q" value="{{ q }}" placeholder="search chunks…" style="flex:1;">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.6rem; align-items:center;">
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Source filter
+          <input type="text" name="source" value="{{ source }}" placeholder="partial match" style="width:160px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Tag filter
+          <input type="text" name="tags" value="{{ tags }}" placeholder="partial match" style="width:140px;">
+        </label>
+        <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
+          Top hits
+          <div class="num-stepper">
+            <input type="number" name="limit" value="{{ limit }}" min="1" max="200" style="width:52px;">
+            <div class="stepper-btns">
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
+              <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
+            </div>
+          </div>
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if searched %}
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> RESULTS
+    <span class="badge badge-dim" style="margin-left:0.5rem;">{{ results | length }}</span>
+  </div>
+  <div class="panel-body">
+    {% if results %}
+    {% for r in results %}
+    <div style="border-bottom:1px solid var(--border); padding:0.75rem 0; {% if loop.last %}border-bottom:none;{% endif %}">
+      <div style="display:flex; align-items:baseline; gap:0.6rem; margin-bottom:0.2rem;">
+        <a href="/rag/{{ r.id }}" style="color:var(--text); font-size:13px;">{{ r.title or "(untitled)" }}</a>
+        <span class="meta" style="font-size:11px;">#{{ r.id }}</span>
+      </div>
+      {% if r.source or r.tags %}
+      <div class="meta" style="font-size:11px; margin-bottom:0.25rem;">
+        {% if r.source %}<span>{{ r.source }}</span>{% endif %}
+        {% if r.source and r.tags %} · {% endif %}
+        {% if r.tags %}<span style="color:var(--amber);">{{ r.tags }}</span>{% endif %}
+        {% if r.word_count %} · {{ "{:,}".format(r.word_count) }} words{% endif %}
+      </div>
+      {% endif %}
+      {% if r.snippet %}
+      <div style="font-size:12px; color:var(--text); line-height:1.6; margin-top:0.25rem;">{{ r.snippet }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="meta">No chunks matched your query.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

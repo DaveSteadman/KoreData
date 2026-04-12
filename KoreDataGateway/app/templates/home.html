@@ -6,27 +6,32 @@
   /* ─── service health grid ─────────────────────── */
   .svc-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
   }
-  @media (max-width: 800px) { .svc-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .svc-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px)  { .svc-grid { grid-template-columns: 1fr; } }
 
   .svc-card {
     border: 1px solid var(--border);
     background: var(--bg);
-    padding: 1rem 1.1rem;
+    padding: 0.65rem 0.85rem;
   }
   .svc-card.online  { border-left: 3px solid var(--green); }
   .svc-card.offline { border-left: 3px solid var(--red); }
 
   .svc-name {
-    font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em;
-    color: var(--text); margin-bottom: 0.4rem;
+    font-size: 0.875rem; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--text); margin-bottom: 0.1rem;
+  }
+  .svc-desc {
+    font-size: 10.5px; color: var(--dim); letter-spacing: 0.02em;
+    margin-bottom: 0.35rem;
   }
   .svc-badge {
     display: inline-flex; align-items: center; gap: 5px;
     font-size: 11px; letter-spacing: 0.06em; font-weight: 600;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.45rem;
   }
   .svc-badge .dot {
     width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
@@ -36,12 +41,12 @@
   .svc-badge.offline { color: var(--red); }
   .svc-badge.offline .dot { background: var(--red); }
 
-  .svc-stats { display: flex; flex-direction: column; gap: 3px; margin-bottom: 0.8rem; }
-  .svc-stat  { display: flex; gap: 0.5rem; font-size: 12px; }
-  .svc-stat-key { color: var(--dim); min-width: 130px; }
+  .svc-stats { display: flex; flex-direction: column; gap: 2px; margin-bottom: 0.5rem; }
+  .svc-stat  { display: flex; gap: 0.4rem; font-size: 11.5px; }
+  .svc-stat-key { color: var(--dim); min-width: 80px; }
   .svc-stat-val { color: var(--text); font-variant-numeric: tabular-nums; }
 
-  .svc-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .svc-links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
   .svc-links a { font-size: 11px; color: var(--blue); letter-spacing: 0.04em; }
 
   /* ─── search panel ────────────────────────────── */
@@ -111,14 +116,21 @@
       {% set cls = "online" if svc.healthy else "offline" %}
       <div class="svc-card {{ cls }}" id="svc-{{ svc.slug }}">
         <div class="svc-name">{{ svc.label }}</div>
+        <div class="svc-desc">
+          {%- if svc.slug == "feeds" %}RSS feed &amp; website data
+          {%- elif svc.slug == "library" %}Long form book content
+          {%- elif svc.slug == "reference" %}Linked encyclopedia
+          {%- elif svc.slug == "rag" %}Searchable user data
+          {%- endif %}
+        </div>
         <div class="svc-badge {{ cls }}">
           <span class="dot"></span>
-          {{ "ONLINE" if svc.healthy else "OFFLINE" }}
+          {{ "ONLINE" if svc.healthy else "OFFLINE" }}{% if svc.healthy %}<span style="font-weight:400;letter-spacing:0;margin-left:5px;opacity:0.7;">{{ svc.url | replace("http://", "") }}</span>{% endif %}
         </div>
         <div class="svc-stats">
           {% if svc.slug == "feeds" %}
-            <div class="svc-stat"><span class="svc-stat-key">feeds</span><span class="svc-stat-val">{{ svc.stats.get("total_feeds", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">domains</span><span class="svc-stat-val">{{ svc.stats.get("total_domains", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">feeds</span><span class="svc-stat-val">{{ svc.stats.get("total_feeds", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">entries</span><span class="svc-stat-val">{{ svc.stats.get("total_entries", "—") }}</span></div>
           {% elif svc.slug == "library" %}
             <div class="svc-stat"><span class="svc-stat-key">books</span><span class="svc-stat-val">{{ svc.stats.get("total_books", "—") }}</span></div>
@@ -127,18 +139,27 @@
             <div class="svc-stat"><span class="svc-stat-key">articles</span><span class="svc-stat-val">{{ svc.stats.get("total_articles", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">redirects</span><span class="svc-stat-val">{{ svc.stats.get("total_redirects", "—") }}</span></div>
             <div class="svc-stat"><span class="svc-stat-key">links</span><span class="svc-stat-val">{{ svc.stats.get("total_links", "—") }}</span></div>
+          {% elif svc.slug == "rag" %}
+            <div class="svc-stat"><span class="svc-stat-key">chunks</span><span class="svc-stat-val">{{ svc.stats.get("total_chunks", "—") }}</span></div>
+            <div class="svc-stat"><span class="svc-stat-key">db size</span><span class="svc-stat-val">{{ "%.1f KB" | format(svc.stats.get("db_size_bytes", 0) / 1024) if svc.stats.get("db_size_bytes") else "—" }}</span></div>
           {% endif %}
         </div>
         <div class="svc-links">
-          <a href="/{{ svc.slug }}">Browse</a>
           {% if svc.slug == "feeds" %}
+            <a href="/{{ svc.slug }}">Browse</a>
             <a href="/feeds/search">Search</a>
           {% elif svc.slug == "library" %}
+            <a href="/{{ svc.slug }}">Browse</a>
             <a href="/library/search">Search</a>
             <a href="/library/import">Import</a>
           {% elif svc.slug == "reference" %}
+            <a href="/{{ svc.slug }}">Browse</a>
             <a href="/reference/search">Search</a>
             <a href="/reference/import">Import</a>
+          {% elif svc.slug == "rag" %}
+            <a href="/{{ svc.slug }}">Browse</a>
+            <a href="/rag/search">Search</a>
+            <a href="/rag/insert">Insert</a>
           {% endif %}
         </div>
       </div>
@@ -173,6 +194,9 @@
       </label>
       <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text); cursor:pointer; text-transform:none; letter-spacing:normal;">
         <input type="checkbox" class="sq-domain" value="library" checked style="accent-color:var(--green); width:auto; cursor:pointer;"> Library
+      </label>
+      <label style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text); cursor:pointer; text-transform:none; letter-spacing:normal;">
+        <input type="checkbox" class="sq-domain" value="rag" checked style="accent-color:var(--green); width:auto; cursor:pointer;"> RAG
       </label>
     </div>
 
@@ -299,6 +323,10 @@ function renderCard(r) {
     meta = r.word_count ? `${r.word_count.toLocaleString()} words` : '';
   } else if (r.type === 'library_book') {
     meta = r.author ? escHtml(r.author) : '';
+  } else if (r.type === 'rag_chunk') {
+    const src  = r.source ? escHtml(r.source) : '';
+    const tags = r.tags   ? `  ·  ${escHtml(r.tags)}` : '';
+    meta = `${src}${tags}`;
   }
   const typeLabel = (r.type || '').replace('_', ' ');
   return `<div class="result-card">

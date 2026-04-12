@@ -171,8 +171,34 @@
   </div>
 </div>
 
+<!-- ─── Gutenberg catalog browser ───────────────────────────── -->
+<div style="margin-top:1rem;">
+  <div class="panel">
+    <div class="panel-header">
+      <span class="ph-diamond">◆</span> GUTENBERG CATALOG
+      <span id="cat_total" class="meta" style="margin-left:auto; font-size:11px;"></span>
+    </div>
+    <div class="panel-body">
+      <p class="meta" style="font-size:11px; margin-bottom:0.6rem;">
+        Parses the ZIM's full book index. Select a ZIM first (Reload above), then filter by author name. Leave blank to load all authors.
+      </p>
+      <div style="display:grid; grid-template-columns:1fr auto auto; gap:0.5rem; margin-bottom:0.75rem; align-items:end;">
+        <div>
+          <label for="cat_author">Author filter</label>
+          <input id="cat_author" type="text" placeholder="e.g. Dickens, Nietzsche, Anonymous…"
+            onkeydown="if(event.key==='Enter') catalogLoad()">
+        </div>
+        <button type="button" onclick="catalogLoad()" style="white-space:nowrap;">SEARCH</button>
+        <button type="button" onclick="catalogAddAllToBatch()" style="white-space:nowrap; color:var(--dim); border-color:var(--border); background:transparent; font-size:11px;"
+          title="Copy all visible viewer URLs into the Batch Import textarea">ADD ALL TO BATCH</button>
+      </div>
+      <div id="cat_status" class="meta" style="min-height:1.2em; margin-bottom:0.5rem;"></div>
+      <div id="cat_results" style="max-height:600px; overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Browse ZIM by letter ───────────────────────────── -->
-<div id="k_browse_panel" style="display:none; margin-top:1rem; display:none;">
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;">
 
     <!-- Title browse -->
@@ -506,6 +532,100 @@ function escHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+// ─── Gutenberg catalog browser ───────────────────────────────
+
+let _catalogData = null; // cached last result
+
+async function catalogLoad() {
+  const zim = document.getElementById('k_zim').value;
+  if (!zim) { catalogStatus('Select a ZIM first.', 'var(--amber)'); return; }
+  const author = document.getElementById('cat_author').value.trim();
+  const url = kiwixUrl();
+  catalogStatus('Loading catalog…', 'var(--dim)');
+  document.getElementById('cat_results').innerHTML = '';
+  document.getElementById('cat_total').textContent = '';
+  try {
+    let apiUrl = `/library/kiwix/catalog?zim=${encodeURIComponent(zim)}`;
+    if (author) apiUrl += `&author=${encodeURIComponent(author)}`;
+    if (url) apiUrl += `&kiwix_url=${encodeURIComponent(url)}`;
+    const resp = await fetch(apiUrl);
+    if (!resp.ok) {
+      const d = await resp.json().catch(() => ({}));
+      catalogStatus('✗ ' + (d.detail || resp.status), 'var(--red)');
+      return;
+    }
+    const data = await resp.json();
+    _catalogData = data;
+    catalogRender(data, zim);
+  } catch(e) {
+    catalogStatus('✗ ' + e.message, 'var(--red)');
+  }
+}
+
+function catalogStatus(msg, color) {
+  const el = document.getElementById('cat_status');
+  el.textContent = msg;
+  el.style.color = color || 'var(--text)';
+}
+
+function catalogRender(data, zim) {
+  const groups = data.authors || [];
+  const total  = data.total || 0;
+  document.getElementById('cat_total').textContent = `${total} book${total !== 1 ? 's' : ''}, ${groups.length} author${groups.length !== 1 ? 's' : ''}`;
+  catalogStatus('', '');
+
+  if (!groups.length) {
+    document.getElementById('cat_results').innerHTML = '<p class="meta" style="padding:0.5rem 0;">No results.</p>';
+    return;
+  }
+
+  const html = groups.map(g => {
+    const authorHtml = escHtml(g.author);
+    const rows = g.books.map((b, i) => {
+      const t   = escHtml(b.title);
+      const vu  = escHtml(b.viewer_url);
+      const ap  = escHtml(b.article_path);
+      const rid = `cat_${g.author}_${i}`.replace(/[^a-z0-9_]/gi, '_');
+      return `<tr id="${rid}">
+        <td style="font-size:12px; padding:3px 6px;">
+          <a href="${vu}" target="_blank" style="color:var(--text); text-decoration:none;" title="Open in Kiwix viewer">${t}</a>
+        </td>
+        <td style="text-align:center; width:70px; padding:3px;">
+          <button type="button" style="font-size:11px; padding:2px 8px;"
+            data-title="${t}" data-zim="${escHtml(zim)}"
+            data-article-url="${ap}" data-row="${rid}"
+            onclick="kiwixImport(this.dataset.title, this.dataset.zim, this.dataset.articleUrl, this.dataset.row)">
+            Import
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+    return `<div style="margin-bottom:0.75rem;">
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.04em; color:var(--dim); padding:4px 0; border-bottom:1px solid var(--border); margin-bottom:2px;">
+        Author: ${authorHtml}
+        <span class="meta" style="font-weight:normal; margin-left:0.5rem;">${g.books.length} work${g.books.length !== 1 ? 's' : ''}</span>
+      </div>
+      <table style="width:100%;"><tbody>${rows}</tbody></table>
+    </div>`;
+  }).join('');
+  document.getElementById('cat_results').innerHTML = html;
+}
+
+function catalogAddAllToBatch() {
+  if (!_catalogData) { catalogStatus('Load the catalog first.', 'var(--amber)'); return; }
+  const urls = [];
+  for (const g of (_catalogData.authors || [])) {
+    for (const b of (g.books || [])) {
+      if (b.viewer_url) urls.push(b.viewer_url);
+    }
+  }
+  if (!urls.length) { catalogStatus('No URLs to add.', 'var(--amber)'); return; }
+  const ta = document.getElementById('batch_urls');
+  const existing = ta.value.trim();
+  ta.value = existing ? existing + '\n' + urls.join('\n') : urls.join('\n');
+  ta.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Don't auto-load — user must confirm/set URL first

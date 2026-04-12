@@ -11,7 +11,12 @@ from urllib.parse import urljoin, urlparse
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from app.database import insert_entry, get_domain_age_settings
+from app.database import (
+    apply_age_rule,
+    get_domain_age_settings,
+    insert_entry,
+    list_domains,
+)
 from app.feed_manager import load_feeds, get_feed, update_feed_last_fetched, update_feed_status
 
 scheduler = BackgroundScheduler(daemon=True)
@@ -368,12 +373,32 @@ def trigger_immediate(feed: dict) -> None:
     _queue.put(feed)
 
 
+def _daily_prune() -> None:
+    """Apply each domain's age rule once per day. Called hourly; skips if already done today."""
+    for domain in list_domains():
+        n = apply_age_rule(domain)
+        if n:
+            _log(f"Daily prune: {domain} — {n} entries removed")
+
+
 def start_scheduler() -> None:
     # Start the single worker thread
     t = threading.Thread(target=_worker, daemon=True, name="ingest-worker")
     t.start()
 
+    # Run startup prune in background so uvicorn can respond immediately
+    threading.Thread(target=_daily_prune, daemon=True, name="startup-prune").start()
+
     schedule_feeds()
+
+    # Hourly job: applies age rules for any domain not yet pruned today
+    scheduler.add_job(
+        _daily_prune,
+        "interval",
+        hours=1,
+        id="daily_prune",
+        replace_existing=True,
+    )
 
     # Enqueue feeds that are due — respects last_fetched_at gate
     for feed in load_feeds():

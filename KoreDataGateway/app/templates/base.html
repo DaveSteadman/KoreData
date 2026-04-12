@@ -181,6 +181,8 @@
     .btn-danger { color: var(--red); border-color: var(--red); }
     .btn-danger:hover { background: rgba(255,95,95,.1); }
     .btn-sm { padding: 0.2rem 0.5rem; font-size: 11px; }
+    .btn-secondary { color: var(--dim); border-color: var(--dim); }
+    .btn-secondary:hover { background: rgba(78,84,102,.15); }
 
     /* ─── misc ───────────────────────────────────── */
     a { color: var(--blue); text-decoration: none; }
@@ -281,6 +283,7 @@
       <a href="/feeds" {% if request.url.path.startswith("/feeds") %}class="active"{% endif %}>FEEDS</a>
       <a href="/library" {% if request.url.path.startswith("/library") %}class="active"{% endif %}>LIBRARY</a>
       <a href="/reference" {% if request.url.path.startswith("/reference") %}class="active"{% endif %}>REFERENCE</a>
+      <a href="/rag" {% if request.url.path.startswith("/rag") %}class="active"{% endif %}>RAG</a>
       <a href="/docs" target="_blank">API&nbsp;DOCS</a>
     </nav>
   </header>

@@ -223,5 +223,22 @@ function cancelEditDomain() {
   document.getElementById('domain-panel-label').textContent = 'CREATE DOMAIN';
   document.getElementById('new_domain').value = '';
 }
+
+(function () {
+  var DELAY = 5000;
+  var timer;
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(function () { location.reload(); }, DELAY);
+  }
+  ['mousedown', 'keydown', 'touchstart'].forEach(function (evt) {
+    document.addEventListener(evt, schedule, { passive: true });
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') schedule();
+    else clearTimeout(timer);
+  });
+  schedule();
+}());
 </script>
 {% endblock %}

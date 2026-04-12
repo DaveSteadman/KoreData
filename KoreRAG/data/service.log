@@ -1,0 +1,328 @@
+INFO:     Started server process [19576]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8400 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [23:33:11]
+================================================================================
+
+  Host:                  http://0.0.0.0:8400/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          0
+  DB size:               28,672 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:56423 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56423 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58855 - "POST /chunks HTTP/1.1" 201 Created
+INFO:     127.0.0.1:58855 - "GET /chunks/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62730 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62730 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62731 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62730 - "GET /chunks/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62730 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54699 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62730 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64144 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49686 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62528 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50977 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58231 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55955 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55955 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55955 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58009 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58608 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58609 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58610 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58610 - "GET /chunks/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53841 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53842 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53842 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62750 - "GET /search?q=KoerLibrary+Links&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54017 - "GET /search?q=KoerLibrary&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54017 - "GET /search?q=KoerLibrary&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53662 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53663 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59423 - "GET /search?q=KoerLibrary&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55636 - "GET /search?q=KoreLibrary&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55636 - "GET /chunks/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62837 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51030 - "GET /status HTTP/1.1" 200 OK
+INFO:     Started server process [24268]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8400 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [23:43:12]
+================================================================================
+
+  Host:                  http://0.0.0.0:8400/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          1
+  DB size:               40,960 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:60730 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58417 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50103 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53435 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51751 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55421 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61780 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56933 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51526 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52212 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50695 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61121 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57633 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58930 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62766 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51091 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63615 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60681 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59652 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Started server process [28600]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8400 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [00:01:48]
+================================================================================
+
+  Host:                  http://0.0.0.0:8400/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          1
+  DB size:               40,960 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:57492 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [28600]
+INFO:     Started server process [32904]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8400 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [00:02:46]
+================================================================================
+
+  Host:                  http://0.0.0.0:8400/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          1
+  DB size:               40,960 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:55451 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50742 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63005 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55485 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55485 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54609 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54609 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54611 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54609 - "GET /chunks/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52002 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57447 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57447 - "GET /search?q=a+complete+and+utter+lie&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54231 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58310 - "GET /search?q=%22a+complete+and+utter+lie%22&limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49944 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54458 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54459 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54460 - "GET /chunks?limit=100&offset=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62765 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49794 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57133 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58245 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49274 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63393 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62247 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52580 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57153 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64664 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57845 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51896 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51117 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57059 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64766 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63052 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52208 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54999 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53723 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59465 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55333 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64187 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50903 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50331 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61869 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57239 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64160 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50551 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49695 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50750 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54479 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53810 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51791 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62135 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65070 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61669 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55568 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51713 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58387 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57121 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51943 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64675 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56549 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58166 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59158 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56572 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57392 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50433 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60364 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55289 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49889 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53305 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51657 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51757 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58201 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64136 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63931 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51378 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63452 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49674 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51741 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57977 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63110 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57200 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63217 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53901 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53165 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63642 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54421 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56263 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52190 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62986 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56523 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55838 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54124 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64014 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56242 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61005 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50515 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65492 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63856 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61848 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52812 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54061 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49829 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56287 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58708 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49928 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60788 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61390 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62310 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63118 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53528 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52946 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56335 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64671 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64195 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50534 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61273 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50482 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53577 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57427 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54113 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58924 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51204 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57995 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65506 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63466 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51165 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59848 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50854 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62434 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50966 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49842 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63435 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52513 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54560 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59339 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61869 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52800 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50549 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60894 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51115 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55545 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65510 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61052 - "GET /status HTTP/1.1" 200 OK
+INFO:     Started server process [36560]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8400 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [09:28:18]
+================================================================================
+
+  Host:                  http://0.0.0.0:8400/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          1
+  DB size:               40,960 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:58363 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62701 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53884 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65518 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50064 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56264 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56140 - "GET /status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [36560]
+INFO:     Started server process [31624]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8803 (Press CTRL+C to quit)
+
+================================================================================
+  KORERAG 0001 / 0.1+dev  [09:34:27]
+================================================================================
+
+  Host:                  http://0.0.0.0:8803/
+  Data dir:              data
+  Log level:             INFO
+  Total chunks:          1
+  DB size:               40,960 bytes
+
+================================================================================
+
+INFO:     127.0.0.1:51587 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54279 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58365 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49340 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49226 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52455 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60113 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64157 - "GET /status HTTP/1.1" 200 OK

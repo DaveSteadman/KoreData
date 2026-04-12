@@ -4,11 +4,10 @@ from pathlib import Path
 _CONFIG_FILE = Path("config/default.json")
 
 _DEFAULTS = {
-    "port": 8804,
+    "port": 8803,
     "host": "0.0.0.0",
-    "data_dir": "data",
     "log_level": "info",
-    "kiwix_url": "http://127.0.0.1:8888",
+    "data_dir": "data",
 }
 
 

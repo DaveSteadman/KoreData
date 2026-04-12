@@ -1,10 +1,26 @@
 import re
 import sqlite3
+import zlib
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
 from app.config import cfg
+
+
+def _compress(text: Optional[str]) -> Optional[bytes]:
+    if not text:
+        return None
+    return zlib.compress(text.encode("utf-8"), level=6)
+
+
+def _decompress(blob: Optional[bytes]) -> Optional[str]:
+    if not blob:
+        return None
+    if isinstance(blob, str):
+        return blob  # legacy uncompressed row
+    return zlib.decompress(blob).decode("utf-8")
+
 
 DATA_DIR = Path(cfg["data_dir"])
 _DB_PATH = DATA_DIR / "library.db"
@@ -22,6 +38,8 @@ def get_db_path() -> Path:
 def db_connection():
     conn = sqlite3.connect(str(get_db_path()), check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA foreign_keys=ON")
     try:
         yield conn
         conn.commit()
@@ -57,42 +75,47 @@ def init_db() -> None:
                 conn.execute(f"ALTER TABLE books DROP COLUMN {col}")
             except Exception:
                 pass
+        # Detect old content-table schema (triggers existed before this migration)
+        _has_old_triggers = conn.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name='books_ai'"
+        ).fetchone()[0] > 0
+
+        # Drop old triggers regardless (no-op if already gone)
+        for _trg in ("books_ai", "books_ad", "books_au"):
+            conn.execute(f"DROP TRIGGER IF EXISTS {_trg}")
+
+        if _has_old_triggers:
+            # Migrating from content FTS: rebuild as contentless and compress body
+            conn.execute("DROP TABLE IF EXISTS books_fts")
+
+        # FTS: contentless — body stored compressed so triggers can't index it.
+        # Python CRUD code manages FTS explicitly with plain text.
         conn.execute("""
             CREATE VIRTUAL TABLE IF NOT EXISTS books_fts USING fts5(
                 title, author, body,
                 tokenize='unicode61 remove_diacritics 1',
-                content=books,
-                content_rowid=id
+                content=''
             )
         """)
-        # Triggers to keep FTS in sync
-        conn.execute("""
-            CREATE TRIGGER IF NOT EXISTS books_ai AFTER INSERT ON books BEGIN
+
+        if _has_old_triggers:
+            # Compress all text bodies and populate FTS with plain text
+            _rows = conn.execute(
+                "SELECT id, title, author, body FROM books WHERE body IS NOT NULL"
+            ).fetchall()
+            for _row in _rows:
+                conn.execute("UPDATE books SET body=? WHERE id=?",
+                             (_compress(_row["body"]), _row["id"]))
+                conn.execute(
+                    "INSERT INTO books_fts(rowid, title, author, body) VALUES (?,?,?,?)",
+                    (_row["id"], _row["title"] or "", _row["author"] or "", _row["body"] or ""),
+                )
+            # Index rows with NULL body (title/author still searchable)
+            conn.execute("""
                 INSERT INTO books_fts(rowid, title, author, body)
-                VALUES (new.id, COALESCE(new.title,''), COALESCE(new.author,''), COALESCE(new.body,''));
-            END
-        """)
-        conn.execute("""
-            CREATE TRIGGER IF NOT EXISTS books_ad AFTER DELETE ON books BEGIN
-                INSERT INTO books_fts(books_fts, rowid, title, author, body)
-                VALUES ('delete', old.id, COALESCE(old.title,''), COALESCE(old.author,''), COALESCE(old.body,''));
-            END
-        """)
-        conn.execute("""
-            CREATE TRIGGER IF NOT EXISTS books_au AFTER UPDATE ON books BEGIN
-                INSERT INTO books_fts(books_fts, rowid, title, author, body)
-                VALUES ('delete', old.id, COALESCE(old.title,''), COALESCE(old.author,''), COALESCE(old.body,''));
-                INSERT INTO books_fts(rowid, title, author, body)
-                VALUES (new.id, COALESCE(new.title,''), COALESCE(new.author,''), COALESCE(new.body,''));
-            END
-        """)
-        # Back-fill FTS for any existing rows (e.g. if DB pre-dates triggers)
-        conn.execute("""
-            INSERT INTO books_fts(rowid, title, author, body)
-            SELECT b.id, COALESCE(b.title,''), COALESCE(b.author,''), COALESCE(b.body,'')
-            FROM books b
-            WHERE b.id NOT IN (SELECT rowid FROM books_fts)
-        """)
+                SELECT id, COALESCE(title,''), COALESCE(author,''), ''
+                FROM books WHERE body IS NULL
+            """)
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +143,10 @@ _BOOK_COLS_WITH_BODY = _BOOK_COLS + ("body",)
 
 def _row_to_dict(row: sqlite3.Row, include_body: bool = False) -> dict:
     cols = _BOOK_COLS_WITH_BODY if include_body else _BOOK_COLS
-    return {c: row[c] for c in cols}
+    d = {c: row[c] for c in cols}
+    if include_body:
+        d["body"] = _decompress(d.get("body"))
+    return d
 
 
 # ---------------------------------------------------------------------------
@@ -139,14 +165,19 @@ def add_book(
 ) -> dict:
     cleaned_body = _strip_page_markers(body) if body else None
     word_count = _compute_word_count(cleaned_body)
+    compressed = _compress(cleaned_body)
     with db_connection() as conn:
         cur = conn.execute("""
             INSERT INTO books (title, author, year, language, genre, notes,
                                word_count, body)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (title, author, year, language, genre, notes,
-              word_count, cleaned_body))
+              word_count, compressed))
         book_id = cur.lastrowid
+        conn.execute(
+            "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
+            (book_id, title or "", author or "", cleaned_body or ""),
+        )
     return get_book(book_id, include_body=False)
 
 
@@ -162,11 +193,27 @@ def get_book(book_id: int, include_body: bool = True) -> Optional[dict]:
 def update_book_body(book_id: int, body: str) -> Optional[dict]:
     cleaned = _strip_page_markers(body) if body else None
     word_count = _compute_word_count(cleaned)
+    compressed = _compress(cleaned)
     with db_connection() as conn:
+        cur_row = conn.execute(
+            "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
+        ).fetchone()
+        if cur_row:
+            conn.execute(
+                "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
+                "VALUES ('delete', ?, ?, ?, ?)",
+                (book_id, cur_row["title"] or "", cur_row["author"] or "",
+                 _decompress(cur_row["body"]) or ""),
+            )
         conn.execute(
             "UPDATE books SET body = ?, word_count = ? WHERE id = ?",
-            (cleaned, word_count, book_id),
+            (compressed, word_count, book_id),
         )
+        if cur_row:
+            conn.execute(
+                "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
+                (book_id, cur_row["title"] or "", cur_row["author"] or "", cleaned or ""),
+            )
     return get_book(book_id, include_body=False)
 
 
@@ -194,24 +241,56 @@ def update_book(book_id: int, fields: dict) -> Optional[dict]:
         return get_book(book_id, include_body=False)
 
     if "body" in to_set:
-        to_set["body"] = _strip_page_markers(to_set["body"]) if to_set["body"] else None
-        to_set["word_count"] = _compute_word_count(to_set["body"])
+        cleaned_body: Optional[str] = _strip_page_markers(to_set["body"]) if to_set["body"] else None
+        to_set["body"] = _compress(cleaned_body)
+        to_set["word_count"] = _compute_word_count(cleaned_body)
 
+    fts_affected = bool({"title", "author", "body"} & to_set.keys())
     assignments = ", ".join(f"{k} = ?" for k in to_set)
     values = list(to_set.values())
     values.append(book_id)
 
     with db_connection() as conn:
-        conn.execute(
-            f"UPDATE books SET {assignments} WHERE id = ?", values
-        )
+        if fts_affected:
+            cur_row = conn.execute(
+                "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
+            ).fetchone()
+            if cur_row:
+                conn.execute(
+                    "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
+                    "VALUES ('delete', ?, ?, ?, ?)",
+                    (book_id, cur_row["title"] or "", cur_row["author"] or "",
+                     _decompress(cur_row["body"]) or ""),
+                )
+        conn.execute(f"UPDATE books SET {assignments} WHERE id = ?", values)
+        if fts_affected:
+            upd_row = conn.execute(
+                "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
+            ).fetchone()
+            if upd_row:
+                conn.execute(
+                    "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
+                    (book_id, upd_row["title"] or "", upd_row["author"] or "",
+                     _decompress(upd_row["body"]) or ""),
+                )
     return get_book(book_id, include_body=False)
 
 
 def delete_book(book_id: int) -> bool:
     with db_connection() as conn:
-        cur = conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
-    return cur.rowcount > 0
+        row = conn.execute(
+            "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
+        ).fetchone()
+        if not row:
+            return False
+        conn.execute(
+            "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
+            "VALUES ('delete', ?, ?, ?, ?)",
+            (book_id, row["title"] or "", row["author"] or "",
+             _decompress(row["body"]) or ""),
+        )
+        conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
+    return True
 
 
 # ---------------------------------------------------------------------------

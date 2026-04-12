@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}RAG Chunk #{{ chunk.id }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/">home</a><span class="sep">›</span>
+  <a href="/rag">rag</a><span class="sep">›</span>#{{ chunk.id }}
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> CHUNK #{{ chunk.id }}
+    <div style="margin-left:auto; display:flex; gap:0.5rem;">
+      <form action="/rag/{{ chunk.id }}/delete" method="post" style="display:inline;"
+            onsubmit="return confirm('Delete this chunk?');">
+        <button type="submit" class="btn btn-sm btn-danger">DELETE</button>
+      </form>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div style="display:grid; grid-template-columns: 120px 1fr; gap:0.4rem 0.75rem; margin-bottom:1rem;">
+      <span class="meta">Title</span>
+      <span>{{ chunk.title or "—" }}</span>
+      <span class="meta">Source</span>
+      <span>
+        {% if chunk.source and chunk.source.startswith("http") %}
+          <a href="{{ chunk.source }}" target="_blank" rel="noopener">{{ chunk.source }}</a>
+        {% else %}
+          {{ chunk.source or "—" }}
+        {% endif %}
+      </span>
+      <span class="meta">Tags</span>
+      <span style="color:var(--amber);">{{ chunk.tags or "—" }}</span>
+      <span class="meta">Words</span>
+      <span>{% if chunk.word_count %}{{ "{:,}".format(chunk.word_count) }}{% else %}—{% endif %}</span>
+      <span class="meta">Created</span>
+      <span class="meta" style="font-size:11px;">{{ chunk.created_at or "" }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> CONTENT
+  </div>
+  <div class="panel-body" style="padding:0;">
+    <div class="scrollable-body" style="max-height:70vh; overflow-y:auto;">{{ chunk.content or "" }}</div>
+  </div>
+</div>
+{% endblock %}

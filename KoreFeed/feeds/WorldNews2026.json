@@ -5,10 +5,10 @@
     "name": "BBC World",
     "url": "http://feeds.bbci.co.uk/news/world/rss.xml",
     "update_rate": 6004,
-    "last_fetched_at": "2026-04-07T18:12:11",
+    "last_fetched_at": "2026-04-11T22:17:34",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 25.1,
+    "last_duration_s": 7.9,
     "last_new_entries": 26,
     "content_status": "good"
   },
@@ -18,11 +18,11 @@
     "name": "DW World",
     "url": "https://rss.dw.com/rdf/rss-en-world",
     "update_rate": 6001,
-    "last_fetched_at": "2026-04-07T18:12:15",
+    "last_fetched_at": "2026-04-11T22:17:37",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 4.1,
-    "last_new_entries": 11,
+    "last_duration_s": 3.3,
+    "last_new_entries": 12,
     "content_status": "good"
   },
   {
@@ -31,11 +31,11 @@
     "name": "France24",
     "url": "https://www.france24.com/en/rss",
     "update_rate": 6005,
-    "last_fetched_at": "2026-04-07T18:12:20",
+    "last_fetched_at": "2026-04-11T22:17:41",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 5.0,
-    "last_new_entries": 24,
+    "last_duration_s": 3.5,
+    "last_new_entries": 23,
     "content_status": "good"
   },
   {
@@ -44,10 +44,10 @@
     "name": "Aljazeera All",
     "url": "https://www.aljazeera.com/xml/rss/all.xml",
     "update_rate": 6003,
-    "last_fetched_at": "2026-04-07T18:12:25",
+    "last_fetched_at": "2026-04-11T22:17:44",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 4.4,
+    "last_duration_s": 2.9,
     "last_new_entries": 25,
     "content_status": "good"
   },
@@ -57,11 +57,11 @@
     "name": "The Guardian World",
     "url": "https://www.theguardian.com/world/rss",
     "update_rate": 6002,
-    "last_fetched_at": "2026-04-07T18:12:31",
+    "last_fetched_at": "2026-04-11T22:17:52",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 6.7,
-    "last_new_entries": 45,
+    "last_duration_s": 7.8,
+    "last_new_entries": 44,
     "content_status": "good"
   },
   {
@@ -70,10 +70,10 @@
     "name": "NPR World",
     "url": "https://feeds.npr.org/1004/rss.xml",
     "update_rate": 5999,
-    "last_fetched_at": "2026-04-07T18:12:33",
+    "last_fetched_at": "2026-04-11T22:17:53",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 1.9,
+    "last_duration_s": 1.4,
     "last_new_entries": 10,
     "content_status": "good"
   }

@@ -4,7 +4,7 @@ from pathlib import Path
 _CONFIG_FILE = Path("config/default.json")
 
 _DEFAULTS = {
-    "port": 8000,
+    "port": 8801,
     "host": "0.0.0.0",
     "data_dir": "data",
     "feeds_dir": "feeds",

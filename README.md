@@ -17,10 +17,10 @@ KoreData provides structured, searchable content across three domains — live n
 
 | Service | Port | Status | Description |
 |---|---|---|---|
-| **KoreDataGateway** | 8200 | Planned | Unified agent API; proxies and aggregates results from all child services |
-| **KoreFeed** | 8000 | Working | RSS ingest with full-text scraping and per-domain SQLite/FTS5 storage |
-| **KoreLibrary** | 8100 | In development | Long-form ebook and document store, imported from Kiwix / Project Gutenberg |
-| **KoreReference** | 8300 | Planned | Wikipedia-scale encyclopedic articles with wikilink traversal |
+| **KoreDataGateway** | 8800 | Planned | Unified agent API; proxies and aggregates results from all child services |
+| **KoreFeed** | 8801 | Working | RSS ingest with full-text scraping and per-domain SQLite/FTS5 storage |
+| **KoreLibrary** | 8802 | In development | Long-form ebook and document store, imported from Kiwix / Project Gutenberg |
+| **KoreReference** | 8804 | Planned | Wikipedia-scale encyclopedic articles with wikilink traversal |
 
 ---
 
@@ -40,7 +40,7 @@ python main.py
 Then open:
 
 ```text
-http://localhost:8000/
+http://localhost:8801/
 ```
 
 The feed scheduler starts immediately. Configured feeds are fetched on their own intervals; a restart respects each feed's last-fetched timestamp so nothing is re-ingested unnecessarily.
@@ -52,7 +52,7 @@ The feed scheduler starts immediately. Configured feeds are fetched on their own
 Once KoreFeed is running, try a keyword search against the live database:
 
 ```text
-http://localhost:8000/search?q=artificial+intelligence
+http://localhost:8801/search?q=artificial+intelligence
 ```
 
 What you should see:
@@ -63,7 +63,7 @@ What you should see:
 Browse by domain to see per-source coverage:
 
 ```text
-http://localhost:8000/
+http://localhost:8801/
 ```
 
 This is the core loop: feeds arrive on schedule, full page text is extracted, stored, and immediately searchable — by browser or by agent.
@@ -72,7 +72,7 @@ This is the core loop: feeds arrive on schedule, full page text is extracted, st
 
 ## What You Can Do
 
-- Point an LLM agent at `POST /search` on KoreDataGateway (port 8200) and receive ranked results across all three data domains in one call.
+- Point an LLM agent at `POST /search` on KoreDataGateway (port 8800) and receive ranked results across all three data domains in one call.
 - Manage feed inventories — add, remove, or adjust domains and fetch intervals — via the REST API or the browser UI.
 - Import an ebook collection from a local Kiwix server running Project Gutenberg ZIM content into KoreLibrary.
 - Import Wikipedia (or any Kiwix-hosted wiki) into KoreReference and traverse inter-article links as part of an agent research workflow.
@@ -86,11 +86,11 @@ This is the core loop: feeds arrive on schedule, full page text is extracted, st
 LLM Agent
     │
     ▼
-KoreDataGateway  :8200
+KoreDataGateway  :8800
     ├── POST /search   ◄── primary agent endpoint
-    ├── /feeds/*       ──► KoreFeed      :8000
-    ├── /library/*     ──► KoreLibrary   :8100
-    └── /reference/*   ──► KoreReference :8300
+    ├── /feeds/*       ──► KoreFeed      :8801
+    ├── /library/*     ──► KoreLibrary   :8802
+    └── /reference/*   ──► KoreReference :8804
 ```
 
 KoreDataGateway launches and supervises the three child services as subprocesses, waits for each to become healthy, and proxies all UI and API requests through. The gateway's `POST /search` endpoint fans requests out to however many services are specified in the call, merges the results, and returns a single structured JSON response.
@@ -101,7 +101,7 @@ While KoreDataGateway is under development, each service can be started and used
 
 ## Works With
 
-KoreData is designed to be the data layer for [MiniAgentFramework](https://github.com/DaveSteadman/MiniAgentFramework), a local-first Ollama-based agent framework. Point MiniAgentFramework at `POST http://localhost:8200/search` to give agents access to live news, books, and reference articles without any cloud search dependency.
+KoreData is designed to be the data layer for [MiniAgentFramework](https://github.com/DaveSteadman/MiniAgentFramework), a local-first Ollama-based agent framework. Point MiniAgentFramework at `POST http://localhost:8800/search` to give agents access to live news, books, and reference articles without any cloud search dependency.
 
 ---
 

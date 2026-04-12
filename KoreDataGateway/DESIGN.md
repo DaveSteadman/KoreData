@@ -10,7 +10,7 @@ KoreDataGateway has two distinct but related roles:
 
 1. **Agent search interface** — the primary API that LLM agents call. Accepts a unified search request across one or more KoreData services and returns a structured JSON response the agent can act on.
 
-2. **Service management hub** — launches, monitors, and terminates the child services (KoreFeed, KoreLibrary, KoreReference) and provides a web UI for each.
+2. **Service management hub** — launches, monitors, and terminates the child services (KoreFeed, KoreLibrary, KoreReference, KoreRAG) and provides a web UI for each.
 
 The agent search interface is the **primary goal**. All other features exist to support or manage the system that makes search possible.
 
@@ -22,16 +22,17 @@ The agent search interface is the **primary goal**. All other features exist to 
 LLM Agent
     │
     ▼
-KoreDataGateway  :8200
+KoreDataGateway  :8800
     ├── POST /search  ◄── primary agent API
     ├── GET  /        ◄── landing page (health + search test UI)
     ├── GET  /status  ◄── machine-readable health
-    ├── /feeds/*      ◄── proxied to KoreFeed      → :8000  (child process)
-    ├── /library/*    ◄── proxied to KoreLibrary   → :8100  (child process)
-    └── /reference/*  ◄── proxied to KoreReference → :8300  (child process)
+    ├── /feeds/*      ◄── proxied to KoreFeed      → :8801  (child process)
+    ├── /library/*    ◄── proxied to KoreLibrary   → :8802  (child process)
+    ├── /reference/*  ◄── proxied to KoreReference → :8804  (child process)
+    └── /rag/*        ◄── proxied to KoreRAG       → :8803  (child process)
 ```
 
-The gateway starts all three child services at startup (subprocess), waits for each to become healthy, and terminates them cleanly at shutdown. It holds persistent `httpx.AsyncClient` connections to each child.
+The gateway starts all four child services at startup (subprocess), waits for each to become healthy, and terminates them cleanly at shutdown. It holds persistent `httpx.AsyncClient` connections to each child.
 
 ---
 
@@ -46,7 +47,7 @@ A single endpoint that an LLM agent calls to search across any combination of Ko
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `query` | `string` | yes | Natural-language or keyword query string |
-| `domains` | `array[string]` | no | Which services to search: `"feeds"`, `"reference"`, `"library"`. Omit or pass `[]` to search all three |
+| `domains` | `array[string]` | no | Which services to search: `"feeds"`, `"reference"`, `"library"`, `"rag"`. Omit or pass `[]` to search all four |
 | `since` | `string` (ISO 8601 date `YYYY-MM-DD`) | no | Earliest published-date filter — applied to KoreFeed only |
 | `until` | `string` (ISO 8601 date `YYYY-MM-DD`) | no | Latest published-date filter — applied to KoreFeed only |
 | `limit` | `integer` | no | Maximum results **per domain** (default 5, min 1, max 20) |
@@ -55,7 +56,7 @@ Example:
 ```json
 {
   "query": "climate change arctic ice",
-  "domains": ["feeds", "reference"],
+  "domains": ["feeds", "reference", "rag"],
   "since": "2025-01-01",
   "limit": 5
 }
@@ -66,7 +67,7 @@ Example:
 ```json
 {
   "query": "climate change arctic ice",
-  "domains_searched": ["feeds", "reference"],
+  "domains_searched": ["feeds", "reference", "rag"],
   "results": {
     "feeds": [
       {
@@ -87,6 +88,17 @@ Example:
         "snippet": "…accelerating ice loss linked to greenhouse gas emissions…",
         "word_count": 4200,
         "url": "/reference/Arctic_sea_ice_decline"
+      }
+    ],
+    "rag": [
+      {
+        "type": "rag_chunk",
+        "id": 7,
+        "title": "IPCC 2025 summary – Arctic projections",
+        "source": "https://ipcc.ch/report/ar7",
+        "tags": "climate,arctic,ipcc",
+        "snippet": "…Arctic summer sea ice is projected to disappear…",
+        "url": "/rag/7"
       }
     ]
   }
@@ -130,6 +142,17 @@ Example:
 | `snippet` | FTS highlight snippet or first 300 chars of notes |
 | `url` | Gateway path to the full book — `GET /library/{id}` |
 
+**`rag` result:**
+| Field | Description |
+|-------|-------------|
+| `type` | `"rag_chunk"` |
+| `id` | KoreRAG chunk ID |
+| `title` | Optional chunk label |
+| `source` | Origin URL, document name, or identifier |
+| `tags` | Comma-separated tags |
+| `snippet` | FTS highlight snippet from content (~32 tokens) |
+| `url` | Gateway path to the full chunk — `GET /rag/{id}` |
+
 ### Agent retrieval pattern
 
 After receiving search results the agent fetches full content as needed:
@@ -137,6 +160,7 @@ After receiving search results the agent fetches full content as needed:
 - `GET /reference/{title}` — article JSON with body, sections, links, backlinks
 - `GET /feeds/{domain}/{entry_id}` — full feed entry including page text
 - `GET /library/{book_id}` — full book including body
+- `GET /rag/{chunk_id}` — full chunk with decompressed content
 
 These routes return the same data used by the web UI.
 
@@ -148,14 +172,15 @@ The landing page is the home for both human operators and the health monitor. It
 
 ### Service health panel
 
-For each child service (KoreFeed, KoreLibrary, KoreReference):
+For each child service (KoreFeed, KoreLibrary, KoreReference, KoreRAG), displayed as a 4-wide grid:
 
-- **Name** and status badge: `● ONLINE` (green) / `● OFFLINE` (red)
+- **Name**, short description, and status badge: `● ONLINE` (green) / `● OFFLINE` (red)
 - **Stats** pulled from the service's `/status` endpoint:
   - KoreFeed: total domains, total feeds, total entries
   - KoreLibrary: total books, incomplete records
-  - KoreReference: total articles, total redirects, total links, total categories
-- **Quick links** to each service's UI section (Browse, Search, Import where applicable)
+  - KoreReference: total articles, total redirects, total links
+  - KoreRAG: total chunks, database size
+- **Quick links** to each service's UI section (Browse, Search, Insert/Import where applicable)
 - Status auto-refreshes every **60 seconds** via `GET /status`; manual ↺ REFRESH button also available
 
 ### Search test panel
@@ -163,7 +188,7 @@ For each child service (KoreFeed, KoreLibrary, KoreReference):
 Mirrors exactly what an agent calls via `POST /search`:
 
 - `query` text input (Enter key or SEARCH button submits)
-- `domains` checkboxes — Feeds / Reference / Library (all checked by default)
+- `domains` checkboxes — Feeds / Reference / Library / RAG (all checked by default)
 - `since` / `until` date pickers with calendar icon
 - `No Older Than` num-stepper (sets `since` to today − N days)
 - `limit` num-stepper (default 5, max 20)
@@ -178,9 +203,10 @@ Machine-readable health endpoint used by the landing page and agents.
   "service": "KoreDataGateway",
   "version": "...",
   "children": {
-    "korefeed":      { "url": "http://127.0.0.1:8000", "healthy": true, ... },
-    "korelibrary":   { "url": "http://127.0.0.1:8100", "healthy": true, ... },
-    "korereference": { "url": "http://127.0.0.1:8300", "healthy": true, ... }
+    "korefeed":      { "url": "http://127.0.0.1:8801", "healthy": true, ... },
+    "korelibrary":   { "url": "http://127.0.0.1:8802", "healthy": true, ... },
+    "korereference": { "url": "http://127.0.0.1:8804", "healthy": true, ... },
+    "korerag":       { "url": "http://127.0.0.1:8803", "healthy": true, ... }
   }
 }
 ```
@@ -195,9 +221,9 @@ Each child object merges the child's own `/status` fields with `url` and `health
 
 At gateway startup:
 
-1. All three child services are started as subprocesses via `subprocess.Popen`.
+1. All four child services are started as subprocesses via `subprocess.Popen`.
 2. stdout/stderr of each child is redirected to `<service>/data/service.log`.
-3. The gateway polls each child's `GET /status` endpoint until it responds 200 or a 20-second timeout elapses.
+3. The gateway polls each child's `GET /status` endpoint until it responds 200 or a timeout elapses (KoreFeed: 60 s, others: 20 s).
 4. `httpx.AsyncClient` connections are held for the lifetime of the process.
 
 ### Shutdown
@@ -213,12 +239,13 @@ At gateway shutdown (SIGTERM or process exit):
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `port` | `8200` | Gateway listen port |
+| `port` | `8800` | Gateway listen port |
 | `host` | `0.0.0.0` | Gateway bind address |
 | `log_level` | `"info"` | Uvicorn log level |
-| `korefeed_url` | `http://127.0.0.1:8000` | KoreFeed base URL |
-| `korelibrary_url` | `http://127.0.0.1:8100` | KoreLibrary base URL |
-| `korereference_url` | `http://127.0.0.1:8300` | KoreReference base URL |
+| `korefeed_url` | `http://127.0.0.1:8801` | KoreFeed base URL |
+| `korelibrary_url` | `http://127.0.0.1:8802` | KoreLibrary base URL |
+| `korereference_url` | `http://127.0.0.1:8804` | KoreReference base URL |
+| `korerag_url` | `http://127.0.0.1:8803` | KoreRAG base URL |
 
 ---
 
@@ -263,13 +290,15 @@ The gateway proxies web UI interactions to the appropriate child service and ren
 | `GET` | `/library` | Book list with inline search panel |
 | `GET` | `/library/incomplete` | Books with missing metadata fields |
 | `GET` | `/library/search` | Search books (`q`, `author`, `title`, `year`, `language`, `genre`, `limit`, `offset`) |
-| `GET` | `/library/import` | Import UI (manual + Kiwix) |
+| `GET` | `/library/import` | Import UI (manual form + Kiwix browser + Gutenberg catalog) |
 | `POST` | `/library/import/manual` | Manual import form submission |
 | `GET` | `/library/kiwix/inventory` | ZIM book inventory (JSON) |
 | `GET` | `/library/kiwix/suggest` | Title suggest from Kiwix (JSON) |
 | `GET` | `/library/kiwix/search` | Search within Kiwix (JSON) |
+| `GET` | `/library/kiwix/catalog` | Gutenberg author/book catalog from Kiwix ZIM (`?zim=`, `?author=`) |
 | `POST` | `/library/import/kiwix` | Start Kiwix import (JSON) |
-| `POST` | `/library/import/kiwix/viewer` | Kiwix viewer proxy (JSON) |
+| `POST` | `/library/import/kiwix/viewer` | Kiwix viewer URL import (JSON) |
+| `POST` | `/library/import/kiwix/viewer/batch` | Batch import from viewer URL list (JSON) |
 | `GET` | `/library/{book_id}/edit` | Edit book metadata form |
 | `POST` | `/library/{book_id}/edit` | Save book edits |
 | `POST` | `/library/{book_id}/delete` | Delete book |
@@ -282,8 +311,6 @@ The gateway proxies web UI interactions to the appropriate child service and ren
 |--------|------|-------------|
 | `GET` | `/reference` | Article index (recent articles) |
 | `GET` | `/reference/search` | Search articles by full-text query (`q`, `limit`, `offset`) |
-| `GET` | `/reference/categories` | Category list |
-| `GET` | `/reference/categories/{name}` | Articles in category |
 | `GET` | `/reference/import` | Kiwix crawl import UI |
 | `POST` | `/reference/import/crawl` | Start crawl (proxied JSON) |
 | `GET` | `/reference/import/status` | Crawl progress (proxied JSON) |
@@ -292,9 +319,32 @@ The gateway proxies web UI interactions to the appropriate child service and ren
 | `POST` | `/reference/new` | Create article |
 | `GET` | `/reference/{title}/edit` | Edit article |
 | `POST` | `/reference/{title}/edit` | Save article edits (upsert via KoreReference `/articles`) |
+| `POST` | `/reference/delete-all` | Delete all articles |
 | `POST` | `/reference/{title}/delete` | Delete article |
 | `GET` | `/reference/{title}/links-json` | Outbound links JSON (for UI panel) |
 | `GET` | `/reference/{title}` | View article with backlinks panel |
+
+### KoreRAG — `/rag/*`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/rag` | Chunk browser (paginated list, metadata only) |
+| `GET` | `/rag/search` | Search chunks by FTS query (`q`, `source`, `tags`, `limit`) |
+| `GET` | `/rag/insert` | Insert form UI |
+| `POST` | `/rag/insert` | Submit new chunk (title, source, tags, content) |
+| `GET` | `/rag/{chunk_id}` | View full chunk with decompressed content |
+| `POST` | `/rag/{chunk_id}/delete` | Delete chunk |
+
+#### KoreRAG JSON API proxy (for programmatic / agent use)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/rag/chunks` | List chunks (JSON) |
+| `GET` | `/api/rag/chunks/{id}` | Get chunk with content (JSON) |
+| `POST` | `/api/rag/chunks` | Create chunk (JSON body: `content`, `title`, `source`, `tags`) |
+| `PATCH` | `/api/rag/chunks/{id}` | Update chunk fields (JSON) |
+| `DELETE` | `/api/rag/chunks/{id}` | Delete chunk (JSON) |
+| `GET` | `/api/rag/search` | FTS search — same params as `/rag/search` (JSON) |
 
 ---
 
@@ -319,10 +369,14 @@ When editing a Kiwix-imported article whose body was stored as structured `secti
 
 Library books store bodies as Markdown (imported via `markdownify` from HTML). The body is injected into the page as a JSON string via Jinja2 (`| tojson`), then rendered in the browser as HTML by the `marked.js` library (loaded from CDN). Markdown syntax — headers, bold, links, code blocks — is fully parsed and displayed client-side.
 
+### RAG chunks
+
+RAG chunk content is stored compressed (zlib) in the database. It is decompressed on read and displayed as plain pre-wrapped text. No additional rendering is applied — content is expected to be plain text or lightly formatted prose suitable for direct agent consumption.
+
 ---
 
 ## Non-Goals
 
 - The gateway does **not** store any data of its own (no database, no persistent state beyond child process handles).
 - The gateway does **not** implement authentication or access control — it is an internal tool on a trusted network.
-- The gateway does **not** provide write access to data via the agent API — `POST /search` and all `GET` retrieval routes are read-only from the agent's perspective.
+- The gateway does **not** provide write access to data via the agent API — `POST /search` and all `GET` retrieval routes are read-only from the agent's perspective. Write operations (insert, update, delete) require direct UI interaction or explicit `POST`/`PATCH`/`DELETE` API calls.

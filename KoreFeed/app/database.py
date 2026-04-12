@@ -420,6 +420,41 @@ def delete_entries_outside_calendar(domain: str, start_date: str, end_date: str)
         return 0
 
 
+def apply_age_rule(domain: str) -> int:
+    """Apply the domain age gate if it hasn't already run today. Returns count deleted.
+
+    Reads `age_last_pruned` from domain_settings; skips if the stored date equals
+    today (UTC). Otherwise runs the appropriate purge and records today's date.
+    """
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    try:
+        with db_connection(domain) as conn:
+            row = conn.execute(
+                "SELECT value FROM domain_settings WHERE key = 'age_last_pruned'"
+            ).fetchone()
+            last_pruned = row["value"] if row else None
+        if last_pruned == today:
+            return 0
+        age = get_domain_age_settings(domain)
+        if age["mode"] == "none":
+            return 0
+        deleted = 0
+        if age["mode"] == "days_previous" and age["days"]:
+            deleted = delete_entries_older_than(domain, float(age["days"]))
+        elif age["mode"] == "calendar_period":
+            start = age.get("start_date") or "1970-01-01"
+            end   = age.get("end_date")   or "9999-12-31"
+            deleted = delete_entries_outside_calendar(domain, start, end)
+        with db_connection(domain) as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO domain_settings (key, value) VALUES ('age_last_pruned', ?)",
+                (today,),
+            )
+        return deleted
+    except Exception:
+        return 0
+
+
 def delete_domain_db(domain: str) -> bool:
     """Delete the SQLite database for a domain. Returns False if it didn't exist."""
     path = get_db_path(domain)

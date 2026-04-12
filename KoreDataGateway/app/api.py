@@ -29,6 +29,7 @@ _SERVICES = [
     (_BASE / "KoreFeed",      "KoreFeed"),
     (_BASE / "KoreLibrary",   "KoreLibrary"),
     (_BASE / "KoreReference", "KoreReference"),
+    (_BASE / "KoreRAG",       "KoreRAG"),
 ]
 
 _children: list[tuple[subprocess.Popen, str, object]] = []
@@ -89,20 +90,23 @@ async def _wait_for(client: httpx.AsyncClient, label: str, timeout: float = 20.0
 _feed_client: httpx.AsyncClient | None = None
 _lib_client:  httpx.AsyncClient | None = None
 _ref_client:  httpx.AsyncClient | None = None
+_rag_client:  httpx.AsyncClient | None = None
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
-    global _feed_client, _lib_client, _ref_client
+    global _feed_client, _lib_client, _ref_client, _rag_client
     print("\n  KoreDataGateway — starting child services")
     _start_children()
     _feed_client = httpx.AsyncClient(base_url=cfg["korefeed_url"],      timeout=15.0)
     _lib_client  = httpx.AsyncClient(base_url=cfg["korelibrary_url"],   timeout=15.0)
     _ref_client  = httpx.AsyncClient(base_url=cfg["korereference_url"], timeout=15.0)
+    _rag_client  = httpx.AsyncClient(base_url=cfg["korerag_url"],       timeout=15.0)
     await asyncio.gather(
-        _wait_for(_feed_client,  "KoreFeed"),
+        _wait_for(_feed_client,  "KoreFeed",      timeout=60.0),
         _wait_for(_lib_client,   "KoreLibrary"),
         _wait_for(_ref_client,   "KoreReference"),
+        _wait_for(_rag_client,   "KoreRAG"),
     )
     print("  All services ready\n")
     yield
@@ -110,6 +114,7 @@ async def _lifespan(app: FastAPI):
     await _feed_client.aclose()
     await _lib_client.aclose()
     await _ref_client.aclose()
+    await _rag_client.aclose()
     _stop_children()
 
 
@@ -356,9 +361,21 @@ def _map_lib_book(b: dict) -> dict:
     }
 
 
+def _map_rag_chunk(c: dict) -> dict:
+    return {
+        "type":    "rag_chunk",
+        "id":      c.get("id"),
+        "title":   c.get("title", ""),
+        "source":  c.get("source", ""),
+        "tags":    c.get("tags", ""),
+        "snippet": c.get("snippet") or "",
+        "url":     f"/rag/{c.get('id', '')}",
+    }
+
+
 @app.post("/search")
 async def api_search(req: _SearchRequest):
-    search_domains = [d.lower() for d in req.domains] if req.domains else ["feeds", "reference", "library"]
+    search_domains = [d.lower() for d in req.domains] if req.domains else ["feeds", "reference", "library", "rag"]
     limit = req.limit
 
     async def _feeds():
@@ -384,10 +401,18 @@ async def api_search(req: _SearchRequest):
             return {"error": f"HTTP {r.status_code}"}
         return [_map_lib_book(b) for b in (r.json() or [])[:limit]]
 
+    async def _rag():
+        params: dict = {"q": req.query, "limit": limit}
+        r = await _rag_client.get("/search", params=params, timeout=10.0)
+        if r.status_code != 200:
+            return {"error": f"HTTP {r.status_code}"}
+        return [_map_rag_chunk(c) for c in (r.json() or [])[:limit]]
+
     tasks: list[tuple[str, Any]] = []
     if "feeds"     in search_domains: tasks.append(("feeds",     _feeds()))
     if "reference" in search_domains: tasks.append(("reference", _reference()))
     if "library"   in search_domains: tasks.append(("library",   _library()))
+    if "rag"       in search_domains: tasks.append(("rag",       _rag()))
 
     gathered = await asyncio.gather(*(coro for _, coro in tasks), return_exceptions=True)
     results = {
@@ -422,16 +447,18 @@ def _add_next_mins(feeds: list) -> None:
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def web_root(request: Request):
-    kf_r, kl_r, kr_r = await asyncio.gather(
+    kf_r, kl_r, kr_r, krag_r = await asyncio.gather(
         _feed_client.get("/status", timeout=3.0),
         _lib_client.get("/status", timeout=3.0),
         _ref_client.get("/status", timeout=3.0),
+        _rag_client.get("/status", timeout=3.0),
         return_exceptions=True,
     )
     services = [
-        _svc_ui(kf_r, "KoreFeed",      "feeds",     cfg["korefeed_url"]),
-        _svc_ui(kl_r, "KoreLibrary",   "library",   cfg["korelibrary_url"]),
-        _svc_ui(kr_r, "KoreReference", "reference", cfg["korereference_url"]),
+        _svc_ui(kf_r,   "KoreFeed",      "feeds",     cfg["korefeed_url"]),
+        _svc_ui(kl_r,   "KoreLibrary",   "library",   cfg["korelibrary_url"]),
+        _svc_ui(kr_r,   "KoreReference", "reference", cfg["korereference_url"]),
+        _svc_ui(krag_r, "KoreRAG",       "rag",       cfg["korerag_url"]),
     ]
     return templates.TemplateResponse(request, "home.html", {"services": services})
 
@@ -833,6 +860,17 @@ async def lib_kiwix_search(zim: str, q: str, count: int = 100, kiwix_url: Option
     return JSONResponse(content=r.json(), status_code=r.status_code)
 
 
+@app.get("/library/kiwix/catalog")
+async def lib_kiwix_catalog(zim: str, author: Optional[str] = None, kiwix_url: Optional[str] = None):
+    params: dict = {"zim": zim}
+    if author:
+        params["author"] = author
+    if kiwix_url:
+        params["kiwix_url"] = kiwix_url
+    r = await _lib_client.get("/kiwix/catalog", params=params)
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
 @app.post("/library/import/kiwix")
 async def lib_import_kiwix(request: Request):
     payload = await request.json()
@@ -1131,18 +1169,161 @@ async def ref_article(request: Request, title: str):
 
 @app.get("/status")
 async def gateway_status():
-    kf_r, kl_r, kr_r = await asyncio.gather(
+    kf_r, kl_r, kr_r, krag_r = await asyncio.gather(
         _feed_client.get("/status", timeout=3.0),
         _lib_client.get("/status", timeout=3.0),
         _ref_client.get("/status", timeout=3.0),
+        _rag_client.get("/status", timeout=3.0),
         return_exceptions=True,
     )
     return {
         "service": "KoreDataGateway",
         "version": __version__,
         "children": {
-            "korefeed":      _svc_status(kf_r, cfg["korefeed_url"]),
-            "korelibrary":   _svc_status(kl_r, cfg["korelibrary_url"]),
-            "korereference": _svc_status(kr_r, cfg["korereference_url"]),
+            "korefeed":      _svc_status(kf_r,   cfg["korefeed_url"]),
+            "korelibrary":   _svc_status(kl_r,   cfg["korelibrary_url"]),
+            "korereference": _svc_status(kr_r,   cfg["korereference_url"]),
+            "korerag":       _svc_status(krag_r, cfg["korerag_url"]),
         },
     }
+
+
+# ===========================================================================
+# KoreRAG — Web UI
+# ===========================================================================
+
+@app.get("/rag", response_class=HTMLResponse)
+async def rag_index(request: Request, limit: int = 100, offset: int = 0):
+    chunks_r, status_r = await asyncio.gather(
+        _rag_client.get("/chunks", params={"limit": limit, "offset": offset}),
+        _rag_client.get("/status"),
+    )
+    chunks = chunks_r.json() if chunks_r.status_code == 200 else []
+    status = status_r.json() if status_r.status_code == 200 else {}
+    return templates.TemplateResponse(
+        request, "rag_index.html",
+        {
+            "chunks": chunks,
+            "total":  status.get("total_chunks", len(chunks)),
+            "limit":  limit,
+            "offset": offset,
+        },
+    )
+
+
+@app.get("/rag/search", response_class=HTMLResponse)
+async def rag_search(
+    request: Request,
+    q: Optional[str] = None,
+    source: Optional[str] = None,
+    tags: Optional[str] = None,
+    limit: int = 20,
+):
+    results = []
+    searched = bool(q)
+    if searched:
+        params: dict = {"q": q, "limit": limit}
+        if source: params["source"] = source
+        if tags:   params["tags"]   = tags
+        r = await _rag_client.get("/search", params=params)
+        results = r.json() if r.status_code == 200 else []
+    return templates.TemplateResponse(
+        request, "rag_search.html",
+        {
+            "results":  results,
+            "searched": searched,
+            "q":        q or "",
+            "source":   source or "",
+            "tags":     tags or "",
+            "limit":    limit,
+        },
+    )
+
+
+@app.get("/rag/insert", response_class=HTMLResponse)
+async def rag_insert(request: Request):
+    return templates.TemplateResponse(request, "rag_insert.html", {"error": None, "success": None})
+
+
+@app.post("/rag/insert", response_class=HTMLResponse)
+async def rag_insert_post(
+    request: Request,
+    content: str           = Form(...),
+    title:   Optional[str] = Form(None),
+    source:  Optional[str] = Form(None),
+    tags:    Optional[str] = Form(None),
+):
+    payload: dict = {"content": content}
+    if title:  payload["title"]  = title
+    if source: payload["source"] = source
+    if tags:   payload["tags"]   = tags
+    r = await _rag_client.post("/chunks", json=payload)
+    if r.status_code in (200, 201):
+        chunk_id = r.json().get("id")
+        return RedirectResponse(url=f"/rag/{chunk_id}", status_code=303)
+    return templates.TemplateResponse(
+        request, "rag_insert.html",
+        {"error": r.json().get("detail", f"Error {r.status_code}"), "success": None},
+        status_code=400,
+    )
+
+
+@app.get("/rag/{chunk_id}", response_class=HTMLResponse)
+async def rag_chunk(request: Request, chunk_id: int):
+    r = await _rag_client.get(f"/chunks/{chunk_id}")
+    if r.status_code == 404:
+        raise HTTPException(status_code=404, detail="Chunk not found")
+    return templates.TemplateResponse(request, "rag_chunk.html", {"chunk": r.json()})
+
+
+@app.post("/rag/{chunk_id}/delete")
+async def rag_chunk_delete(chunk_id: int):
+    r = await _rag_client.delete(f"/chunks/{chunk_id}")
+    if r.status_code not in (200, 204):
+        raise HTTPException(status_code=r.status_code, detail="Delete failed")
+    return RedirectResponse(url="/rag", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# KoreRAG JSON API proxy
+# ---------------------------------------------------------------------------
+
+@app.get("/api/rag/chunks")
+async def api_rag_list(limit: int = 100, offset: int = 0):
+    r = await _rag_client.get("/chunks", params={"limit": limit, "offset": offset})
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+@app.get("/api/rag/chunks/{chunk_id}")
+async def api_rag_get(chunk_id: int):
+    r = await _rag_client.get(f"/chunks/{chunk_id}")
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+@app.post("/api/rag/chunks", status_code=201)
+async def api_rag_add(request: Request):
+    payload = await request.json()
+    r = await _rag_client.post("/chunks", json=payload)
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+@app.patch("/api/rag/chunks/{chunk_id}")
+async def api_rag_update(chunk_id: int, request: Request):
+    payload = await request.json()
+    r = await _rag_client.patch(f"/chunks/{chunk_id}", json=payload)
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+@app.delete("/api/rag/chunks/{chunk_id}")
+async def api_rag_delete(chunk_id: int):
+    r = await _rag_client.delete(f"/chunks/{chunk_id}")
+    return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+@app.get("/api/rag/search")
+async def api_rag_search(q: str, limit: int = 20, source: Optional[str] = None, tags: Optional[str] = None):
+    params: dict = {"q": q, "limit": limit}
+    if source: params["source"] = source
+    if tags:   params["tags"]   = tags
+    r = await _rag_client.get("/search", params=params)
+    return JSONResponse(content=r.json(), status_code=r.status_code)

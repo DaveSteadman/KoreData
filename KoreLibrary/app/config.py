@@ -4,7 +4,7 @@ from pathlib import Path
 _CONFIG_FILE = Path("config/default.json")
 
 _DEFAULTS = {
-    "port": 8100,
+    "port": 8802,
     "host": "0.0.0.0",
     "data_dir": "data",
     "log_level": "info",

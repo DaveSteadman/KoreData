@@ -48,7 +48,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The server starts on **http://localhost:8100** by default (configurable in `config/`).
+The server starts on **http://localhost:8801** by default (configurable in `config/`).
 
 On startup, the scheduler respects the last-fetched timestamp for every feed — feeds that were fetched recently are skipped until they are next due, so a restart never causes an unnecessary flood of re-ingests.
 
@@ -60,11 +60,11 @@ Press `Ctrl+C` to stop.
 
 | URL | Purpose |
 |---|---|
-| `http://localhost:8100/` | Home — manage domains, search across all feeds |
-| `http://localhost:8100/web/{domain}` | Domain view — feeds, entries, management |
-| `http://localhost:8100/web/{domain}/{id}` | Full entry including extracted page text |
-| `http://localhost:8100/web/search?q=…` | Full-text search (optionally scoped to a domain) |
-| `http://localhost:8100/api/docs` | Interactive Swagger API documentation |
+| `http://localhost:8801/` | Home — manage domains, search across all feeds |
+| `http://localhost:8801/web/{domain}` | Domain view — feeds, entries, management |
+| `http://localhost:8801/web/{domain}/{id}` | Full entry including extracted page text |
+| `http://localhost:8801/web/search?q=…` | Full-text search (optionally scoped to a domain) |
+| `http://localhost:8801/api/docs` | Interactive Swagger API documentation |
 
 ### Domain view features
 
@@ -99,7 +99,7 @@ Entries can also be bulk-deleted by feed.
 
 ## REST API
 
-Full interactive reference at `http://localhost:8100/api/docs`.
+Full interactive reference at `http://localhost:8801/api/docs`.
 
 ### Feeds
 
@@ -113,7 +113,7 @@ PATCH  /api/feeds/{feed_id}/rate         Update a feed's polling interval (minut
 **Add a feed**
 
 ```sh
-curl -X POST http://localhost:8100/api/feeds \
+curl -X POST http://localhost:8801/api/feeds \
   -H "Content-Type: application/json" \
   -d '{
     "domain": "tech",
@@ -126,7 +126,7 @@ curl -X POST http://localhost:8100/api/feeds \
 **Change polling interval**
 
 ```sh
-curl -X PATCH "http://localhost:8100/api/feeds/<feed_id>/rate?minutes=60"
+curl -X PATCH "http://localhost:8801/api/feeds/<feed_id>/rate?minutes=60"
 ```
 
 ### Domains
@@ -151,7 +151,7 @@ POST /api/domains/{domain}/entries/bulk-delete      Delete a list of entry IDs
 **Get entries for a domain**
 
 ```sh
-curl "http://localhost:8100/api/domains/tech/entries?limit=50&offset=0"
+curl "http://localhost:8801/api/domains/tech/entries?limit=50&offset=0"
 ```
 
 ### Search
@@ -163,7 +163,7 @@ GET /api/search?q={query}&full=true            Include full page text in results
 ```
 
 ```sh
-curl "http://localhost:8100/api/search?q=artificial+intelligence&domain=tech"
+curl "http://localhost:8801/api/search?q=artificial+intelligence&domain=tech"
 ```
 
 Search uses SQLite FTS5 with a `unicode61` tokenizer and BM25 ranking — results match whole words only, not substrings.
@@ -276,7 +276,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-The server starts on **http://localhost:8000**.
+The server starts on **http://localhost:8801**.
 
 On first startup, all previously configured feeds are ingested immediately in the background. Each feed then runs on its own schedule.
 
@@ -290,15 +290,15 @@ To stop the server press `Ctrl+C`.
 
 | URL | Purpose |
 |---|---|
-| `http://localhost:8000/` | Home — manage feeds, view all domains |
-| `http://localhost:8000/web/{domain}` | Paginated list of entries for a domain |
-| `http://localhost:8000/web/{domain}/{id}` | Full entry including extracted page text |
-| `http://localhost:8000/web/search?q=your+query` | Search across all feeds |
-| `http://localhost:8000/api/docs` | Interactive Swagger API documentation |
+| `http://localhost:8801/` | Home — manage feeds, view all domains |
+| `http://localhost:8801/web/{domain}` | Paginated list of entries for a domain |
+| `http://localhost:8801/web/{domain}/{id}` | Full entry including extracted page text |
+| `http://localhost:8801/web/search?q=your+query` | Search across all feeds |
+| `http://localhost:8801/api/docs` | Interactive Swagger API documentation |
 
 #### Adding a feed
 
-1. Open `http://localhost:8000/`.
+1. Open `http://localhost:8801/`.
 2. Fill in the **Add Feed** form on the right:
    - **Feed name** — a human-readable label (e.g. `TechCrunch`)
    - **Domain** — a short slug used to group feeds (e.g. `tech`)
@@ -314,7 +314,7 @@ On the home page, click the **✕** button next to any feed in the configured fe
 
 ### REST API
 
-The full interactive reference is at `http://localhost:8000/api/docs`.
+The full interactive reference is at `http://localhost:8801/api/docs`.
 
 #### Feed management
 
@@ -327,7 +327,7 @@ DELETE /api/feeds/{feed_id}        Remove a feed
 **Add a feed (POST /api/feeds)**
 
 ```sh
-curl -X POST http://localhost:8000/api/feeds \
+curl -X POST http://localhost:8801/api/feeds \
   -H "Content-Type: application/json" \
   -d '{
     "domain": "tech",
@@ -340,7 +340,7 @@ curl -X POST http://localhost:8000/api/feeds \
 **Remove a feed (DELETE /api/feeds/{feed_id})**
 
 ```sh
-curl -X DELETE http://localhost:8000/api/feeds/<feed_id>
+curl -X DELETE http://localhost:8801/api/feeds/<feed_id>
 ```
 
 #### Browsing content
@@ -354,19 +354,19 @@ GET /api/domains/{domain}/entries/{entry_id}  Single entry with full content
 **List domains**
 
 ```sh
-curl http://localhost:8000/api/domains
+curl http://localhost:8801/api/domains
 ```
 
 **Get entries for a domain (50 at a time)**
 
 ```sh
-curl "http://localhost:8000/api/domains/tech/entries?limit=50&offset=0"
+curl "http://localhost:8801/api/domains/tech/entries?limit=50&offset=0"
 ```
 
 **Get a single entry**
 
 ```sh
-curl http://localhost:8000/api/domains/tech/entries/42
+curl http://localhost:8801/api/domains/tech/entries/42
 ```
 
 #### Search
@@ -377,7 +377,7 @@ GET /api/search?q={query}&domain={domain}     Search within one domain
 ```
 
 ```sh
-curl "http://localhost:8000/api/search?q=artificial+intelligence&domain=tech"
+curl "http://localhost:8801/api/search?q=artificial+intelligence&domain=tech"
 ```
 
 ---

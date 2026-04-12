@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Insert Chunk{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/">home</a><span class="sep">›</span>
+  <a href="/rag">rag</a><span class="sep">›</span>insert
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> INSERT CHUNK
+  </div>
+  <div class="panel-body">
+    {% if error %}
+    <p style="color:var(--red); margin-bottom:0.75rem; font-size:12px;">Error: {{ error }}</p>
+    {% endif %}
+
+    <form action="/rag/insert" method="post">
+      <label>Title <span class="meta">(optional)</span></label>
+      <input type="text" name="title" placeholder="short label for this chunk">
+
+      <label>Source <span class="meta">(optional)</span></label>
+      <input type="text" name="source" placeholder="URL, document name, or identifier">
+
+      <label>Tags <span class="meta">(optional — comma separated)</span></label>
+      <input type="text" name="tags" placeholder="e.g. science, climate, 2024">
+
+      <label>Content <span class="meta">(required)</span></label>
+      <textarea name="content" rows="12" placeholder="Paste or type the text content for this chunk…" required></textarea>
+
+      <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
+        <button type="submit">INSERT</button>
+        <a class="btn btn-secondary" href="/rag">CANCEL</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="ph-diamond">◆</span> BULK INSERT — API
+  </div>
+  <div class="panel-body">
+    <p class="meta" style="margin-bottom:0.75rem;">
+      You can POST directly to <code>POST /api/rag/chunks</code> or use the top-level
+      <code>POST /search</code> with <code>"domains": ["rag"]</code> to include RAG results in
+      multi-service searches.
+    </p>
+    <pre style="font-size:11px; line-height:1.7;">POST /api/rag/chunks
+Content-Type: application/json
+
+{
+  "content": "The text body of this chunk…",
+  "title":   "Optional label",
+  "source":  "https://example.com/doc",
+  "tags":    "tag1,tag2"
+}</pre>
+  </div>
+</div>
+{% endblock %}

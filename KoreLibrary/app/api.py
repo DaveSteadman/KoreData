@@ -1,6 +1,8 @@
 import html as _html
+import json as _json
 import re as _re
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 from contextlib import asynccontextmanager
 from typing import Optional
 from urllib.parse import quote as _urlquote, urlparse as _urlparse, unquote as _urlunquote
@@ -454,6 +456,71 @@ async def kiwix_suggest(zim: str, pattern: str = "", count: int = 50, kiwix_url:
         return cleaned
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"Kiwix unreachable: {exc}") from exc
+
+
+@app.get("/kiwix/catalog", summary="Return full Gutenberg ZIM catalog grouped by author")
+async def kiwix_catalog(
+    zim: str,
+    author: Optional[str] = None,
+    kiwix_url: Optional[str] = None,
+):
+    """Fetch full_by_popularity.js from a Gutenberg Kiwix ZIM and return parsed
+    books grouped by author. Pass ?author= to filter results (case-insensitive
+    substring match). Each book includes the article_path and viewer_url."""
+    url = kiwix_url or cfg.get("kiwix_url", "")
+    if not url:
+        raise HTTPException(status_code=503, detail="kiwix_url not configured")
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            r = await client.get(f"{url}/content/{zim}/full_by_popularity.js")
+        r.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Kiwix unreachable: {exc}") from exc
+
+    # Parse  var json_data = [...];
+    m = _re.search(r"var\s+json_data\s*=\s*(\[.*?\])\s*;?\s*$", r.text, _re.DOTALL)
+    if not m:
+        raise HTTPException(status_code=502, detail="Could not locate json_data in catalog JS file")
+    try:
+        raw = _json.loads(m.group(1))
+    except _json.JSONDecodeError as exc:
+        raise HTTPException(status_code=502, detail=f"Catalog JSON parse error: {exc}") from exc
+
+    # Entry format: [title, author, popularity_rank_str, gutenberg_id_int, lcc_class]
+    author_lower = author.lower() if author else None
+    by_author: dict[str, list[dict]] = defaultdict(list)
+    total = 0
+    for entry in raw:
+        if not isinstance(entry, list) or len(entry) < 4:
+            continue
+        title      = str(entry[0]).strip()
+        author_name = str(entry[1]).strip()
+        gut_id     = entry[3]
+        if author_lower and author_lower not in author_name.lower():
+            continue
+        # Construct URL exactly as Kiwix tools.js does:
+        # urlBase = title.replace("/", "-")[:230] + "." + gutenberg_id
+        slug         = title.replace("/", "-")[:230] + "." + str(gut_id)
+        article_path = f"/content/{zim}/{_urlquote(slug)}"
+        viewer_url   = f"{url}/viewer#{zim}/{_urlquote(slug)}"
+        by_author[author_name].append({
+            "title":        title,
+            "gutenberg_id": gut_id,
+            "article_path": article_path,
+            "viewer_url":   viewer_url,
+        })
+        total += 1
+
+    return {
+        "total": total,
+        "authors": [
+            {
+                "author": a,
+                "books": sorted(bks, key=lambda x: x["title"]),
+            }
+            for a, bks in sorted(by_author.items())
+        ],
+    }
 
 
 async def _kiwix_search_url(host: str, zim: str, title: str) -> tuple[Optional[str], Optional[str]]:

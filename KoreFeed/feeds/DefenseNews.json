@@ -5,11 +5,11 @@
     "name": "Defense News",
     "url": "https://www.defensenews.com/arc/outboundfeeds/rss/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:16",
+    "last_fetched_at": "2026-04-11T13:41:03",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 6.7,
-    "last_new_entries": 25,
+    "last_duration_s": 16.2,
+    "last_new_entries": 13,
     "content_status": "good"
   },
   {
@@ -18,10 +18,10 @@
     "name": "Breaking Defense",
     "url": "https://breakingdefense.com/feed/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:20",
+    "last_fetched_at": "2026-04-11T13:41:07",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 3.5,
+    "last_duration_s": 4.3,
     "last_new_entries": 15,
     "content_status": "good"
   },
@@ -31,11 +31,11 @@
     "name": "airforce-technology",
     "url": "https://www.airforce-technology.com/feed/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:21",
+    "last_fetched_at": "2026-04-11T13:41:08",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 1.1,
-    "last_new_entries": 10,
+    "last_duration_s": 1.3,
+    "last_new_entries": 5,
     "content_status": "good"
   },
   {
@@ -44,11 +44,11 @@
     "name": "army-technology",
     "url": "https://www.army-technology.com/feed/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:22",
+    "last_fetched_at": "2026-04-11T13:41:10",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 1.2,
-    "last_new_entries": 10,
+    "last_duration_s": 1.4,
+    "last_new_entries": 6,
     "content_status": "good"
   },
   {
@@ -57,11 +57,11 @@
     "name": "defenseone",
     "url": "https://www.defenseone.com/rss/all/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:38",
+    "last_fetched_at": "2026-04-11T13:41:24",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 16.4,
-    "last_new_entries": 24,
+    "last_duration_s": 14.4,
+    "last_new_entries": 5,
     "content_status": "good"
   },
   {
@@ -70,11 +70,11 @@
     "name": "ukdefencejournal",
     "url": "https://ukdefencejournal.org.uk/feed/",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:40",
+    "last_fetched_at": "2026-04-11T13:41:26",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 1.3,
-    "last_new_entries": 10,
+    "last_duration_s": 1.6,
+    "last_new_entries": 5,
     "content_status": "good"
   },
   {
@@ -83,11 +83,11 @@
     "name": "defenceiq - defence-technology",
     "url": "https://www.defenceiq.com/rss/categories/defence-technology",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:44",
+    "last_fetched_at": "2026-04-11T13:41:30",
     "last_status": "ok",
     "last_error": null,
     "last_duration_s": 4.4,
-    "last_new_entries": 2,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -96,11 +96,11 @@
     "name": "defenceiq - air-forces-military-aircraft",
     "url": "https://www.defenceiq.com/rss/categories/air-forces-military-aircraft",
     "update_rate": 3000,
-    "last_fetched_at": "2026-04-09T05:51:49",
+    "last_fetched_at": "2026-04-11T13:41:35",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 4.1,
-    "last_new_entries": 2,
+    "last_duration_s": 4.0,
+    "last_new_entries": 0,
     "content_status": "good"
   },
   {
@@ -110,11 +110,11 @@
     "url": "https://www.defense-aerospace.com/",
     "update_rate": 3000,
     "type": "web",
-    "last_fetched_at": "2026-04-09T05:52:04",
+    "last_fetched_at": "2026-04-11T13:42:36",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 15.5,
-    "last_new_entries": 15,
+    "last_duration_s": 61.6,
+    "last_new_entries": 7,
     "content_status": "good"
   },
   {
@@ -124,10 +124,10 @@
     "url": "https://www.janes.com/osint-insights/defence-news",
     "update_rate": 3000,
     "type": "web",
-    "last_fetched_at": "2026-04-09T20:23:05",
+    "last_fetched_at": "2026-04-11T22:33:22",
     "last_status": "ok",
     "last_error": null,
-    "last_duration_s": 11.3,
+    "last_duration_s": 10.5,
     "last_new_entries": 9,
     "content_status": "good"
   }

@@ -1,5 +1,5 @@
 {
-    "port": 8300,
+    "port": 8804,
     "host": "0.0.0.0",
     "data_dir": "data",
     "log_level": "info",
