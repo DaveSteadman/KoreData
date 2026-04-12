@@ -8,7 +8,7 @@ from typing import Optional
 from app.config import cfg
 from app.database import rename_feed_entries
 
-FEEDS_DIR = Path(cfg["feeds_dir"])
+FEEDS_DIR = Path(cfg["data_dir"])
 
 
 def _domain_file(domain: str) -> Path:

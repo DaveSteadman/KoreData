@@ -32,13 +32,14 @@ from app.feed_manager import (
     get_feed,
     list_feed_domains,
     load_feeds,
-    load_feeds_for_domain,
     remove_feed,
     rename_domain_feeds,
     update_feed,
     update_feed_rate,
 )
 from app.ingest import schedule_feeds, scheduler, start_scheduler, trigger_immediate
+
+
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
     # Migrate all existing databases (adds `deleted` column if absent, etc.)
@@ -322,67 +323,5 @@ def api_purge_outside_calendar(domain: str, start_date: str, end_date: str):
     delete_entries_outside_calendar(domain, start_date, end_date)
     return {"ok": True}
 
-
-# (Web UI removed — all UI is now served by KoreDataGateway)
-
-@app.patch("/api/feeds/{feed_id}/rate", tags=["feeds"])
-def api_update_feed_rate(feed_id: str, minutes: int):
-    if minutes < 1:
-        raise HTTPException(status_code=400, detail="minutes must be >= 1")
-    if not update_feed_rate(feed_id, minutes):
-        raise HTTPException(status_code=404, detail="Feed not found")
-    schedule_feeds()
-    return {"ok": True, "update_rate": minutes}
-
-
-@app.post("/api/feeds/{feed_id}/trigger", tags=["feeds"])
-def api_trigger_feed(feed_id: str):
-    """Manually trigger an immediate fetch for a feed."""
-    feed = get_feed(feed_id)
-    if not feed:
-        raise HTTPException(status_code=404, detail="Feed not found")
-    trigger_immediate(feed)
-    return {"triggered": feed_id}
-
-
-@app.get("/api/domains/{domain}/age-settings", tags=["domains"])
-def api_get_age_settings(domain: str):
-    """Get entry age/date filter settings for a domain."""
-    return get_domain_age_settings(domain)
-
-
-class AgeSettingsBody(BaseModel):
-    mode: str
-    days: Optional[int] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
-
-
-@app.post("/api/domains/{domain}/age-settings", tags=["domains"])
-def api_set_age_settings(domain: str, body: AgeSettingsBody):
-    """Set entry age/date filter settings for a domain."""
-    valid = {"none", "days_previous", "calendar_period"}
-    if body.mode not in valid:
-        raise HTTPException(status_code=400, detail=f"mode must be one of: {', '.join(valid)}")
-    set_domain_age_settings(
-        domain, body.mode,
-        days=body.days,
-        start_date=body.start_date or None,
-        end_date=body.end_date or None,
-    )
-    return {"ok": True}
-
-
-@app.get("/api/domains/{domain}/feed-counts", tags=["domains"])
-def api_feed_counts(domain: str):
-    """Return per-feed entry counts for a domain."""
-    return get_feed_counts(domain)
-
-
-@app.post("/api/domains/{domain}/entries/purge-outside-calendar", tags=["content"])
-def api_purge_outside_calendar(domain: str, start_date: str, end_date: str):
-    """Delete all entries published outside the given date range."""
-    delete_entries_outside_calendar(domain, start_date, end_date)
-    return {"ok": True}
 
 # (Web UI removed — all UI is now served by KoreDataGateway)

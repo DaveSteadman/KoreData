@@ -1,12 +1,14 @@
 import json
 import re
 import sqlite3
-import zlib
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
 from app.importers.shared import TABLE_OPEN, TABLE_CLOSE, table_to_fts_text
+from app.config import cfg
+from compress import compress as _compress, decompress as _decompress
+from dbutil import fts_build_query
 
 _TABLE_MARKER_RE = re.compile(rf'{re.escape(TABLE_OPEN)}(.*?){re.escape(TABLE_CLOSE)}', re.DOTALL)
 
@@ -17,21 +19,6 @@ def _body_for_fts(body: Optional[str]) -> str:
         return ""
     return _TABLE_MARKER_RE.sub(lambda m: table_to_fts_text(m.group(1)), body)
 
-
-def _compress(text: Optional[str]) -> Optional[bytes]:
-    if not text:
-        return None
-    return zlib.compress(text.encode("utf-8"), level=6)
-
-
-def _decompress(blob: Optional[bytes]) -> Optional[str]:
-    if not blob:
-        return None
-    if isinstance(blob, str):
-        return blob  # legacy uncompressed row
-    return zlib.decompress(blob).decode("utf-8")
-
-from app.config import cfg
 
 DATA_DIR = Path(cfg["data_dir"])
 _DB_PATH = DATA_DIR / "reference.db"
@@ -439,6 +426,9 @@ def search_articles(
     if q:
         # FTS path
         with db_connection() as conn:
+            fts_q = fts_build_query(q)
+            if not fts_q:
+                return []
             rows = conn.execute(f"""
                 SELECT {meta_cols},
                        bm25(articles_fts) AS score
@@ -448,7 +438,7 @@ def search_articles(
                   AND a.redirect_to IS NULL
                 ORDER BY score
                 LIMIT :lim OFFSET :off
-            """, {"q": q, "lim": limit, "off": offset}).fetchall()
+            """, {"q": fts_q, "lim": limit, "off": offset}).fetchall()
         results = []
         for r in rows:
             d = _row_to_dict(r)

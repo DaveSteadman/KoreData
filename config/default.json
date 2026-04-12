@@ -1,0 +1,23 @@
+{
+    "host": "0.0.0.0",
+    "log_level": "info",
+    "ports": {
+        "koredatagateway": 8800,
+        "korefeed": 8801,
+        "korelibrary": 8802,
+        "korerag": 8803,
+        "korereference": 8804
+    },
+    "korefeed": {
+        "data_dir": "../Data/Feeds"
+    },
+    "korelibrary": {
+        "data_dir": "../Data/Library"
+    },
+    "korerag": {
+        "data_dir": "../Data/RAG"
+    },
+    "korereference": {
+        "data_dir": "../Data/Reference"
+    }
+}

@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import re
+import threading
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from email.utils import parsedate as _rfc_parsedate
@@ -8,8 +9,12 @@ from pathlib import Path
 from typing import Optional
 
 from app.config import cfg
+from dbutil import fts_build_query
 
 DATA_DIR = Path(cfg["data_dir"])
+
+_domains_ready: set[str] = set()
+_domains_lock = threading.Lock()
 
 
 def _parse_published(s: str) -> Optional[datetime]:
@@ -127,7 +132,10 @@ def insert_entry(
     metadata: dict,
     page_text: str,
 ) -> bool:
-    init_db(domain)
+    with _domains_lock:
+        if domain not in _domains_ready:
+            init_db(domain)
+            _domains_ready.add(domain)
     with db_connection(domain) as conn:
         cur = conn.execute(
             """
@@ -170,11 +178,6 @@ def get_entry(domain: str, entry_id: int) -> Optional[dict]:
         return None
 
 
-def _fts_term(t: str) -> str:
-    """Wrap a user term for FTS5 MATCH — double-quotes escape special syntax."""
-    return '"' + t.replace('"', '""') + '"'
-
-
 def search_entries(
     domain: Optional[str],
     query: str,
@@ -185,10 +188,9 @@ def search_entries(
 ) -> list[dict]:
     body_col    = ", e.page_text" if include_body else ""
     domains     = [domain] if domain else list_domains()
-    terms       = [t for t in re.split(r"[\s,]+", query.strip()) if t]
-    if not terms:
+    fts_query   = fts_build_query(query)
+    if not fts_query:
         return []
-    fts_query   = " ".join(_fts_term(t) for t in terms)  # AND by default in FTS5
     per_domain_cap = max(limit, 20)
 
     date_clauses = ""

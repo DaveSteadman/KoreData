@@ -2,6 +2,11 @@
 {% block title %}Edit #{{ book.id }} — KoreLibrary{% endblock %}
 
 {% block content %}
+<style>
+  #e_year_abs::-webkit-inner-spin-button,
+  #e_year_abs::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  #e_year_abs { -moz-appearance: textfield; appearance: textfield; }
+</style>
 <div class="breadcrumb">
   <a href="/library">library</a><span class="sep">›</span>
   <a href="/library/{{ book.id }}">#{{ book.id }}</a><span class="sep">›</span>edit
@@ -47,8 +52,17 @@
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
             <div>
-              <label for="e_year">Year</label>
-              <input id="e_year" name="year" type="number" value="{{ book.year or '' }}" style="width:100%;">
+              <label for="e_year_abs">Year</label>
+              <div style="display:flex; gap:0.4rem;">
+                <input id="e_year_abs" type="number" min="1"
+                       value="{{ book.year | abs if book.year else '' }}"
+                       style="width:100%; min-width:0;">
+                <select id="e_era" style="width:4.5rem; flex-shrink:0;">
+                  <option value="AD"{% if not book.year or book.year > 0 %} selected{% endif %}>AD</option>
+                  <option value="BC"{% if book.year and book.year < 0 %} selected{% endif %}>BC</option>
+                </select>
+              </div>
+              <input type="hidden" id="e_year" name="year" value="{{ book.year or '' }}">
             </div>
             <div>
               <label for="e_language">Language</label>
@@ -89,4 +103,19 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const form     = document.getElementById('edit-form');
+  const absInput = document.getElementById('e_year_abs');
+  const era      = document.getElementById('e_era');
+  const hidden   = document.getElementById('e_year');
+  form.addEventListener('submit', function () {
+    const v = parseInt(absInput.value, 10);
+    hidden.value = (!isNaN(v) && v > 0) ? (era.value === 'BC' ? -v : v) : '';
+  });
+})();
+</script>
 {% endblock %}

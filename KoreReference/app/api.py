@@ -61,17 +61,18 @@ class ArticleCreate(BaseModel):
 
 class KiwixImportRequest(BaseModel):
     zim_name: str
-    titles: Optional[list[str]] = None   # explicit list; if omitted uses search prefix
-    prefix: str = ""                      # search prefix for bulk; "" = all (A→Z walk)
-    limit: Optional[int] = None           # cap on number of articles
-    resume: bool = True                   # skip articles whose source_hash is unchanged
+    kiwix_url: str
+    titles: Optional[list[str]] = None
+    prefix: str = ""
+    limit: Optional[int] = None
+    resume: bool = True
 
 
 class KiwixCrawlRequest(BaseModel):
-    seed_url: str            # Kiwix viewer URL or direct article URL
-    max_depth: int = 1       # 0 = seed only, 1 = seed + direct links, 2 = two hops, …
-    limit: int = 200         # hard cap on total articles imported
-    resume: bool = True      # skip articles already in DB
+    seed_url: str
+    max_depth: int = 1
+    limit: int = 200
+    resume: bool = True
 
 
 
@@ -210,7 +211,7 @@ def route_import_kiwix(req: KiwixImportRequest, background_tasks: BackgroundTask
     })
     import_lock.release()
     background_tasks.add_task(
-        run_kiwix_import, req.zim_name, req.titles, req.prefix, req.limit, req.resume
+        run_kiwix_import, req.zim_name, req.kiwix_url, req.titles, req.prefix, req.limit, req.resume
     )
     return {"started": True, "zim_name": req.zim_name}
 
@@ -247,9 +248,9 @@ def route_import_stop():
 
 
 @app.post("/import/article", status_code=201, summary="Import a single article by title from Kiwix")
-def route_import_article(zim_name: str, title: str):
+def route_import_article(zim_name: str, title: str, kiwix_url: str):
     """Synchronous single-article import — useful for testing and on-demand fetch."""
-    kiwix_base = cfg["kiwix_url"].rstrip("/")
+    kiwix_base = kiwix_url.rstrip("/")
     try:
         with httpx.Client(timeout=30.0, follow_redirects=False) as client:
             import_one(client, kiwix_base, zim_name, title, resume=True)
@@ -265,6 +266,7 @@ def route_import_article(zim_name: str, title: str):
 
 class KiwixBackfillRequest(BaseModel):
     zim_name: str
+    kiwix_url: str
     limit: int = 10_000
 
 
@@ -289,7 +291,7 @@ def route_import_kiwix_backfill(req: KiwixBackfillRequest, background_tasks: Bac
         "redirects_stored": 0, "last_redirect": None,
     })
     import_lock.release()
-    background_tasks.add_task(run_kiwix_backfill, req.zim_name, req.limit)
+    background_tasks.add_task(run_kiwix_backfill, req.zim_name, req.kiwix_url, req.limit)
     return {"started": True, "pending": len(pending), "zim_name": req.zim_name}
 
 

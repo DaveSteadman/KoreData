@@ -1,7 +1,0 @@
-{
-    "port": 8802,
-    "host": "0.0.0.0",
-    "data_dir": "data",
-    "log_level": "info",
-    "kiwix_url": "http://192.168.1.33:8080"
-}

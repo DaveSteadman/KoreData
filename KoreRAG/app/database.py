@@ -1,24 +1,11 @@
 import sqlite3
-import zlib
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
 from app.config import cfg
-
-
-def _compress(text: Optional[str]) -> Optional[bytes]:
-    if not text:
-        return None
-    return zlib.compress(text.encode("utf-8"), level=6)
-
-
-def _decompress(blob: Optional[bytes]) -> Optional[str]:
-    if not blob:
-        return None
-    if isinstance(blob, str):
-        return blob  # legacy uncompressed row
-    return zlib.decompress(blob).decode("utf-8")
+from compress import compress as _compress, decompress as _decompress
+from dbutil import fts_build_query
 
 
 DATA_DIR = Path(cfg["data_dir"])
@@ -218,7 +205,10 @@ def search_chunks(
         JOIN chunks c ON c.id = chunks_fts.rowid
         WHERE chunks_fts MATCH ?
     """
-    params: list = [q]
+    fts_q = fts_build_query(q)
+    if not fts_q:
+        return []
+    params: list = [fts_q]
 
     if source:
         sql += " AND c.source LIKE ?"

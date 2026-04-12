@@ -1,25 +1,12 @@
 import re
 import sqlite3
-import zlib
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
 from app.config import cfg
-
-
-def _compress(text: Optional[str]) -> Optional[bytes]:
-    if not text:
-        return None
-    return zlib.compress(text.encode("utf-8"), level=6)
-
-
-def _decompress(blob: Optional[bytes]) -> Optional[str]:
-    if not blob:
-        return None
-    if isinstance(blob, str):
-        return blob  # legacy uncompressed row
-    return zlib.decompress(blob).decode("utf-8")
+from compress import compress as _compress, decompress as _decompress
+from dbutil import fts_build_query
 
 
 DATA_DIR = Path(cfg["data_dir"])
@@ -321,7 +308,10 @@ def search_books(
             JOIN books b ON b.id = books_fts.rowid
             WHERE books_fts MATCH ?
         """
-        params.append(q)
+        fts_q = fts_build_query(q)
+        if not fts_q:
+            return []
+        params.append(fts_q)
         filters, filter_params = _build_meta_filters(
             author, title, year, language, genre, table_prefix="b"
         )

@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "CommonCode"))
+
+import logutil
 import uvicorn
 from datetime import datetime
 from app.config import cfg
@@ -14,7 +19,6 @@ def _print_status() -> None:
     host = cfg["host"]
     port = cfg["port"]
     data_dir = cfg["data_dir"]
-    feeds_dir = cfg["feeds_dir"]
     log_level = cfg["log_level"].upper()
 
     sep = "=" * _W
@@ -30,7 +34,6 @@ def _print_status() -> None:
         row("Host:", f"http://{host}:{port}/"),
         row("Web UI:", f"http://localhost:{port}/"),
         row("Data dir:", data_dir),
-        row("Feeds dir:", feeds_dir),
         row("Log level:", log_level),
         row("Domains:", str(n_domains) + (f"  ({', '.join(domains)})" if domains else "")),
         row("Feeds:", str(n_feeds)),
@@ -41,11 +44,14 @@ def _print_status() -> None:
     print("\n".join(lines))
 
 if __name__ == "__main__":
+    _DATA_DIR = Path(cfg["data_dir"])
+    _DATA_DIR.mkdir(parents=True, exist_ok=True)
     _print_status()
     uvicorn.run(
         "app.api:app",
         host=cfg["host"],
         port=cfg["port"],
         log_level=cfg["log_level"],
+        log_config=logutil.make_log_config(_DATA_DIR / "service.log"),
         reload=False,
     )

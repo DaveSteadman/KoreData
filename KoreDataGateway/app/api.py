@@ -24,20 +24,21 @@ from app.version import __version__
 # ---------------------------------------------------------------------------
 
 _BASE = Path(__file__).parent.parent.parent  # KoreData/ root
+_DATA = _BASE / "Data"
 
 _SERVICES = [
-    (_BASE / "KoreFeed",      "KoreFeed"),
-    (_BASE / "KoreLibrary",   "KoreLibrary"),
-    (_BASE / "KoreReference", "KoreReference"),
-    (_BASE / "KoreRAG",       "KoreRAG"),
+    (_BASE / "KoreFeed",      "KoreFeed",      _DATA / "Feeds"),
+    (_BASE / "KoreLibrary",   "KoreLibrary",   _DATA / "Library"),
+    (_BASE / "KoreReference", "KoreReference", _DATA / "Reference"),
+    (_BASE / "KoreRAG",       "KoreRAG",       _DATA / "RAG"),
 ]
 
 _children: list[tuple[subprocess.Popen, str, object]] = []
 
 
 def _start_children() -> None:
-    for service_dir, label in _SERVICES:
-        log_path = service_dir / "data" / "service.log"
+    for service_dir, label, data_dir in _SERVICES:
+        log_path = data_dir / "service.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_file = open(log_path, "a", encoding="utf-8")  # noqa: SIM115
         proc = subprocess.Popen(
