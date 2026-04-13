@@ -117,3 +117,9 @@ KoreData is designed to be the data layer for [MiniAgentFramework](https://githu
 | [KoreLibrary/DESIGN.md](KoreLibrary/DESIGN.md) | Book storage schema, Kiwix import path, search API |
 | [KoreReference/DESIGN.md](KoreReference/DESIGN.md) | Article schema, wikilink model, Wikipedia-scale import design |
 | [DESIGN.md](DESIGN.md) | Top-level system purpose and service breakdown |
+
+---
+
+## Screenshots
+
+[![KoreData Web UI – April 2026](Progress/2026-04-13%20WebUI.png)](Progress/2026-04-13%20WebUI.png)
