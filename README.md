@@ -119,7 +119,3 @@ KoreData is designed to be the data layer for [MiniAgentFramework](https://githu
 | [DESIGN.md](DESIGN.md) | Top-level system purpose and service breakdown |
 
 ---
-
-## Screenshots
-
-[![KoreData Web UI – April 2026](Progress/2026-04-13%20WebUI.png)](Progress/2026-04-13%20WebUI.png)
