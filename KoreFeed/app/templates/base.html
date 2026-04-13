@@ -44,9 +44,14 @@
 
     .dot-live {
       width: 7px; height: 7px; border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+      display: inline-block; flex-shrink: 0;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .dot-live.online {
       background: var(--green);
       box-shadow: 0 0 6px var(--green);
-      display: inline-block; flex-shrink: 0;
     }
 
     nav { margin-left: auto; display: flex; gap: 1.25rem; }
@@ -229,7 +234,7 @@
     <a class="logo" href="/">
       <span class="l-mini">MINI</span><span class="l-feed">FEED</span>
     </a>
-    <span class="dot-live" title="running"></span>
+    <span class="dot-live" id="hdr-dot" title="checking..."></span>
     <span class="tag">RSS INGEST SERVER</span>
     <span class="tag" style="color:var(--amber); border-color:var(--amber);">{{ app_version }}</span>
     <nav>
@@ -242,5 +247,20 @@
     {% block content %}{% endblock %}
   </main>
   {% block scripts %}{% endblock %}
+  <script>
+  (function () {
+    const dot = document.getElementById('hdr-dot');
+    function checkStatus() {
+      fetch('/status', { cache: 'no-store' })
+        .then(r => {
+          if (r.ok) { dot.classList.add('online'); dot.title = 'connected'; }
+          else      { dot.classList.remove('online'); dot.title = 'error ' + r.status; }
+        })
+        .catch(() => { dot.classList.remove('online'); dot.title = 'disconnected'; });
+    }
+    checkStatus();
+    setInterval(checkStatus, 15000);
+  })();
+  </script>
 </body>
 </html>

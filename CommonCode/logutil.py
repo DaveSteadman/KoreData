@@ -67,5 +67,6 @@ def make_log_config(log_path: str | Path) -> dict:
             "uvicorn":        {"handlers": ["default"], "level": "INFO", "propagate": False},
             "uvicorn.error":  {"handlers": ["default"], "level": "INFO", "propagate": False},
             "uvicorn.access": {"handlers": ["access"],  "level": "INFO", "propagate": False},
+            "httpx":          {"handlers": ["default"], "level": "INFO", "propagate": False},
         },
     }

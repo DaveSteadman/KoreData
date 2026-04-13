@@ -20,7 +20,10 @@ from app.database import (
 )
 from app.feed_manager import load_feeds, get_feed, update_feed_last_fetched, update_feed_status
 
-scheduler = BackgroundScheduler(daemon=True)
+scheduler = BackgroundScheduler(
+    daemon=True,
+    job_defaults={"misfire_grace_time": None, "coalesce": True},
+)
 
 _queue: queue.Queue = queue.Queue()
 
