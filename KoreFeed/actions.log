@@ -1,12 +1,3 @@
-[2026-04-11T15:44:17]   Australia ABC: +0 entries in 12.9s [good]
-[2026-04-11T15:44:17] Ingesting: latimes
-[2026-04-11T15:44:18]   latimes: +0 entries in 0.8s [good]
-[2026-04-11T15:44:51] Ingesting: Mail / Guardian (SA)
-[2026-04-11T15:44:54]   Mail / Guardian (SA): +0 entries in 3.6s [good]
-[2026-04-11T15:46:59] Ingesting: indianexpress
-[2026-04-11T15:47:02]   indianexpress: +4 entries in 3.5s [good]
-[2026-04-11T15:48:37] Ingesting: DW
-[2026-04-11T15:48:43]   DW: +3 entries in 6.2s [good]
 [2026-04-11T15:50:46] Ingesting: BBCi
 [2026-04-11T15:50:53]   BBCi: +3 entries in 7.2s [good]
 [2026-04-11T15:57:32] Ingesting: lemonde
@@ -998,3 +989,12 @@
 [2026-04-13T07:09:51]   Mail / Guardian (SA): +0 entries in 2.2s [good]
 [2026-04-13T07:12:03] Ingesting: lemonde
 [2026-04-13T07:12:07]   lemonde: +2 entries in 4.1s [good]
+[2026-04-13T07:17:50] Web crawl: janes Insights (https://www.janes.com/osint-insights/defence-news)
+[2026-04-13T07:17:50]   janes Insights: 50 level-1 candidates
+[2026-04-13T07:18:01]   janes Insights: +0 articles from 41 pages in 11.1s [good]
+[2026-04-13T07:20:39] Ingesting: indianexpress
+[2026-04-13T07:20:41]   indianexpress: +2 entries in 2.0s [good]
+[2026-04-13T07:21:39] Ingesting: DW
+[2026-04-13T07:21:41]   DW: +2 entries in 2.5s [good]
+[2026-04-13T07:22:39] Ingesting: BBCi
+[2026-04-13T07:22:48]   BBCi: +9 entries in 9.4s [good]

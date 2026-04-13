@@ -4,7 +4,7 @@ A collection of local data services for LLM agents.
 
 KoreData provides structured, searchable content across three domains — live news feeds, long-form books, and encyclopedic reference articles — through a single unified API gateway. Agents query one endpoint and get ranked results from whichever services are relevant.
 
-![KoreData](/progress/readme_banner.png)
+![KoreData](/Progress/readme_banner.png)
 
 ## Why this exists
 
