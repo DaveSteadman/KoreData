@@ -5,7 +5,7 @@ from typing import Optional
 
 from app.config import cfg
 from compress import compress as _compress, decompress as _decompress
-from dbutil import fts_build_query
+from dbutil import fts_build_query, compute_word_count as _compute_word_count
 
 
 DATA_DIR = Path(cfg["data_dir"])
@@ -56,14 +56,27 @@ def init_db() -> None:
         """)
 
 
-def _compute_word_count(text: Optional[str]) -> Optional[int]:
-    if not text:
-        return None
-    return len(text.split())
-
-
 _CHUNK_COLS = ("id", "title", "source", "tags", "word_count", "created_at")
 _CHUNK_COLS_WITH_CONTENT = _CHUNK_COLS + ("content",)
+
+
+def _fts_delete(conn: sqlite3.Connection, chunk_id: int,
+                title: str, source: str, tags: str, content: str) -> None:
+    """Remove a chunk from the FTS index."""
+    conn.execute(
+        "INSERT INTO chunks_fts(chunks_fts, rowid, title, source, tags, content) "
+        "VALUES ('delete', ?, ?, ?, ?, ?)",
+        (chunk_id, title, source, tags, content),
+    )
+
+
+def _fts_insert(conn: sqlite3.Connection, chunk_id: int,
+                title: str, source: str, tags: str, content: str) -> None:
+    """Add or re-add a chunk to the FTS index."""
+    conn.execute(
+        "INSERT INTO chunks_fts(rowid, title, source, tags, content) VALUES (?, ?, ?, ?, ?)",
+        (chunk_id, title, source, tags, content),
+    )
 
 
 def _row_to_dict(row: sqlite3.Row, include_content: bool = False) -> dict:
@@ -137,15 +150,9 @@ def update_chunk(chunk_id: int, fields: dict) -> Optional[dict]:
                 "SELECT title, source, tags, content FROM chunks WHERE id = ?", (chunk_id,)
             ).fetchone()
             if cur_row:
-                conn.execute(
-                    "INSERT INTO chunks_fts(chunks_fts, rowid, title, source, tags, content) "
-                    "VALUES ('delete', ?, ?, ?, ?, ?)",
-                    (chunk_id,
-                     cur_row["title"] or "",
-                     cur_row["source"] or "",
-                     cur_row["tags"] or "",
-                     _decompress(cur_row["content"]) or ""),
-                )
+                _fts_delete(conn, chunk_id,
+                            cur_row["title"] or "", cur_row["source"] or "",
+                            cur_row["tags"] or "", _decompress(cur_row["content"]) or "")
         conn.execute(
             f"UPDATE chunks SET {assignments} WHERE id = ?", values + [chunk_id]
         )
@@ -158,14 +165,9 @@ def update_chunk(chunk_id: int, fields: dict) -> Optional[dict]:
                     plain_content if plain_content is not None
                     else _decompress(new_row["content"]) or ""
                 )
-                conn.execute(
-                    "INSERT INTO chunks_fts(rowid, title, source, tags, content) VALUES (?, ?, ?, ?, ?)",
-                    (chunk_id,
-                     new_row["title"] or "",
-                     new_row["source"] or "",
-                     new_row["tags"] or "",
-                     resolved_content),
-                )
+                _fts_insert(conn, chunk_id,
+                            new_row["title"] or "", new_row["source"] or "",
+                            new_row["tags"] or "", resolved_content)
     return get_chunk(chunk_id, include_content=False)
 
 
@@ -176,15 +178,9 @@ def delete_chunk(chunk_id: int) -> bool:
         ).fetchone()
         if not row:
             return False
-        conn.execute(
-            "INSERT INTO chunks_fts(chunks_fts, rowid, title, source, tags, content) "
-            "VALUES ('delete', ?, ?, ?, ?, ?)",
-            (chunk_id,
-             row["title"] or "",
-             row["source"] or "",
-             row["tags"] or "",
-             _decompress(row["content"]) or ""),
-        )
+        _fts_delete(conn, chunk_id,
+                    row["title"] or "", row["source"] or "",
+                    row["tags"] or "", _decompress(row["content"]) or "")
         conn.execute("DELETE FROM chunks WHERE id = ?", (chunk_id,))
     return True
 

@@ -3,7 +3,7 @@ import json
 import re
 import threading
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate as _rfc_parsedate
 from pathlib import Path
 from typing import Optional
@@ -299,17 +299,14 @@ def delete_entries_by_feed(domain: str, feed_name: str) -> int:
 
 def delete_entries_older_than(domain: str, days: float) -> int:
     """Soft-delete entries whose *published* date is more than `days` days ago."""
-    cutoff = datetime.utcnow() - timedelta(days=days)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
     try:
         with db_connection(domain) as conn:
-            rows = conn.execute(
-                "SELECT id, published FROM entries WHERE deleted = 0"
-            ).fetchall()
-        ids = [
-            r["id"] for r in rows
-            if (dt := _parse_published(r["published"])) is not None and dt < cutoff
-        ]
-        return delete_entries_by_ids(domain, ids)
+            return _tombstone(
+                conn,
+                "published IS NOT NULL AND published != '' AND published < ?",
+                [cutoff],
+            )
     except Exception:
         return 0
 
@@ -406,19 +403,15 @@ def set_domain_age_settings(
 
 def delete_entries_outside_calendar(domain: str, start_date: str, end_date: str) -> int:
     """Soft-delete entries whose published date falls outside [start_date, end_date]."""
+    start_str = f"{start_date} 00:00:00"
+    end_str   = f"{end_date} 23:59:59"
     try:
-        start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-        end_dt   = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
         with db_connection(domain) as conn:
-            rows = conn.execute(
-                "SELECT id, published FROM entries WHERE deleted = 0"
-            ).fetchall()
-        ids = []
-        for r in rows:
-            dt = _parse_published(r["published"])
-            if dt is None or dt < start_dt or dt > end_dt:
-                ids.append(r["id"])
-        return delete_entries_by_ids(domain, ids)
+            return _tombstone(
+                conn,
+                "(published IS NULL OR published = '' OR published < ? OR published > ?)",
+                [start_str, end_str],
+            )
     except Exception:
         return 0
 

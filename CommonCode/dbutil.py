@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 
 def fts_build_query(q: str) -> str:
@@ -12,3 +13,10 @@ def fts_build_query(q: str) -> str:
     """
     terms = [t for t in re.split(r"[\s,]+", (q or "").strip()) if t]
     return " ".join('"' + t.replace('"', '""') + '"' for t in terms)
+
+
+def compute_word_count(text: Optional[str]) -> Optional[int]:
+    """Return the number of whitespace-separated words in *text*, or None if empty."""
+    if not text:
+        return None
+    return len(text.split())

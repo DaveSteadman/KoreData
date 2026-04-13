@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from config import load_config
+
 _CONFIG_FILE = Path("../config/default.json")
 _SECTION = "koredatagateway"
 
@@ -24,22 +26,17 @@ _DEFAULTS = {
 
 
 def load() -> dict:
+    result = load_config(_SECTION, _DEFAULTS)
+    # Add service URL mappings derived from ports config.
+    # Explicit section-level overrides (already applied by load_config) take priority.
     if _CONFIG_FILE.exists():
         with open(_CONFIG_FILE, encoding="utf-8") as f:
             raw = json.load(f)
-        result = dict(_DEFAULTS)
-        for key in ("host", "log_level"):
-            if key in raw:
-                result[key] = raw[key]
-        ports = raw.get("ports", {})
-        if _SECTION in ports:
-            result["port"] = ports[_SECTION]
+        section_overrides = raw.get(_SECTION, {})
         for svc, url_key in _SVC_URLS.items():
-            if svc in ports:
-                result[url_key] = f"http://127.0.0.1:{ports[svc]}"
-        result.update(raw.get(_SECTION, {}))
-        return result
-    return dict(_DEFAULTS)
+            if svc in raw.get("ports", {}) and url_key not in section_overrides:
+                result[url_key] = f"http://127.0.0.1:{raw['ports'][svc]}"
+    return result
 
 
 cfg = load()

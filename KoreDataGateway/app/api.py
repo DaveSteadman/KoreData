@@ -14,6 +14,7 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from markupsafe import Markup, escape
+from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 from app.config import cfg
@@ -124,6 +125,20 @@ app = FastAPI(
     description="Central web UI for KoreData services",
     version=__version__,
     lifespan=_lifespan,
+)
+
+# ---------------------------------------------------------------------------
+# MCP server (mounted at /mcp — Streamable HTTP transport)
+# ---------------------------------------------------------------------------
+
+_mcp = FastMCP(
+    "KoreDataGateway",
+    instructions=(
+        "Search KoreData services (news feeds, reference articles, library books, RAG chunks) "
+        "and retrieve full content by ID or title. Always call search first, then fetch full "
+        "content for the most relevant results."
+    ),
+    streamable_http_path="/",
 )
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
@@ -440,6 +455,115 @@ def _add_next_mins(feeds: list) -> None:
                 f["_next_mins"] = None
         else:
             f["_next_mins"] = None
+
+
+# ===========================================================================
+# MCP tools
+# ===========================================================================
+
+@_mcp.tool()
+async def search(
+    query: str,
+    domains: Optional[list[str]] = None,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+    limit: int = 5,
+) -> dict:
+    """Search across KoreData services and return structured results.
+
+    Args:
+        query: Natural-language or keyword search string.
+        domains: Which services to search — any of "feeds", "reference", "library", "rag".
+                 Omit or pass null to search all four.
+        since: Earliest published-date filter (YYYY-MM-DD). Applied to feeds only.
+        until: Latest published-date filter (YYYY-MM-DD). Applied to feeds only.
+        limit: Maximum results per domain (1–20, default 5).
+
+    Returns a dict with keys "query", "domains_searched", and "results" (keyed by domain).
+    Each result item includes a "url" field — pass it to the matching get_* tool to fetch
+    full content.
+    """
+    if _feed_client is None:
+        return {"error": "KoreDataGateway is still starting up — retry in a moment"}
+    req = _SearchRequest(query=query, domains=domains or [], since=since, until=until, limit=limit)
+    return await api_search(req)
+
+
+@_mcp.tool()
+async def get_feed_entry(domain: str, entry_id: int) -> dict:
+    """Fetch the full content of a news feed entry.
+
+    Args:
+        domain: Feed domain slug (e.g. "tech", "world"). Use the value from search results.
+        entry_id: Numeric entry ID returned by search.
+
+    Returns the full entry including page text, metadata, and publication details.
+    """
+    if _feed_client is None:
+        return {"error": "KoreDataGateway is still starting up — retry in a moment"}
+    r = await _feed_client.get(f"/api/domains/{domain}/entries/{entry_id}", timeout=10.0)
+    if r.status_code == 404:
+        return {"error": f"Feed entry not found: domain={domain!r} id={entry_id}"}
+    if r.status_code != 200:
+        return {"error": f"HTTP {r.status_code}"}
+    return r.json()
+
+
+@_mcp.tool()
+async def get_reference_article(title: str) -> dict:
+    """Fetch the full content of a reference (wiki-style) article.
+
+    Args:
+        title: Article title exactly as returned by search (URL-decoding is handled automatically).
+
+    Returns the full article including body, sections, summary, facts, and links.
+    """
+    if _ref_client is None:
+        return {"error": "KoreDataGateway is still starting up — retry in a moment"}
+    r = await _ref_client.get(f"/articles/{quote(title, safe='')}", timeout=10.0)
+    if r.status_code == 404:
+        return {"error": f"Reference article not found: {title!r}"}
+    if r.status_code != 200:
+        return {"error": f"HTTP {r.status_code}"}
+    return r.json()
+
+
+@_mcp.tool()
+async def get_library_book(book_id: int) -> dict:
+    """Fetch the full content of a library book.
+
+    Args:
+        book_id: Numeric book ID returned by search.
+
+    Returns the full book record including body, author, year, genre, notes, and source.
+    """
+    if _lib_client is None:
+        return {"error": "KoreDataGateway is still starting up — retry in a moment"}
+    r = await _lib_client.get(f"/books/{book_id}", timeout=10.0)
+    if r.status_code == 404:
+        return {"error": f"Library book not found: id={book_id}"}
+    if r.status_code != 200:
+        return {"error": f"HTTP {r.status_code}"}
+    return r.json()
+
+
+@_mcp.tool()
+async def get_rag_chunk(chunk_id: int) -> dict:
+    """Fetch the full content of a RAG (retrieval-augmented generation) chunk.
+
+    Args:
+        chunk_id: Numeric chunk ID returned by search.
+
+    Returns the full chunk including decompressed content, title, source, and tags.
+    """
+    if _rag_client is None:
+        return {"error": "KoreDataGateway is still starting up — retry in a moment"}
+    r = await _rag_client.get(f"/chunks/{chunk_id}", timeout=10.0)
+    if r.status_code == 404:
+        return {"error": f"RAG chunk not found: id={chunk_id}"}
+    if r.status_code != 200:
+        return {"error": f"HTTP {r.status_code}"}
+    return r.json()
 
 
 # ===========================================================================
@@ -1328,3 +1452,10 @@ async def api_rag_search(q: str, limit: int = 20, source: Optional[str] = None, 
     if tags:   params["tags"]   = tags
     r = await _rag_client.get("/search", params=params)
     return JSONResponse(content=r.json(), status_code=r.status_code)
+
+
+# ===========================================================================
+# MCP server mount
+# ===========================================================================
+
+app.mount("/mcp", _mcp.streamable_http_app())

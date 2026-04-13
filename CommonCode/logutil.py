@@ -2,14 +2,26 @@ import logging
 from pathlib import Path
 
 _MAX_LINES = 1000
+_TRIM_INTERVAL = 50  # only scan + rewrite the file every N log writes
 
 
 class LineCappedFileHandler(logging.FileHandler):
-    """FileHandler that trims the log file to the last _MAX_LINES lines on each write."""
+    """FileHandler that trims the log file to the last _MAX_LINES lines periodically.
+
+    Trimming is deferred and only runs every _TRIM_INTERVAL emits to avoid a
+    full file read+write on every single log message.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._trim_counter = 0
 
     def emit(self, record: logging.LogRecord) -> None:
         super().emit(record)
-        self._trim()
+        self._trim_counter += 1
+        if self._trim_counter >= _TRIM_INTERVAL:
+            self._trim_counter = 0
+            self._trim()
 
     def _trim(self) -> None:
         path = Path(self.baseFilename)

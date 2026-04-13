@@ -1,3 +1,4 @@
+import collections
 import queue
 import re
 import threading
@@ -30,19 +31,28 @@ _HTTP_HEADERS = {
 _LOG_FILE = Path("actions.log")
 _LOG_MAX_LINES = 1000
 _log_lock = threading.Lock()
+_log_buffer: collections.deque = collections.deque(maxlen=_LOG_MAX_LINES)
+
+
+def _log_init() -> None:
+    """Seed the in-memory log buffer from the existing log file (if any)."""
+    if _LOG_FILE.exists():
+        try:
+            lines = _LOG_FILE.read_text(encoding="utf-8").splitlines(keepends=True)
+            _log_buffer.extend(lines)
+        except OSError:
+            pass
+
+
+_log_init()
 
 
 def _log(msg: str) -> None:
-    """Append a timestamped line to actions.log, trimming to _LOG_MAX_LINES."""
+    """Append a timestamped line to actions.log via an in-memory deque (no read on write)."""
     line = f"[{datetime.now().isoformat(timespec='seconds')}] {msg}\n"
     with _log_lock:
-        existing: list[str] = []
-        if _LOG_FILE.exists():
-            existing = _LOG_FILE.read_text(encoding="utf-8").splitlines(keepends=True)
-        existing.append(line)
-        if len(existing) > _LOG_MAX_LINES:
-            existing = existing[-_LOG_MAX_LINES:]
-        _LOG_FILE.write_text("".join(existing), encoding="utf-8")
+        _log_buffer.append(line)
+        _LOG_FILE.write_text("".join(_log_buffer), encoding="utf-8")
 
 
 def _fetch_page_text(url: str) -> str:

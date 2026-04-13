@@ -6,7 +6,7 @@ from typing import Optional
 
 from app.config import cfg
 from compress import compress as _compress, decompress as _decompress
-from dbutil import fts_build_query
+from dbutil import fts_build_query, compute_word_count as _compute_word_count
 
 
 DATA_DIR = Path(cfg["data_dir"])
@@ -114,10 +114,20 @@ def _strip_page_markers(text: str) -> str:
     return re.sub(r"\{[ivxlcdmIVXLCDM\d]+\}", "", text)
 
 
-def _compute_word_count(text: Optional[str]) -> Optional[int]:
-    if not text:
-        return None
-    return len(text.split())
+def _fts_delete(conn: sqlite3.Connection, book_id: int, title: str, author: str, body: str) -> None:
+    """Remove a book from the FTS index."""
+    conn.execute(
+        "INSERT INTO books_fts(books_fts, rowid, title, author, body) VALUES ('delete', ?, ?, ?, ?)",
+        (book_id, title, author, body),
+    )
+
+
+def _fts_insert(conn: sqlite3.Connection, book_id: int, title: str, author: str, body: str) -> None:
+    """Add or re-add a book to the FTS index."""
+    conn.execute(
+        "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
+        (book_id, title, author, body),
+    )
 
 
 _BOOK_COLS = (
@@ -186,21 +196,14 @@ def update_book_body(book_id: int, body: str) -> Optional[dict]:
             "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
         ).fetchone()
         if cur_row:
-            conn.execute(
-                "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
-                "VALUES ('delete', ?, ?, ?, ?)",
-                (book_id, cur_row["title"] or "", cur_row["author"] or "",
-                 _decompress(cur_row["body"]) or ""),
-            )
+                _fts_delete(conn, book_id, cur_row["title"] or "", cur_row["author"] or "",
+                            _decompress(cur_row["body"]) or "")
         conn.execute(
             "UPDATE books SET body = ?, word_count = ? WHERE id = ?",
             (compressed, word_count, book_id),
         )
         if cur_row:
-            conn.execute(
-                "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
-                (book_id, cur_row["title"] or "", cur_row["author"] or "", cleaned or ""),
-            )
+                _fts_insert(conn, book_id, cur_row["title"] or "", cur_row["author"] or "", cleaned or "")
     return get_book(book_id, include_body=False)
 
 
@@ -243,23 +246,16 @@ def update_book(book_id: int, fields: dict) -> Optional[dict]:
                 "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
             ).fetchone()
             if cur_row:
-                conn.execute(
-                    "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
-                    "VALUES ('delete', ?, ?, ?, ?)",
-                    (book_id, cur_row["title"] or "", cur_row["author"] or "",
-                     _decompress(cur_row["body"]) or ""),
-                )
+                _fts_delete(conn, book_id, cur_row["title"] or "", cur_row["author"] or "",
+                            _decompress(cur_row["body"]) or "")
         conn.execute(f"UPDATE books SET {assignments} WHERE id = ?", values)
         if fts_affected:
             upd_row = conn.execute(
                 "SELECT title, author, body FROM books WHERE id = ?", (book_id,)
             ).fetchone()
             if upd_row:
-                conn.execute(
-                    "INSERT INTO books_fts(rowid, title, author, body) VALUES (?, ?, ?, ?)",
-                    (book_id, upd_row["title"] or "", upd_row["author"] or "",
-                     _decompress(upd_row["body"]) or ""),
-                )
+                _fts_insert(conn, book_id, upd_row["title"] or "", upd_row["author"] or "",
+                            _decompress(upd_row["body"]) or "")
     return get_book(book_id, include_body=False)
 
 
@@ -270,12 +266,8 @@ def delete_book(book_id: int) -> bool:
         ).fetchone()
         if not row:
             return False
-        conn.execute(
-            "INSERT INTO books_fts(books_fts, rowid, title, author, body) "
-            "VALUES ('delete', ?, ?, ?, ?)",
-            (book_id, row["title"] or "", row["author"] or "",
-             _decompress(row["body"]) or ""),
-        )
+        _fts_delete(conn, book_id, row["title"] or "", row["author"] or "",
+                    _decompress(row["body"]) or "")
         conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
     return True
 
