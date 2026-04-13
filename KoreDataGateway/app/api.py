@@ -164,8 +164,8 @@ def _resolve_wikilinks_in_html(html: str) -> str:
     return _WIKILINK_RE.sub(_repl, html)
 
 
-def _process_wikitext(text: str) -> str:
-    """Escape text, convert [[wikilinks]], paragraphs and line breaks to HTML."""
+def _process_inline(text: str) -> str:
+    """HTML-escape text and convert [[wikilinks]] to <a> anchors."""
     parts: list[str] = []
     last_end = 0
     for m in _WIKILINK_RE.finditer(text):
@@ -180,11 +180,53 @@ def _process_wikitext(text: str) -> str:
         parts.append(f'<a href="/reference/{quote(target)}">{escape(display)}</a>')
         last_end = m.end()
     parts.append(str(escape(text[last_end:])))
-    html = "".join(parts)
-    html = html.replace('\r\n', '\n').replace('\r', '\n')
-    html = re.sub(r'\n{2,}', '</p><p>', html)
-    html = html.replace('\n', '<br>')
-    return f'<p>{html}</p>'
+    return "".join(parts)
+
+
+def _render_list_lines(lines: list[str]) -> str:
+    """Recursively render indented '* '/'# '-prefixed lines into nested ul/ol HTML."""
+    if not lines:
+        return ''
+    base_indent = len(lines[0]) - len(lines[0].lstrip())
+    tag = 'ol' if lines[0].lstrip().startswith('# ') else 'ul'
+    html = [f'<{tag}>']
+    i = 0
+    while i < len(lines):
+        indent = len(lines[i]) - len(lines[i].lstrip())
+        if indent < base_indent:
+            break
+        if indent == base_indent:
+            item_text = _process_inline(lines[i].lstrip()[2:].strip())
+            j = i + 1
+            children: list[str] = []
+            while j < len(lines) and (len(lines[j]) - len(lines[j].lstrip())) > base_indent:
+                children.append(lines[j])
+                j += 1
+            child_html = _render_list_lines(children) if children else ''
+            html.append(f'<li>{item_text}{child_html}</li>')
+            i = j
+        else:
+            i += 1
+    html.append(f'</{tag}>')
+    return ''.join(html)
+
+
+def _process_wikitext(text: str) -> str:
+    """Escape text, convert [[wikilinks]], paragraphs, lists, and line breaks to HTML."""
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    html_parts: list[str] = []
+    for block in re.split(r'\n{2,}', text):
+        block = block.strip()
+        if not block:
+            continue
+        lines = [l for l in block.split('\n') if l.strip()]
+        if lines and all(l.lstrip().startswith(('* ', '# ')) for l in lines):
+            html_parts.append(_render_list_lines(lines))
+        else:
+            inner = _process_inline('\n'.join(lines))
+            inner = inner.replace('\n', '<br>')
+            html_parts.append(f'<p>{inner}</p>')
+    return ''.join(html_parts)
 
 
 def _wikilinks_filter(text: str) -> Markup:

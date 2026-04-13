@@ -5,14 +5,30 @@ from typing import Optional
 def fts_build_query(q: str) -> str:
     """Convert a raw user search string into a safe FTS5 MATCH expression.
 
-    Each whitespace/comma-separated token is wrapped in double-quotes so that
-    FTS5 treats it as a literal phrase rather than interpreting special syntax
-    characters (AND, OR, NOT, *, ^, parentheses, unmatched quotes, etc.).
-    Tokens are combined with implicit AND (FTS5 default).
-    Returns an empty string if the input contains no usable tokens.
+    Quoted substrings are treated as phrase searches (words must appear
+    consecutively in that order). Unquoted words are individual AND terms.
+    All tokens are combined with implicit AND (FTS5 default).
+
+    Examples:
+        "art of war"          → "art of war"          (exact phrase)
+        art of war            → "art" "of" "war"       (all three words, any order)
+        sun tzu "art of war"  → "sun" "tzu" "art of war"
     """
-    terms = [t for t in re.split(r"[\s,]+", (q or "").strip()) if t]
-    return " ".join('"' + t.replace('"', '""') + '"' for t in terms)
+    parts: list[str] = []
+    for m in re.finditer(r'"([^"]+)"|(\S+)', (q or "").strip()):
+        phrase = m.group(1)
+        word   = m.group(2)
+        if phrase:
+            # Quoted phrase — pass through as a single FTS5 phrase
+            inner = phrase.strip().replace('"', '""')
+            if inner:
+                parts.append(f'"{inner}"')
+        elif word:
+            # Bare word — strip any stray quotes and emit individually
+            clean = word.replace('"', '')
+            if clean:
+                parts.append(f'"{clean}"')
+    return " ".join(parts)
 
 
 def compute_word_count(text: Optional[str]) -> Optional[int]:

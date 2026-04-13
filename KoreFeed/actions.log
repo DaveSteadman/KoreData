@@ -1,150 +1,3 @@
-[2026-04-12T00:01:49]   Skipping Breaking Defense — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping airforce-technology — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping army-technology — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping defenseone — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping ukdefencejournal — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping defenceiq - defence-technology — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~2439m
-[2026-04-12T00:01:49]   Skipping defense-aerospace WEB — next fetch in ~2440m
-[2026-04-12T00:01:49]   Skipping janes Insights — next fetch in ~2971m
-[2026-04-12T00:01:49]   Skipping TechCrunch — next fetch in ~301m
-[2026-04-12T00:01:49]   Skipping Ars Technica — next fetch in ~301m
-[2026-04-12T00:01:49]   Skipping Hacker News — next fetch in ~302m
-[2026-04-12T00:01:49]   Skipping The Verge — next fetch in ~300m
-[2026-04-12T00:01:49]   Skipping Wired — next fetch in ~301m
-[2026-04-12T00:01:49]   Skipping MIT Technology Review — next fetch in ~303m
-[2026-04-12T00:01:49]   Skipping IEEE Spectrum — next fetch in ~304m
-[2026-04-12T00:01:49]   Skipping Tom's Hardware — next fetch in ~299m
-[2026-04-12T00:01:49]   Skipping BBC World — next fetch in ~5959m
-[2026-04-12T00:01:49]   Skipping DW World — next fetch in ~5956m
-[2026-04-12T00:01:49]   Skipping France24 — next fetch in ~5960m
-[2026-04-12T00:01:49]   Skipping Aljazeera All — next fetch in ~5958m
-[2026-04-12T00:01:49]   Skipping The Guardian World — next fetch in ~5958m
-[2026-04-12T00:01:49]   Skipping NPR World — next fetch in ~5955m
-[2026-04-12T00:01:49] Ingesting: lemonde
-[2026-04-12T00:01:49]   Skipping BBCi — next fetch in ~4m
-[2026-04-12T00:01:49]   Skipping Australia ABC — next fetch in ~29m
-[2026-04-12T00:01:49]   Skipping DW — next fetch in ~2m
-[2026-04-12T00:01:49]   Skipping latimes — next fetch in ~29m
-[2026-04-12T00:02:46]   Skipping HuggingFace Blog — next fetch in ~300m
-[2026-04-12T00:02:46]   Skipping Understanding AI — next fetch in ~228m
-[2026-04-12T00:02:46]   Skipping Ollama Blog — next fetch in ~241m
-[2026-04-12T00:02:46]   Skipping Defense News — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping Breaking Defense — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping airforce-technology — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping army-technology — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping defenseone — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping ukdefencejournal — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping defenceiq - defence-technology — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~2438m
-[2026-04-12T00:02:46]   Skipping defense-aerospace WEB — next fetch in ~2439m
-[2026-04-12T00:02:46]   Skipping janes Insights — next fetch in ~2970m
-[2026-04-12T00:02:46]   Skipping TechCrunch — next fetch in ~300m
-[2026-04-12T00:02:46]   Skipping Ars Technica — next fetch in ~300m
-[2026-04-12T00:02:46]   Skipping Hacker News — next fetch in ~301m
-[2026-04-12T00:02:46]   Skipping The Verge — next fetch in ~299m
-[2026-04-12T00:02:46]   Skipping Wired — next fetch in ~300m
-[2026-04-12T00:02:46]   Skipping MIT Technology Review — next fetch in ~302m
-[2026-04-12T00:02:46]   Skipping IEEE Spectrum — next fetch in ~303m
-[2026-04-12T00:02:46]   Skipping Tom's Hardware — next fetch in ~298m
-[2026-04-12T00:02:46]   Skipping BBC World — next fetch in ~5958m
-[2026-04-12T00:02:46]   Skipping DW World — next fetch in ~5955m
-[2026-04-12T00:02:46]   Skipping France24 — next fetch in ~5959m
-[2026-04-12T00:02:46]   Skipping Aljazeera All — next fetch in ~5957m
-[2026-04-12T00:02:46]   Skipping The Guardian World — next fetch in ~5957m
-[2026-04-12T00:02:46]   Skipping NPR World — next fetch in ~5954m
-[2026-04-12T00:02:46] Ingesting: lemonde
-[2026-04-12T00:02:46]   Skipping BBCi — next fetch in ~3m
-[2026-04-12T00:02:46]   Skipping Australia ABC — next fetch in ~28m
-[2026-04-12T00:02:46]   Skipping DW — next fetch in ~1m
-[2026-04-12T00:02:46]   Skipping latimes — next fetch in ~28m
-[2026-04-12T00:02:51]   lemonde: +2 entries in 4.3s [good]
-[2026-04-12T00:02:51] Ingesting: indianexpress
-[2026-04-12T00:02:55]   indianexpress: +2 entries in 4.0s [good]
-[2026-04-12T00:02:55] Ingesting: Mail / Guardian (SA)
-[2026-04-12T00:02:58]   Mail / Guardian (SA): +0 entries in 3.5s [good]
-[2026-04-12T00:02:58] Ingesting: Mail / Guardian (SA)
-[2026-04-12T00:03:02]   Mail / Guardian (SA): +0 entries in 3.4s [good]
-[2026-04-12T00:03:46]   Skipping indianexpress — next fetch in ~60m
-[2026-04-12T00:06:40] Ingesting: DW
-[2026-04-12T00:06:43]   DW: +0 entries in 3.4s [good]
-[2026-04-12T00:09:44] Ingesting: BBCi
-[2026-04-12T00:09:46]   Skipping lemonde — next fetch in ~60m
-[2026-04-12T00:09:50]   BBCi: +2 entries in 6.8s [good]
-[2026-04-12T00:29:33]   Skipping Australia ABC — next fetch in ~1m
-[2026-04-12T00:29:34]   Skipping latimes — next fetch in ~1m
-[2026-04-12T01:02:46]   Skipping Mail / Guardian (SA) — next fetch in ~0m
-[2026-04-12T01:02:46] Daily prune: WorldToday — 361 entries removed
-[2026-04-12T01:04:46] Ingesting: indianexpress
-[2026-04-12T01:04:50]   indianexpress: +3 entries in 3.2s [good]
-[2026-04-12T01:08:40]   Skipping DW — next fetch in ~0m
-[2026-04-12T01:12:44]   Skipping BBCi — next fetch in ~0m
-[2026-04-12T01:16:46] Ingesting: lemonde
-[2026-04-12T01:16:51]   lemonde: +2 entries in 4.3s [good]
-[2026-04-12T01:27:33] Ingesting: Australia ABC
-[2026-04-12T01:27:40]   Australia ABC: +8 entries in 8.0s [good]
-[2026-04-12T01:27:41] Ingesting: latimes
-[2026-04-12T01:27:41]   latimes: +0 entries in 0.2s [good]
-[2026-04-12T02:02:46] Ingesting: Mail / Guardian (SA)
-[2026-04-12T02:02:50]   Mail / Guardian (SA): +0 entries in 3.5s [good]
-[2026-04-12T02:05:46]   Skipping indianexpress — next fetch in ~0m
-[2026-04-12T02:10:40] Ingesting: DW
-[2026-04-12T02:10:42]   DW: +0 entries in 2.7s [good]
-[2026-04-12T02:15:44] Ingesting: BBCi
-[2026-04-12T02:15:51]   BBCi: +13 entries in 7.1s [good]
-[2026-04-12T02:23:46]   Skipping lemonde — next fetch in ~0m
-[2026-04-12T02:25:33]   Skipping Australia ABC — next fetch in ~0m
-[2026-04-12T02:25:34]   Skipping latimes — next fetch in ~0m
-[2026-04-12T02:51:40]   Skipping Understanding AI — next fetch in ~59m
-[2026-04-12T03:02:46]   Skipping Mail / Guardian (SA) — next fetch in ~0m
-[2026-04-12T03:03:50]   Skipping Ollama Blog — next fetch in ~59m
-[2026-04-12T03:06:46] Ingesting: indianexpress
-[2026-04-12T03:06:51]   indianexpress: +1 entries in 5.0s [good]
-[2026-04-12T03:12:40]   Skipping DW — next fetch in ~0m
-[2026-04-12T03:18:44]   Skipping BBCi — next fetch in ~0m
-[2026-04-12T03:23:33] Ingesting: Australia ABC
-[2026-04-12T03:23:44]   Australia ABC: +11 entries in 11.4s [good]
-[2026-04-12T03:23:44] Ingesting: latimes
-[2026-04-12T03:23:44]   latimes: +0 entries in 0.3s [good]
-[2026-04-12T03:30:46] Ingesting: lemonde
-[2026-04-12T03:30:52]   lemonde: +2 entries in 5.4s [good]
-[2026-04-12T04:01:37]   Skipping Tom's Hardware — next fetch in ~59m
-[2026-04-12T04:02:12]   Skipping The Verge — next fetch in ~59m
-[2026-04-12T04:02:46] Ingesting: Mail / Guardian (SA)
-[2026-04-12T04:02:49]   Skipping HuggingFace Blog — next fetch in ~59m
-[2026-04-12T04:02:50]   Mail / Guardian (SA): +0 entries in 3.5s [good]
-[2026-04-12T04:02:51]   Skipping TechCrunch — next fetch in ~59m
-[2026-04-12T04:03:03]   Skipping Ars Technica — next fetch in ~59m
-[2026-04-12T04:03:22]   Skipping Wired — next fetch in ~59m
-[2026-04-12T04:04:11]   Skipping Hacker News — next fetch in ~59m
-[2026-04-12T04:05:23]   Skipping MIT Technology Review — next fetch in ~59m
-[2026-04-12T04:06:29]   Skipping IEEE Spectrum — next fetch in ~59m
-[2026-04-12T04:07:46]   Skipping indianexpress — next fetch in ~0m
-[2026-04-12T04:14:40] Ingesting: DW
-[2026-04-12T04:14:43]   DW: +2 entries in 3.0s [good]
-[2026-04-12T04:21:33]   Skipping Australia ABC — next fetch in ~0m
-[2026-04-12T04:21:34]   Skipping latimes — next fetch in ~0m
-[2026-04-12T09:24:40] Ingesting: DW
-[2026-04-12T09:24:44]   DW: +5 entries in 4.7s [good]
-[2026-04-12T09:28:19] Ingesting: HuggingFace Blog
-[2026-04-12T09:28:19]   Skipping Defense News — next fetch in ~1872m
-[2026-04-12T09:28:19]   Skipping Breaking Defense — next fetch in ~1872m
-[2026-04-12T09:28:19]   Skipping airforce-technology — next fetch in ~1872m
-[2026-04-12T09:28:19]   Skipping army-technology — next fetch in ~1872m
-[2026-04-12T09:28:19]   Skipping defenseone — next fetch in ~1873m
-[2026-04-12T09:28:19]   Skipping ukdefencejournal — next fetch in ~1873m
-[2026-04-12T09:28:19]   Skipping defenceiq - defence-technology — next fetch in ~1873m
-[2026-04-12T09:28:19]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~1873m
-[2026-04-12T09:28:19]   Skipping defense-aerospace WEB — next fetch in ~1874m
-[2026-04-12T09:28:19]   Skipping janes Insights — next fetch in ~2405m
-[2026-04-12T09:28:19]   Skipping BBC World — next fetch in ~5393m
-[2026-04-12T09:28:19]   Skipping DW World — next fetch in ~5390m
-[2026-04-12T09:28:19]   Skipping France24 — next fetch in ~5394m
-[2026-04-12T09:28:19]   Skipping Aljazeera All — next fetch in ~5392m
-[2026-04-12T09:28:19]   Skipping The Guardian World — next fetch in ~5391m
-[2026-04-12T09:28:19]   Skipping NPR World — next fetch in ~5388m
-[2026-04-12T09:28:19]   Skipping DW — next fetch in ~58m
-[2026-04-12T09:28:23]   HuggingFace Blog: +0 entries in 3.9s [good]
 [2026-04-12T09:28:23] Ingesting: Understanding AI
 [2026-04-12T09:28:25]   Understanding AI: +0 entries in 2.0s [good]
 [2026-04-12T09:28:25] Ingesting: Ollama Blog
@@ -998,3 +851,150 @@
 [2026-04-13T22:28:27] Ingesting: BBCi
 [2026-04-13T22:28:44]   BBCi: +1 entries in 17.0s [good]
 [2026-04-13T22:37:44]   Skipping indianexpress — next fetch in ~0m
+[2026-04-13T23:04:12]   Skipping lemonde — next fetch in ~0m
+[2026-04-13T23:16:27] Ingesting: latimes
+[2026-04-13T23:16:28]   latimes: +0 entries in 0.6s [good]
+[2026-04-13T23:16:28] Ingesting: Australia ABC
+[2026-04-13T23:16:40]   Australia ABC: +18 entries in 12.0s [good]
+[2026-04-13T23:20:53]   Skipping HuggingFace Blog — next fetch in ~1839m
+[2026-04-13T23:20:53]   Skipping Understanding AI — next fetch in ~3838m
+[2026-04-13T23:20:53]   Skipping Ollama Blog — next fetch in ~3807m
+[2026-04-13T23:20:53]   Skipping Artificial Intelligence - News — next fetch in ~4539m
+[2026-04-13T23:20:53]   Skipping aiweekly news-today — next fetch in ~4538m
+[2026-04-13T23:20:53]   Skipping Defense News — next fetch in ~2881m
+[2026-04-13T23:20:53]   Skipping Breaking Defense — next fetch in ~2890m
+[2026-04-13T23:20:53]   Skipping airforce-technology — next fetch in ~2888m
+[2026-04-13T23:20:53]   Skipping army-technology — next fetch in ~2887m
+[2026-04-13T23:20:53]   Skipping defenseone — next fetch in ~2886m
+[2026-04-13T23:20:53]   Skipping ukdefencejournal — next fetch in ~2882m
+[2026-04-13T23:20:53]   Skipping defenceiq - defence-technology — next fetch in ~2884m
+[2026-04-13T23:20:53]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~1238m
+[2026-04-13T23:20:53]   Skipping defense-aerospace WEB — next fetch in ~1244m
+[2026-04-13T23:20:53]   Skipping janes Insights — next fetch in ~2033m
+[2026-04-13T23:20:53]   Skipping TechCrunch — next fetch in ~102m
+[2026-04-13T23:20:53]   Skipping Ars Technica — next fetch in ~102m
+[2026-04-13T23:20:53]   Skipping Hacker News — next fetch in ~105m
+[2026-04-13T23:20:53]   Skipping The Verge — next fetch in ~99m
+[2026-04-13T23:20:53]   Skipping Wired — next fetch in ~102m
+[2026-04-13T23:20:53]   Skipping MIT Technology Review — next fetch in ~108m
+[2026-04-13T23:20:53]   Skipping IEEE Spectrum — next fetch in ~111m
+[2026-04-13T23:20:53]   Skipping Tom's Hardware — next fetch in ~96m
+[2026-04-13T23:20:53]   Skipping BBC World — next fetch in ~3120m
+[2026-04-13T23:20:53]   Skipping DW World — next fetch in ~3117m
+[2026-04-13T23:20:53]   Skipping France24 — next fetch in ~3121m
+[2026-04-13T23:20:53]   Skipping Aljazeera All — next fetch in ~3119m
+[2026-04-13T23:20:53]   Skipping The Guardian World — next fetch in ~3118m
+[2026-04-13T23:20:53]   Skipping NPR World — next fetch in ~3115m
+[2026-04-13T23:20:53] Ingesting: lemonde
+[2026-04-13T23:20:53]   Skipping BBCi — next fetch in ~10m
+[2026-04-13T23:20:53]   Skipping Australia ABC — next fetch in ~53m
+[2026-04-13T23:20:53]   Skipping latimes — next fetch in ~53m
+[2026-04-13T23:20:53]   Skipping BBCi — next fetch in ~10m
+[2026-04-13T23:20:53]   Skipping latimes — next fetch in ~53m
+[2026-04-13T23:20:53]   Skipping Australia ABC — next fetch in ~53m
+[2026-04-13T23:20:57]   lemonde: +2 entries in 4.8s [good]
+[2026-04-13T23:20:57] Ingesting: indianexpress
+[2026-04-13T23:21:00]   indianexpress: +0 entries in 2.8s [good]
+[2026-04-13T23:21:00] Ingesting: DW
+[2026-04-13T23:21:04]   DW: +0 entries in 3.8s [good]
+[2026-04-13T23:21:04] Ingesting: Mail / Guardian (SA)
+[2026-04-13T23:21:08]   Mail / Guardian (SA): +0 entries in 3.5s [good]
+[2026-04-13T23:21:08] Ingesting: lemonde
+[2026-04-13T23:21:11]   lemonde: +0 entries in 2.9s [good]
+[2026-04-13T23:21:11] Ingesting: indianexpress
+[2026-04-13T23:21:13]   indianexpress: +0 entries in 2.4s [good]
+[2026-04-13T23:21:13] Ingesting: DW
+[2026-04-13T23:21:16]   DW: +0 entries in 3.4s [good]
+[2026-04-13T23:21:16] Ingesting: Mail / Guardian (SA)
+[2026-04-13T23:21:20]   Mail / Guardian (SA): +0 entries in 3.2s [good]
+[2026-04-13T23:21:53]   Skipping indianexpress — next fetch in ~60m
+[2026-04-13T23:22:53]   Skipping DW — next fetch in ~60m
+[2026-04-13T23:27:53]   Skipping lemonde — next fetch in ~60m
+[2026-04-13T23:34:44] Ingesting: BBCi
+[2026-04-13T23:34:56]   BBCi: +3 entries in 12.0s [good]
+[2026-04-13T23:48:20]   Skipping HuggingFace Blog — next fetch in ~1812m
+[2026-04-13T23:48:20]   Skipping Understanding AI — next fetch in ~3810m
+[2026-04-13T23:48:20]   Skipping Ollama Blog — next fetch in ~3780m
+[2026-04-13T23:48:20]   Skipping Artificial Intelligence - News — next fetch in ~4511m
+[2026-04-13T23:48:20]   Skipping aiweekly news-today — next fetch in ~4511m
+[2026-04-13T23:48:20]   Skipping Defense News — next fetch in ~2854m
+[2026-04-13T23:48:20]   Skipping Breaking Defense — next fetch in ~2863m
+[2026-04-13T23:48:20]   Skipping airforce-technology — next fetch in ~2861m
+[2026-04-13T23:48:20]   Skipping army-technology — next fetch in ~2860m
+[2026-04-13T23:48:20]   Skipping defenseone — next fetch in ~2859m
+[2026-04-13T23:48:20]   Skipping ukdefencejournal — next fetch in ~2854m
+[2026-04-13T23:48:20]   Skipping defenceiq - defence-technology — next fetch in ~2856m
+[2026-04-13T23:48:20]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~1210m
+[2026-04-13T23:48:20]   Skipping defense-aerospace WEB — next fetch in ~1216m
+[2026-04-13T23:48:20]   Skipping janes Insights — next fetch in ~2005m
+[2026-04-13T23:48:20]   Skipping TechCrunch — next fetch in ~75m
+[2026-04-13T23:48:20]   Skipping Ars Technica — next fetch in ~75m
+[2026-04-13T23:48:20]   Skipping Hacker News — next fetch in ~78m
+[2026-04-13T23:48:20]   Skipping The Verge — next fetch in ~71m
+[2026-04-13T23:48:20]   Skipping Wired — next fetch in ~74m
+[2026-04-13T23:48:20]   Skipping MIT Technology Review — next fetch in ~80m
+[2026-04-13T23:48:20]   Skipping IEEE Spectrum — next fetch in ~83m
+[2026-04-13T23:48:20]   Skipping Tom's Hardware — next fetch in ~68m
+[2026-04-13T23:48:20]   Skipping BBC World — next fetch in ~3093m
+[2026-04-13T23:48:20]   Skipping DW World — next fetch in ~3090m
+[2026-04-13T23:48:20]   Skipping France24 — next fetch in ~3094m
+[2026-04-13T23:48:20]   Skipping Aljazeera All — next fetch in ~3092m
+[2026-04-13T23:48:20]   Skipping The Guardian World — next fetch in ~3091m
+[2026-04-13T23:48:20]   Skipping NPR World — next fetch in ~3088m
+[2026-04-13T23:48:20]   Skipping lemonde — next fetch in ~39m
+[2026-04-13T23:48:20]   Skipping BBCi — next fetch in ~49m
+[2026-04-13T23:48:20]   Skipping Australia ABC — next fetch in ~26m
+[2026-04-13T23:48:20]   Skipping indianexpress — next fetch in ~33m
+[2026-04-13T23:48:20]   Skipping DW — next fetch in ~34m
+[2026-04-13T23:48:20]   Skipping Mail / Guardian (SA) — next fetch in ~32m
+[2026-04-13T23:48:20]   Skipping latimes — next fetch in ~26m
+[2026-04-13T23:48:20]   Skipping latimes — next fetch in ~26m
+[2026-04-13T23:48:20]   Skipping Australia ABC — next fetch in ~26m
+[2026-04-13T23:48:20]   Skipping lemonde — next fetch in ~39m
+[2026-04-13T23:48:20]   Skipping Mail / Guardian (SA) — next fetch in ~32m
+[2026-04-13T23:48:20]   Skipping DW — next fetch in ~34m
+[2026-04-13T23:48:20]   Skipping indianexpress — next fetch in ~33m
+[2026-04-13T23:48:20]   Skipping BBCi — next fetch in ~49m
+[2026-04-13T23:53:25]   Skipping HuggingFace Blog — next fetch in ~1807m
+[2026-04-13T23:53:25]   Skipping Understanding AI — next fetch in ~3805m
+[2026-04-13T23:53:25]   Skipping Ollama Blog — next fetch in ~3775m
+[2026-04-13T23:53:25]   Skipping Artificial Intelligence - News — next fetch in ~4506m
+[2026-04-13T23:53:25]   Skipping aiweekly news-today — next fetch in ~4506m
+[2026-04-13T23:53:25]   Skipping Defense News — next fetch in ~2849m
+[2026-04-13T23:53:25]   Skipping Breaking Defense — next fetch in ~2858m
+[2026-04-13T23:53:25]   Skipping airforce-technology — next fetch in ~2856m
+[2026-04-13T23:53:25]   Skipping army-technology — next fetch in ~2855m
+[2026-04-13T23:53:25]   Skipping defenseone — next fetch in ~2853m
+[2026-04-13T23:53:25]   Skipping ukdefencejournal — next fetch in ~2849m
+[2026-04-13T23:53:25]   Skipping defenceiq - defence-technology — next fetch in ~2851m
+[2026-04-13T23:53:25]   Skipping defenceiq - air-forces-military-aircraft — next fetch in ~1205m
+[2026-04-13T23:53:25]   Skipping defense-aerospace WEB — next fetch in ~1211m
+[2026-04-13T23:53:25]   Skipping janes Insights — next fetch in ~2000m
+[2026-04-13T23:53:25]   Skipping TechCrunch — next fetch in ~70m
+[2026-04-13T23:53:25]   Skipping Ars Technica — next fetch in ~70m
+[2026-04-13T23:53:25]   Skipping Hacker News — next fetch in ~73m
+[2026-04-13T23:53:25]   Skipping The Verge — next fetch in ~66m
+[2026-04-13T23:53:25]   Skipping Wired — next fetch in ~69m
+[2026-04-13T23:53:25]   Skipping MIT Technology Review — next fetch in ~75m
+[2026-04-13T23:53:25]   Skipping IEEE Spectrum — next fetch in ~78m
+[2026-04-13T23:53:25]   Skipping Tom's Hardware — next fetch in ~63m
+[2026-04-13T23:53:25]   Skipping BBC World — next fetch in ~3088m
+[2026-04-13T23:53:25]   Skipping DW World — next fetch in ~3085m
+[2026-04-13T23:53:25]   Skipping France24 — next fetch in ~3089m
+[2026-04-13T23:53:25]   Skipping Aljazeera All — next fetch in ~3087m
+[2026-04-13T23:53:25]   Skipping The Guardian World — next fetch in ~3086m
+[2026-04-13T23:53:25]   Skipping NPR World — next fetch in ~3083m
+[2026-04-13T23:53:25]   Skipping lemonde — next fetch in ~34m
+[2026-04-13T23:53:25]   Skipping BBCi — next fetch in ~44m
+[2026-04-13T23:53:25]   Skipping Australia ABC — next fetch in ~21m
+[2026-04-13T23:53:25]   Skipping indianexpress — next fetch in ~28m
+[2026-04-13T23:53:25]   Skipping DW — next fetch in ~29m
+[2026-04-13T23:53:25]   Skipping Mail / Guardian (SA) — next fetch in ~27m
+[2026-04-13T23:53:25]   Skipping latimes — next fetch in ~21m
+[2026-04-13T23:53:25]   Skipping Australia ABC — next fetch in ~21m
+[2026-04-13T23:53:25]   Skipping latimes — next fetch in ~21m
+[2026-04-13T23:53:25]   Skipping lemonde — next fetch in ~34m
+[2026-04-13T23:53:25]   Skipping DW — next fetch in ~29m
+[2026-04-13T23:53:25]   Skipping Mail / Guardian (SA) — next fetch in ~27m
+[2026-04-13T23:53:25]   Skipping BBCi — next fetch in ~44m
+[2026-04-13T23:53:25]   Skipping indianexpress — next fetch in ~28m

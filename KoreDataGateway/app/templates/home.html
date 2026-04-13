@@ -219,7 +219,7 @@
         No Older Than
         <div class="num-stepper">
           <input type="number" min="1" max="3650" style="width:52px;"
-                 oninput="if(parseInt(this.value)>=1){const d=new Date();d.setDate(d.getDate()-parseInt(this.value));document.getElementById('sq-since').value=d.toISOString().slice(0,10);}">
+                 oninput="const _d=parseInt(this.value);if(_d>=1){const d=new Date();d.setDate(d.getDate()-_d);document.getElementById('sq-since').value=d.toISOString().slice(0,10);}else if(!this.value){document.getElementById('sq-since').value='';}">  
           <div class="stepper-btns">
             <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
             <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
@@ -230,7 +230,7 @@
       <label style="display:flex; align-items:center; gap:0.35rem; font-size:12px; color:var(--dim);">
         Limit
         <div class="num-stepper">
-          <input id="sq-limit" type="number" value="5" min="1" max="20" style="width:52px;">
+          <input id="sq-limit" type="number" placeholder="5" min="1" max="20" style="width:52px;">
           <div class="stepper-btns">
             <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,1)">&#9650;</button>
             <button type="button" tabindex="-1" onmousedown="event.preventDefault()" onclick="stepNum(this,-1)">&#9660;</button>
@@ -240,6 +240,49 @@
     </div>
 
     <span id="sq-spinner">searching…</span>
+  </div>
+</div>
+
+<!-- ─── Search guide ─────────────────────────────────── -->
+<div class="panel" style="margin-top:0.5rem;">
+  <div class="panel-header" style="font-size:11px; cursor:pointer;"
+       onclick="const b=this.nextElementSibling; const arrow=this.querySelector('.sg-arrow'); const open=b.style.display!=='none'; b.style.display=open?'none':''; arrow.textContent=open?'▶ show':'▼ hide';">
+    <span class="ph-diamond">◆</span> SEARCH GUIDE
+    <span class="sg-arrow" style="margin-left:auto; color:var(--dim);">▶ show</span>
+  </div>
+  <div style="display:none;">
+    <div class="panel-body" style="font-size:12px;">
+      <table>
+        <thead><tr><th>You type</th><th>Matches</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code style="color:var(--text);">art of war</code></td>
+            <td>All three words anywhere in the document (any order)</td>
+            <td>Returns entries mentioning art, of, and war individually</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--amber);">"art of war"</code></td>
+            <td>The exact phrase — words must appear consecutively in that order</td>
+            <td>Only returns entries containing the phrase <em>art of war</em></td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--text);">sun tzu <span style="color:var(--amber);">"art of war"</span></code></td>
+            <td>All unquoted words AND the exact phrase</td>
+            <td>Must contain sun, tzu, and the phrase <em>art of war</em></td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--text);">climate change arctic</code></td>
+            <td>All three words present anywhere — standard keyword search</td>
+            <td>Broad coverage across news, reference, and books</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin-top:0.6rem; font-size:11px;">
+        Wrap any multi-word phrase in <strong>double quotes</strong> to require exact adjacency.
+        Unquoted terms are always combined with AND — every word must appear somewhere in the result.
+        The <strong>Since / Until</strong> date filters apply to feeds only; reference, library, and RAG results are unaffected by date.
+      </p>
+    </div>
   </div>
 </div>
 
