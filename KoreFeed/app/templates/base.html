@@ -250,13 +250,16 @@
   <script>
   (function () {
     const dot = document.getElementById('hdr-dot');
+    if (sessionStorage.getItem('kd-online') === '1') {
+      dot.classList.add('online'); dot.title = 'connected';
+    }
     function checkStatus() {
       fetch('/status', { cache: 'no-store' })
         .then(r => {
-          if (r.ok) { dot.classList.add('online'); dot.title = 'connected'; }
-          else      { dot.classList.remove('online'); dot.title = 'error ' + r.status; }
+          if (r.ok) { dot.classList.add('online'); dot.title = 'connected'; sessionStorage.setItem('kd-online', '1'); }
+          else      { dot.classList.remove('online'); dot.title = 'error ' + r.status; sessionStorage.removeItem('kd-online'); }
         })
-        .catch(() => { dot.classList.remove('online'); dot.title = 'disconnected'; });
+        .catch(() => { dot.classList.remove('online'); dot.title = 'disconnected'; sessionStorage.removeItem('kd-online'); });
     }
     checkStatus();
     setInterval(checkStatus, 15000);
