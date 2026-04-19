@@ -635,9 +635,10 @@ async def web_index(request: Request):
     domains_r, feeds_r = await asyncio.gather(
         _feed_client.get("/api/domains"),
         _feed_client.get("/api/feeds"),
+        return_exceptions=True,
     )
-    domains   = domains_r.json() if domains_r.status_code == 200 else []
-    all_feeds = feeds_r.json()   if feeds_r.status_code == 200   else []
+    domains   = domains_r.json() if not isinstance(domains_r, Exception) and domains_r.status_code == 200 else []
+    all_feeds = feeds_r.json()   if not isinstance(feeds_r,   Exception) and feeds_r.status_code == 200   else []
     _add_next_mins(all_feeds)
     all_feeds.sort(key=lambda f: (
         0 if f["_next_mins"] is None else (1 if f["_next_mins"] <= 0 else 2),
@@ -664,8 +665,11 @@ async def web_search(
         if domain: params["domain"] = domain
         if since:  params["since"]  = since
         if until:  params["until"]  = until
-        r = await _feed_client.get("/api/search", params=params)
-        results = r.json() if r.status_code == 200 else []
+        try:
+            r = await _feed_client.get("/api/search", params=params)
+            results = r.json() if r.status_code == 200 else []
+        except Exception:
+            results = []
     return templates.TemplateResponse(
         request, "feed_search.html",
         {"q": q, "domain": domain, "since": since or "", "until": until or "",
@@ -681,12 +685,13 @@ async def web_domain(request: Request, domain: str, limit: int = 50, offset: int
         _feed_client.get("/api/feeds"),
         _feed_client.get(f"/api/domains/{domain}/age-settings"),
         _feed_client.get(f"/api/domains/{domain}/feed-counts"),
+        return_exceptions=True,
     )
-    entries      = entries_r.json()     if entries_r.status_code == 200     else []
-    all_domains  = all_domains_r.json() if all_domains_r.status_code == 200 else []
-    all_feeds    = feeds_all_r.json()   if feeds_all_r.status_code == 200   else []
-    age_settings = age_r.json()         if age_r.status_code == 200         else {"mode": "none"}
-    feed_counts  = counts_r.json()      if counts_r.status_code == 200      else {}
+    entries      = entries_r.json()     if not isinstance(entries_r,    Exception) and entries_r.status_code == 200     else []
+    all_domains  = all_domains_r.json() if not isinstance(all_domains_r, Exception) and all_domains_r.status_code == 200 else []
+    all_feeds    = feeds_all_r.json()   if not isinstance(feeds_all_r,  Exception) and feeds_all_r.status_code == 200   else []
+    age_settings = age_r.json()         if not isinstance(age_r,         Exception) and age_r.status_code == 200         else {"mode": "none"}
+    feed_counts  = counts_r.json()      if not isinstance(counts_r,      Exception) and counts_r.status_code == 200      else {}
 
     domain_info = next((d for d in all_domains if d["domain"] == domain), {})
     total       = domain_info.get("entry_count", len(entries))
@@ -712,7 +717,10 @@ async def web_domain(request: Request, domain: str, limit: int = 50, offset: int
 
 @app.get("/feeds/{domain}/{entry_id}", response_class=HTMLResponse)
 async def web_entry(request: Request, domain: str, entry_id: int):
-    r = await _feed_client.get(f"/api/domains/{domain}/entries/{entry_id}")
+    try:
+        r = await _feed_client.get(f"/api/domains/{domain}/entries/{entry_id}")
+    except Exception:
+        raise HTTPException(status_code=503, detail="Feed service unavailable")
     if r.status_code == 404:
         raise HTTPException(status_code=404, detail="Entry not found")
     entry = r.json()
