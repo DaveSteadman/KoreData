@@ -64,9 +64,10 @@ def make_log_config(log_path: str | Path) -> dict:
             },
         },
         "loggers": {
-            "uvicorn":        {"handlers": ["default"], "level": "INFO", "propagate": False},
-            "uvicorn.error":  {"handlers": ["default"], "level": "INFO", "propagate": False},
-            "uvicorn.access": {"handlers": ["access"],  "level": "INFO", "propagate": False},
-            "httpx":          {"handlers": ["default"], "level": "INFO", "propagate": False},
+            "uvicorn":        {"handlers": ["default"], "level": "INFO",    "propagate": False},
+            "uvicorn.error":  {"handlers": ["default"], "level": "INFO",    "propagate": False},
+            "uvicorn.access": {"handlers": ["access"],  "level": "INFO",    "propagate": False},
+            "httpx":          {"handlers": ["default"], "level": "INFO",    "propagate": False},
+            "mcp":            {"handlers": ["default"], "level": "WARNING", "propagate": False},
         },
     }

@@ -111,7 +111,8 @@ async def _lifespan(app: FastAPI):
         _wait_for(_rag_client,   "KoreRAG"),
     )
     print("  All services ready\n")
-    yield
+    async with _mcp.session_manager.run():
+        yield
     print("\n  KoreDataGateway — shutting down child services")
     await _feed_client.aclose()
     await _lib_client.aclose()
@@ -135,10 +136,24 @@ _mcp = FastMCP(
     "KoreDataGateway",
     instructions=(
         "Search KoreData services (news feeds, reference articles, library books, RAG chunks) "
-        "and retrieve full content by ID or title. Always call search first, then fetch full "
-        "content for the most relevant results."
+        "and retrieve full content by ID or title.\n\n"
+        "Canonical workflow:\n"
+        "1. Call koredata_search first. Omit domains to search all four services at once.\n"
+        "2. Read the snippet field in each result to assess relevance - snippets contain the "
+        "first 300 characters of the article body.\n"
+        "3. Call the matching get function only for the most relevant results - "
+        "koredata_get_reference_article, koredata_get_feed_entry, koredata_get_library_book, "
+        "or koredata_get_rag_chunk.\n"
+        "4. Base your answer ONLY on the full content from the get_* calls. "
+        "Do NOT supplement with training knowledge - if KoreData has no content on a topic, say so.\n\n"
+        "Domain routing: feeds=news/current events, reference=encyclopedia/facts/history, "
+        "library=books/full texts, rag=internal documents/user notes.\n"
+        "Use since/until date filters for time-bounded news searches (YYYY-MM-DD format).\n"
+        "Do NOT pass url fields from search results to web fetch tools - use the koredata_get_* functions.\n"
+        "Always call koredata_search before falling back to web search tools."
     ),
     streamable_http_path="/",
+    stateless_http=True,
 )
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
@@ -437,7 +452,7 @@ async def api_search(req: _SearchRequest):
     limit = req.limit
 
     async def _feeds():
-        params: dict = {"q": req.query, "limit": limit}
+        params: dict = {"q": req.query, "limit": limit, "full": "true"}
         if req.since: params["since"] = req.since
         if req.until: params["until"] = req.until
         r = await _feed_client.get("/api/search", params=params, timeout=10.0)
@@ -504,7 +519,7 @@ def _add_next_mins(feeds: list) -> None:
 # ===========================================================================
 
 @_mcp.tool()
-async def search(
+async def koredata_search(
     query: str,
     domains: Optional[list[str]] = None,
     since: Optional[str] = None,
@@ -532,7 +547,7 @@ async def search(
 
 
 @_mcp.tool()
-async def get_feed_entry(domain: str, entry_id: int) -> dict:
+async def koredata_get_feed_entry(domain: str, entry_id: int) -> dict:
     """Fetch the full content of a news feed entry.
 
     Args:
@@ -552,7 +567,7 @@ async def get_feed_entry(domain: str, entry_id: int) -> dict:
 
 
 @_mcp.tool()
-async def get_reference_article(title: str) -> dict:
+async def koredata_get_reference_article(title: str) -> dict:
     """Fetch the full content of a reference (wiki-style) article.
 
     Args:
@@ -571,7 +586,7 @@ async def get_reference_article(title: str) -> dict:
 
 
 @_mcp.tool()
-async def get_library_book(book_id: int) -> dict:
+async def koredata_get_library_book(book_id: int) -> dict:
     """Fetch the full content of a library book.
 
     Args:
@@ -590,7 +605,7 @@ async def get_library_book(book_id: int) -> dict:
 
 
 @_mcp.tool()
-async def get_rag_chunk(chunk_id: int) -> dict:
+async def koredata_get_rag_chunk(chunk_id: int) -> dict:
     """Fetch the full content of a RAG (retrieval-augmented generation) chunk.
 
     Args:
